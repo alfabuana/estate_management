@@ -51,11 +51,14 @@
 .Trashes
 
 # Directories potentially created on remote AFP share
+
 .AppleDB
 .AppleDesktop
 Network Trash Folder
 Temporary Items
 .apdisk
+target
+target-eclipse
 
 # Windows
 # =========================
