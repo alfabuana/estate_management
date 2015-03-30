@@ -42,7 +42,7 @@ class UserService {
 		def newObject = ShiroUser.read(object.id)
 		newObject.username = String.valueOf(object.username).toUpperCase()
 		newObject.passwordHash = new Sha256Hash(object.passwordHash).toHex()
-		newObject.email = object.email
+//		newObject.email = object.email
 		object = userValidatorService.updateObjectValidation(newObject)
 		if (object.errors.getErrorCount() == 0)
 		{

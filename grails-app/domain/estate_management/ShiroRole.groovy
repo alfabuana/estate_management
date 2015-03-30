@@ -4,9 +4,10 @@ import java.util.Date;
 
 class ShiroRole {
     String name
-	Boolean isDeleted
-	Date dateCreated
-	Date lastUpdated
+
+	Boolean 	isDeleted
+	Date 		dateCreated // Predefined names by Grails will be filled automatically
+	Date 		lastUpdated // Predefined names by Grails will be filled automatically
 
     static hasMany = [ users: ShiroUser, permissions: String ]
     static belongsTo = ShiroUser
