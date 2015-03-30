@@ -3,7 +3,7 @@ package estate_management
 class Home {
 	String name
 	String address
-	boolean isDeleted
+	Boolean isDeleted
 	Date dateCreated
 	Date lastUpdated
 	

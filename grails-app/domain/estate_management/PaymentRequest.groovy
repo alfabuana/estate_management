@@ -1,14 +1,15 @@
 package estate_management
 
 class PaymentRequest {
-	User user
+	ShiroUser username
 	String description
 	String code
-	double amount
+	Double amount
 	Date dueDate
 	Date confirmationDate
-	boolean isConfirmed
-	boolean isDeleted
+	Date requestDate
+	Boolean isConfirmed
+	Boolean isDeleted
 	Date dateCreated
 	Date lastUpdated
 	

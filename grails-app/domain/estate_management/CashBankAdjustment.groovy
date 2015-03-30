@@ -1,13 +1,13 @@
 package estate_management
 
-class CashBankAdjusment {
-	CashBank CashBank
-	Date adjusmentDate
-	double amount
+class CashBankAdjustment {
+	CashBank cashBank
+	Date adjustmentDate
+	Double amount
 	String code
-	boolean isConfirmed
+	Boolean isConfirmed
 	Date confirmationDate
-	boolean isDeleted
+	Boolean isDeleted
 	Date dateCreated
 	Date lastUpdated
 

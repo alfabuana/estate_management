@@ -3,11 +3,11 @@ package estate_management
 class CashBankMutation {
 	CashBank sourceCashBank
 	CashBank targetCashBank
-	double amount
+	Double amount
 	String code
-	boolean isConfirmed
+	Boolean isConfirmed
 	Date confirmationDate
-	boolean isDeleted
+	Boolean isDeleted
 	Date dateCreated
 	Date lastUpdated
 

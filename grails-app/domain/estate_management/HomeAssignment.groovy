@@ -2,14 +2,15 @@ package estate_management
 
 class HomeAssignment {
 	Home home
-	User user
+	ShiroUser username
 	Date assignDate
-	boolean isConfirmed
+	Boolean isConfirmed
 	Date confirmationDate
-	boolean isDeleted
+	Boolean isDeleted
 	Date dateCreated
 	Date lastUpdated
 
     static constraints = {
+		confirmationDate (nullable : true)
     }
 }

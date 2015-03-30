@@ -1,14 +1,20 @@
 package estate_management
 
+import java.util.Date;
+
 class PaymentRequestDetail {
 	PaymentRequest paymentRequest
 	String code
 	Double amount
-	boolean isConfirmed
+	Boolean isConfirmed
 	Date confirmationDate
+	Boolean isDeleted
+	Date dateCreated
+	Date lastUpdated
 	
 	static belongsTo = PaymentRequest
 
     static constraints = {
+		confirmationDate(nullable : true)
     }
 }

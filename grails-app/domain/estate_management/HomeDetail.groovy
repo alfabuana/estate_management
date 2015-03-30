@@ -2,8 +2,8 @@ package estate_management
 
 class HomeDetail {
 	Home home
-	User user
-	boolean isDeleted
+	ShiroUser username
+	Boolean isDeleted
 	Date dateCreated
 	Date lastUpdated
 	

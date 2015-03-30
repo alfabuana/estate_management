@@ -3,9 +3,9 @@ package estate_management
 class CashBank {
 	String name
 	String description
-	double amount
-	boolean isBank
-	boolean isDeleted
+	Double amount
+	Boolean isBank
+	Boolean isDeleted
 	Date dateCreated
 	Date lastUpdated
 

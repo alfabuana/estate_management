@@ -6,12 +6,12 @@ class Vendor {
 	String telephone
 	String fax
 	String email
-	boolean isDeleted
-	Date dateCreate
+	
+	Boolean isDeleted
+	Date dateCreated
 	Date lastUpdated
 
     static constraints = {
-		name (nullable : true)
 		description (nullable : true)
 		telephone (nullable : true)
 		fax (nullable : true)
