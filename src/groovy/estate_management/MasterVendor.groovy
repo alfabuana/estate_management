@@ -41,7 +41,7 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
-import estate_management.HomeService
+import estate_management.VendorService
 
 
 
@@ -49,35 +49,38 @@ import estate_management.HomeService
 
 import com.vaadin.grails.Grails
 
-class MasterHome extends VerticalLayout{
+class MasterVendor extends VerticalLayout{
 	def selectedRow
 	def itemlist
 	GeneralFunction generalFunction = new GeneralFunction()
 	private MenuBar menuBar
 	private Window window
 	private TextField textId
-	private TextField textSKU
-	private TextField textDescription
+//	private TextField textSKU
+//	private TextField textDescription
 	
 	//==============================
 	private TextField textName
-	private TextField textAddress
+	private TextField textDescription
+	private TextField textTelephone
+	private TextField textFax
+	private TextField textEmail
 	
 	//==============================
 	
 	private Table table = new Table();
-	private BeanItemContainer<Home> tableContainer;
+	private BeanItemContainer<Vendor> tableContainer;
 	private FieldGroup fieldGroup;
 	private FormLayout layout
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "Home"
+	String Title = "Vendor"
 //						Constant.MenuName.Item + ":";
 	
-	public MasterHome() {
+	public MasterVendor() {
 //		currentUser = SecurityUtils.getSubject();
-//		table = new Table()
+		
 		initTable();
 		
 		HorizontalLayout menu = new HorizontalLayout()
@@ -96,7 +99,7 @@ class MasterHome extends VerticalLayout{
 				switch(selectedItem.getText())
 				{
 					case "Add":
-						def item = new BeanItem<Home>(tableContainer);
+						def item = new BeanItem<Vendor>(tableContainer);
 						windowAdd("Add");
 					break
 					case "Edit":
@@ -143,24 +146,30 @@ class MasterHome extends VerticalLayout{
 				try{
 					def object = [id:textId.getValue(),
 								  name:textName.getValue(),
-								  address:textAddress.getValue(),
+								  description:textDescription.getValue(),
+								  telephone:textTelephone.getValue(),
+								  fax:textFax.getValue(),
+								  email:textEmail.getValue(),
 								  ]
 					
 					if (object.id == "")
 					{
-						object =  Grails.get(HomeService).createObject(object)
+						object =  Grails.get(VendorService).createObject(object)
 					}
 					else
 					{
-						object =  Grails.get(HomeService).updateObject(object)
+						object =  Grails.get(VendorService).updateObject(object)
 					}
 					
 					
 					if (object.errors.hasErrors())
 					{
 						textName.setData("name")
-						textAddress.setData("address")
-						Object[] tv = [textName,textAddress]
+						textDescription.setData("description")
+						textTelephone.setData("telephone")
+						textFax.setData("fax")
+						textEmail.setData("email")
+						Object[] tv = [textName,textDescription,textTelephone,textFax,textEmail]
 						generalFunction.setErrorUI(tv,object)
 					}
 					else
@@ -193,7 +202,7 @@ class MasterHome extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(HomeService).softDeletedObject(object)
+						Grails.get(VendorService).softDeletedObject(object)
 						initTable()
 					} else {
 								
@@ -226,11 +235,26 @@ class MasterHome extends VerticalLayout{
 			textName.setBuffered(true)
 			textName.setImmediate(false)
 			layout.addComponent(textName)
-			textAddress = new TextField("Address:");
-			textAddress.setPropertyDataSource(item.getItemProperty("address"))
-			textAddress.setBuffered(true)
-			textAddress.setImmediate(false)
-			layout.addComponent(textAddress)
+			textDescription = new TextField("Description:");
+			textDescription.setPropertyDataSource(item.getItemProperty("description"))
+			textDescription.setBuffered(true)
+			textDescription.setImmediate(false)
+			layout.addComponent(textDescription)
+			textTelephone = new TextField("Telephone:");
+			textTelephone.setPropertyDataSource(item.getItemProperty("telephone"))
+			textTelephone.setBuffered(true)
+			textTelephone.setImmediate(false)
+			layout.addComponent(textTelephone)
+			textFax = new TextField("Fax:");
+			textFax.setPropertyDataSource(item.getItemProperty("fax"))
+			textFax.setBuffered(true)
+			textFax.setImmediate(false)
+			layout.addComponent(textFax)
+			textEmail = new TextField("Email:");
+			textEmail.setPropertyDataSource(item.getItemProperty("email"))
+			textEmail.setBuffered(true)
+			textEmail.setImmediate(false)
+			layout.addComponent(textEmail)
 			layout.addComponent(createSaveButton())
 			layout.addComponent(createCancelButton())
 			getUI().addWindow(window);
@@ -258,8 +282,14 @@ class MasterHome extends VerticalLayout{
 			layout.addComponent(textId)
 			textName = new TextField("Name:")
 			layout.addComponent(textName)
-			textAddress = new TextField("Address:")
-			layout.addComponent(textAddress)
+			textDescription = new TextField("Description:")
+			layout.addComponent(textDescription)
+			textTelephone = new TextField("Telephone:")
+			layout.addComponent(textTelephone)
+			textFax = new TextField("Fax:")
+			layout.addComponent(textFax)
+			textEmail = new TextField("Email:")
+			layout.addComponent(textEmail)
 			//			def textArea = new TextArea("Text Area")
 //			layout.addComponent(textArea)
 //			def dateField = new DateField("Date Field")
@@ -299,19 +329,18 @@ class MasterHome extends VerticalLayout{
 		}
 	 
 	 void initTable() {
-		
-		tableContainer = new BeanItemContainer<Home>(Home.class);
+		tableContainer = new BeanItemContainer<Vendor>(Vendor.class);
 		//fillTableContainer(tableContainer);
-	    itemlist = Grails.get(HomeService).getList()
+	    itemlist = Grails.get(VendorService).getList()
 		tableContainer.addAll(itemlist)
 //		tableContainer.addNestedContainerProperty("facility1.id")
 //		tableContainer.addNestedContainerProperty("facility1.nama")
 //		tableContainer.addNestedContainerProperty("customer1.id")
 		
 		table.setContainerDataSource(tableContainer);
-		table.setColumnHeader("name","Name")
-		table.setColumnHeader("address","Address")
-		table.visibleColumns = ["name","address","dateCreated","lastUpdated","isDeleted"]
+//		table.setColumnHeader("name","Name")
+//		table.setColumnHeader("address","Address")
+		table.visibleColumns = ["name","description","telephone","fax","email","dateCreated","lastUpdated","isDeleted"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

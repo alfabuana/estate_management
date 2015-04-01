@@ -28,6 +28,7 @@ import com.vaadin.ui.Button
 import com.vaadin.ui.ComboBox
 import com.vaadin.ui.Component
 import com.vaadin.shared.ui.datefield.Resolution
+import com.vaadin.ui.CheckBox
 import com.vaadin.ui.DateField
 import com.vaadin.ui.Field
 import com.vaadin.ui.FormLayout
@@ -41,7 +42,7 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
-import estate_management.HomeService
+import estate_management.CashBankService
 
 
 
@@ -49,35 +50,36 @@ import estate_management.HomeService
 
 import com.vaadin.grails.Grails
 
-class MasterHome extends VerticalLayout{
+class MasterCashBank extends VerticalLayout{
 	def selectedRow
 	def itemlist
 	GeneralFunction generalFunction = new GeneralFunction()
 	private MenuBar menuBar
 	private Window window
 	private TextField textId
-	private TextField textSKU
-	private TextField textDescription
+//	private TextField textSKU
+//	private TextField textDescription
 	
 	//==============================
 	private TextField textName
-	private TextField textAddress
-	
+	private TextField textDescription
+	private TextField textAmount
+	private CheckBox chkBank
 	//==============================
 	
 	private Table table = new Table();
-	private BeanItemContainer<Home> tableContainer;
+	private BeanItemContainer<CashBank> tableContainer;
 	private FieldGroup fieldGroup;
 	private FormLayout layout
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "Home"
+	String Title = "Cash Bank"
 //						Constant.MenuName.Item + ":";
 	
-	public MasterHome() {
+	public MasterCashBank() {
 //		currentUser = SecurityUtils.getSubject();
-//		table = new Table()
+		
 		initTable();
 		
 		HorizontalLayout menu = new HorizontalLayout()
@@ -96,7 +98,7 @@ class MasterHome extends VerticalLayout{
 				switch(selectedItem.getText())
 				{
 					case "Add":
-						def item = new BeanItem<Home>(tableContainer);
+						def item = new BeanItem<CashBank>(tableContainer);
 						windowAdd("Add");
 					break
 					case "Edit":
@@ -143,24 +145,28 @@ class MasterHome extends VerticalLayout{
 				try{
 					def object = [id:textId.getValue(),
 								  name:textName.getValue(),
-								  address:textAddress.getValue(),
+								  description:textDescription.getValue(),
+								  amount:textAmount.getValue(),
+								  isBank:chkBank.getValue()
 								  ]
 					
 					if (object.id == "")
 					{
-						object =  Grails.get(HomeService).createObject(object)
+						object =  Grails.get(CashBankService).createObject(object)
 					}
 					else
 					{
-						object =  Grails.get(HomeService).updateObject(object)
+						object =  Grails.get(CashBankService).updateObject(object)
 					}
 					
 					
 					if (object.errors.hasErrors())
 					{
 						textName.setData("name")
-						textAddress.setData("address")
-						Object[] tv = [textName,textAddress]
+						textDescription.setData("description")
+						textAmount.setData("amount")
+						chkBank.setData("isBank")
+						Object[] tv = [textName,textDescription,chkBank]
 						generalFunction.setErrorUI(tv,object)
 					}
 					else
@@ -193,7 +199,7 @@ class MasterHome extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(HomeService).softDeletedObject(object)
+						Grails.get(CashBankService).softDeletedObject(object)
 						initTable()
 					} else {
 								
@@ -226,11 +232,22 @@ class MasterHome extends VerticalLayout{
 			textName.setBuffered(true)
 			textName.setImmediate(false)
 			layout.addComponent(textName)
-			textAddress = new TextField("Address:");
-			textAddress.setPropertyDataSource(item.getItemProperty("address"))
-			textAddress.setBuffered(true)
-			textAddress.setImmediate(false)
-			layout.addComponent(textAddress)
+			textDescription = new TextField("Description:");
+			textDescription.setPropertyDataSource(item.getItemProperty("description"))
+			textDescription.setBuffered(true)
+			textDescription.setImmediate(false)
+			layout.addComponent(textDescription)
+			textAmount = new TextField("Amount:");
+//			textAmount.setPropertyDataSource(item.getItemProperty("amount"))
+			textAmount.setValue(item.getItemProperty("amount").toString())
+			textAmount.setBuffered(true)
+			textAmount.setImmediate(false)
+			layout.addComponent(textAmount)
+			chkBank = new CheckBox("isBank");
+			chkBank.setPropertyDataSource(item.getItemProperty("isBank"))
+			chkBank.setBuffered(true)
+			chkBank.setImmediate(false)
+			layout.addComponent(chkBank)
 			layout.addComponent(createSaveButton())
 			layout.addComponent(createCancelButton())
 			getUI().addWindow(window);
@@ -258,8 +275,12 @@ class MasterHome extends VerticalLayout{
 			layout.addComponent(textId)
 			textName = new TextField("Name:")
 			layout.addComponent(textName)
-			textAddress = new TextField("Address:")
-			layout.addComponent(textAddress)
+			textDescription = new TextField("Description:")
+			layout.addComponent(textDescription)
+			textAmount = new TextField("Amount:")
+			layout.addComponent(textAmount)
+			chkBank = new CheckBox("isBank")
+			layout.addComponent(chkBank)
 			//			def textArea = new TextArea("Text Area")
 //			layout.addComponent(textArea)
 //			def dateField = new DateField("Date Field")
@@ -299,19 +320,18 @@ class MasterHome extends VerticalLayout{
 		}
 	 
 	 void initTable() {
-		
-		tableContainer = new BeanItemContainer<Home>(Home.class);
+		tableContainer = new BeanItemContainer<CashBank>(CashBank.class);
 		//fillTableContainer(tableContainer);
-	    itemlist = Grails.get(HomeService).getList()
+	    itemlist = Grails.get(CashBankService).getList()
 		tableContainer.addAll(itemlist)
 //		tableContainer.addNestedContainerProperty("facility1.id")
 //		tableContainer.addNestedContainerProperty("facility1.nama")
 //		tableContainer.addNestedContainerProperty("customer1.id")
 		
 		table.setContainerDataSource(tableContainer);
-		table.setColumnHeader("name","Name")
-		table.setColumnHeader("address","Address")
-		table.visibleColumns = ["name","address","dateCreated","lastUpdated","isDeleted"]
+//		table.setColumnHeader("name","Name")
+//		table.setColumnHeader("address","Address")
+		table.visibleColumns = ["name","description","amount","isBank","dateCreated","lastUpdated","isDeleted"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

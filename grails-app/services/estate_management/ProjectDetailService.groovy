@@ -15,7 +15,12 @@ class ProjectDetailService {
 	def getList(){
 		return ProjectDetail.getAll()
 	}
+	def getList(object){
+		def a = object.toLong()
+		return ProjectDetail.findAll("from ProjectDetail as b where b.project.id=? and b.isDeleted =false",[a])
+	}
 	def createObject(object){
+		object.project = Project.get(object.projectId)
 		object.isDeleted = false
 		object = projectDetailValidationService.createObjectValidation(object as ProjectDetail)
 		if (object.errors.getErrorCount() == 0)
@@ -26,7 +31,7 @@ class ProjectDetailService {
 	}
 	def updateObject(def object){
 		def valObject = ProjectDetail.read(object.id)
-		valObject.project = object.project
+//		valObject.project = object.project
 		valObject.attachmentUrl = object.attachmentUrl
 		valObject = projectDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)

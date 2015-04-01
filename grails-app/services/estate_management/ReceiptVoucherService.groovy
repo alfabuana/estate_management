@@ -33,8 +33,8 @@ class ReceiptVoucherService {
 		valObject.code = object.code
 		valObject.receiptDate = object.receiptDate
 		valObject.isGBCH = object.isGBCH
-		valObject.dueDate = object.dueDate
-		valObject.totalAmount = object.totalAmount
+//		valObject.dueDate = object.dueDate
+		valObject.totalAmount = Double.parseDouble(object.totalAmount)
 		valObject = receiptVoucherValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -62,7 +62,7 @@ class ReceiptVoucherService {
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			newObject.isConfirmed = true
-			newObject.confirmationDate = newObject.confirmationDate
+			newObject.confirmationDate = new Date()
 			newObject.save()
 		}
 	}

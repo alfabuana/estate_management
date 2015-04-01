@@ -4,8 +4,11 @@ import java.util.Date;
 
 class Complaint {
 	ShiroUser	username
+	Home		home
 	String		description
 	String		title
+	Boolean		isConfirmed
+	Date		confirmationDate
 	Boolean 	isDeleted
 	Date 		dateCreated // Predefined names by Grails will be filled automatically
 	Date 		lastUpdated // Predefined names by Grails will be filled automatically
@@ -13,5 +16,6 @@ class Complaint {
 	static hasmany =[complaintDetails : ComplaintDetail]
 
     static constraints = {
+		confirmationDate(nullable:true)
     }
 }

@@ -15,7 +15,12 @@ class ReceiptVoucherDetailService {
 	def getList(){
 		return ReceiptVoucherDetail.getAll()
 	}
+	def getList(object){
+		def a = object.toLong()
+		return ReceiptVoucherDetail.findAll("from ReceiptVoucherDetail as b where b.receiptVoucher.id=? and b.isDeleted =false",[a])
+	}
 	def createObject(object){
+		object.receiptVoucher = ReceiptVoucher.get(object.receiptVoucherId)
 		object.isDeleted = false
 		object.isConfirmed = false
 		object = receiptVoucherDetailValidationService.createObjectValidation(object as ReceiptVoucherDetail)
@@ -28,7 +33,7 @@ class ReceiptVoucherDetailService {
 	
 	def updateObject(def object){
 		def valObject = ReceiptVoucherDetail.read(object.id)
-		valObject.receiptVoucher = object.receiptVoucher
+//		valObject.receiptVoucher = object.receiptVoucher
 		valObject.receivable = object.receivable
 		valObject.code = object.code
 		valObject.amount = object.amount

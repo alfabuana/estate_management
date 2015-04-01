@@ -31,7 +31,7 @@ class PaymentRequestService {
 		valObject.username = object.username
 		valObject.description = object.description
 		valObject.code = object.code
-		valObject.amount = object.amount
+		valObject.amount = Double.parseDouble(object.amount)
 		valObject.dueDate = object.dueDate
 		valObject.requestDate = object.requestDate
 		valObject = paymentRequestValidationService.updateObjectValidation(valObject)
@@ -61,7 +61,7 @@ class PaymentRequestService {
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			newObject.isConfirmed = true
-			newObject.confirmationDate = newObject.confirmationDate
+			newObject.confirmationDate = new Date()
 			newObject.save()
 		}
 	}

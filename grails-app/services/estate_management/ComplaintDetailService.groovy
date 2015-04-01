@@ -15,7 +15,12 @@ class ComplaintDetailService {
 	def getList(){
 		return ComplaintDetail.getAll()
 	}
+	def getList(object){
+		def a = object.toLong()
+		return ComplaintDetail.findAll("from ComplaintDetail as b where b.complaint.id=? and b.isDeleted =false",[a])
+	}
 	def createObject(object){
+		object.complaint = Complaint.get(object.complaintId)
 		object.isDeleted = false
 		object = complaintDetailValidationService.createObjectValidation(object as ComplaintDetail)
 		if (object.errors.getErrorCount() == 0)
@@ -26,12 +31,13 @@ class ComplaintDetailService {
 	}
 	def updateObject(def object){
 		def valObject = ComplaintDetail.read(object.id)
-		valObject.complaint = object.complaint
+//		valObject.complaint = object.complaint
 		valObject.attachmentUrl = object.attachmentUrl
 		valObject = complaintDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
 			valObject.save()
+			
 		}
 		else
 		{

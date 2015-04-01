@@ -15,7 +15,12 @@ class PaymentVoucherDetailService {
 	def getList(){
 		return PaymentVoucherDetail.getAll()
 	}
+	def getList(object){
+		def a = object.toLong()
+		return PaymentVoucherDetail.findAll("from PaymentVoucherDetail as b where b.paymentVoucher.id=? and b.isDeleted =false",[a])
+	}
 	def createObject(object){
+		object.paymentVoucher = PaymentVoucher.get(object.paymentVoucherId)
 		object.isDeleted = false
 		object.isConfirmed = false
 		object = paymentVoucherDetailValidationService.createObjectValidation(object as PaymentVoucherDetail)
@@ -27,10 +32,10 @@ class PaymentVoucherDetailService {
 	}
 	def updateObject(def object){
 		def valObject = PaymentVoucherDetail.read(object.id)
-		valObject.paymentVoucher = object.paymentVoucher
+//		valObject.paymentVoucher = object.paymentVoucher
 		valObject.payable = object.payable
 		valObject.code = object.code
-		valObject.amount = object.amount
+		valObject.amount = Double.parseDouble(object.amount)
 		valObject.description = object.description
 		valObject = paymentVoucherDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)

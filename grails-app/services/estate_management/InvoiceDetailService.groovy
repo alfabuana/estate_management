@@ -15,7 +15,12 @@ class InvoiceDetailService {
 	def getList(){
 		return InvoiceDetail.getAll()
 	}
+	def getList(object){
+		def a = object.toLong()
+		return InvoiceDetail.findAll("from InvoiceDetail as b where b.invoice.id=? and b.isDeleted =false",[a])
+	}
 	def createObject(object){
+		object.invoice = Invoice.get(object.invoiceId)
 		object.isDeleted = false
 		object.isConfirmed = false
 		object = invoiceDetailValidationService.createObjectValidation(object as InvoiceDetail)
@@ -29,7 +34,7 @@ class InvoiceDetailService {
 		def valObject = InvoiceDetail.read(object.id)
 		valObject.invoice = object.invoice
 		valObject.code = object.code
-		valObject.amount = object.amount
+		valObject.amount = Double.parseDouble(object.amount)
 		valObject = invoiceDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -57,7 +62,7 @@ class InvoiceDetailService {
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			newObject.isConfirmed = true
-			newObject.confirmationDate = newObject.confirmationDate
+			newObject.confirmationDate = new Date()
 			newObject.save()
 		}
 	}

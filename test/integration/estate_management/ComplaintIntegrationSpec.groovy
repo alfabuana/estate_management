@@ -4,6 +4,7 @@ import grails.test.spock.IntegrationSpec
 
 class ComplaintIntegrationSpec extends IntegrationSpec {
 	def userService
+	def homeService
 	def complaintService
 
     def setup() {
@@ -18,10 +19,17 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		shiroUser.username = "username"
 		shiroUser.passwordHash = "password"
 		shiroUser = userService.createObject(shiroUser)
+		
+		and:'setting new Home'
+		Home home = new Home()
+		home.name = "newName"
+		home.address = "newAddress"
+		home = homeService.createObject(home)
 
 		and: 'setting new Complaint'
 		def complaint = [
 			username:shiroUser,
+			home:home,
 			description:"newDescription",
 			title:"newTitle"
 		]
@@ -39,10 +47,45 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		shiroUser.username = "username"
 		shiroUser.passwordHash = "password"
 		shiroUser = userService.createObject(shiroUser)
+		
+		and:'setting new Home'
+		Home home = new Home()
+		home.name = "newName"
+		home.address = "newAddress"
+		home = homeService.createObject(home)
 
 		and: 'setting new Complaint'
 		def complaint = [
 			username:null,
+			home:home,
+			description:"newDescription",
+			title:"newTitle"
+		]
+
+		when:'createObject is called'
+		complaint = complaintService.createObject(complaint)
+
+		then:'check has errors'
+		complaint.hasErrors() == true
+		println "Validasi sukses dengan error message : " + complaint.errors.getFieldError().defaultMessage
+	}
+	void "Test Create Complaint Validation Home Not Null"(){
+		setup:'setting new User'
+		ShiroUser shiroUser = new ShiroUser()
+		shiroUser.username = "username"
+		shiroUser.passwordHash = "password"
+		shiroUser = userService.createObject(shiroUser)
+		
+		and:'setting new Home'
+		Home home = new Home()
+		home.name = "newName"
+		home.address = "newAddress"
+		home = homeService.createObject(home)
+
+		and: 'setting new Complaint'
+		def complaint = [
+			username:home,
+			home:null,
 			description:"newDescription",
 			title:"newTitle"
 		]
@@ -60,10 +103,17 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		shiroUser.username = "username"
 		shiroUser.passwordHash = "password"
 		shiroUser = userService.createObject(shiroUser)
+		
+		and:'setting new Home'
+		Home home = new Home()
+		home.name = "newName"
+		home.address = "newAddress"
+		home = homeService.createObject(home)
 
 		and: 'setting new Complaint'
 		def complaint = [
 			username:shiroUser,
+			home:home,
 			description:"",
 			title:"newTitle"
 		]
@@ -81,10 +131,17 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		shiroUser.username = "username"
 		shiroUser.passwordHash = "password"
 		shiroUser = userService.createObject(shiroUser)
+		
+		and:'setting new Home'
+		Home home = new Home()
+		home.name = "newName"
+		home.address = "newAddress"
+		home = homeService.createObject(home)
 
 		and: 'setting new Complaint'
 		def complaint = [
 			username:shiroUser,
+			home:home,
 			description:"newDescription",
 			title:""
 		]
@@ -102,10 +159,17 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		shiroUser.username = "username"
 		shiroUser.passwordHash = "password"
 		shiroUser = userService.createObject(shiroUser)
+		
+		and:'setting new Home'
+		Home home = new Home()
+		home.name = "newName"
+		home.address = "newAddress"
+		home = homeService.createObject(home)
 
 		and: 'setting new Complaint'
 		def complaint = [
 			username:shiroUser,
+			home:home,
 			description:"newDescription",
 			title:"newTitle"
 		]
@@ -115,6 +179,7 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		def complaint2 = [
 			id: complaint.id,
 			username:shiroUser,
+			home:home,
 			description:"newDescription",
 			title:"newTitle"
 		]
@@ -125,6 +190,7 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		then:'check has errors'
 		complaint.hasErrors() == false
 		complaint.username == complaint.username
+		complaint.home == complaint.home
 		complaint.description == complaint.description
 		complaint.title == complaint.title
 	}
@@ -134,10 +200,17 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		shiroUser.username = "username"
 		shiroUser.passwordHash = "password"
 		shiroUser = userService.createObject(shiroUser)
+		
+		and:'setting new Home'
+		Home home = new Home()
+		home.name = "newName"
+		home.address = "newAddress"
+		home = homeService.createObject(home)
 
 		and: 'setting new Complaint'
 		def complaint = [
 			username:shiroUser,
+			home:home,
 			description:"newDescription",
 			title:"newTitle"
 		]
@@ -148,6 +221,47 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		def complaint2 = [
 			id: complaint.id,
 			username:null,
+			home:home,
+			description:"newDescription",
+			title:"newTitle"
+		]
+
+		when:'updateObject is called'
+		complaint = complaintService.updateObject(complaint2)
+
+		then:'check has errors'
+		complaint.hasErrors() == true
+		println "Validasi sukses dengan error message : " + complaint.errors.getFieldError().defaultMessage
+
+	}
+	void "Test Update Complaint Validation home Not Null"(){
+		setup:'setting new User'
+		ShiroUser shiroUser = new ShiroUser()
+		shiroUser.username = "username"
+		shiroUser.passwordHash = "password"
+		shiroUser = userService.createObject(shiroUser)
+		
+		and:'setting new Home'
+		Home home = new Home()
+		home.name = "newName"
+		home.address = "newAddress"
+		home = homeService.createObject(home)
+
+		and: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser,
+			home:home,
+			description:"newDescription",
+			title:"newTitle"
+		]
+
+		complaint= complaintService.createObject(complaint)
+
+		and:'setting data for Update'
+		def complaint2 = [
+			id: complaint.id,
+			username:shiroUser,
+			home:null,
 			description:"newDescription",
 			title:"newTitle"
 		]
@@ -166,10 +280,17 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		shiroUser.username = "username"
 		shiroUser.passwordHash = "password"
 		shiroUser = userService.createObject(shiroUser)
+		
+		and:'setting new Home'
+		Home home = new Home()
+		home.name = "newName"
+		home.address = "newAddress"
+		home = homeService.createObject(home)
 
 		and: 'setting new Complaint'
 		def complaint = [
 			username:shiroUser,
+			home:home,
 			description:"newDescription",
 			title:"newTitle"
 		]
@@ -180,6 +301,7 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		def complaint2 = [
 			id: complaint.id,
 			username:shiroUser,
+			home:home,
 			description:"",
 			title:"newTitle"
 		]
@@ -198,10 +320,17 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		shiroUser.username = "username"
 		shiroUser.passwordHash = "password"
 		shiroUser = userService.createObject(shiroUser)
+		
+		and:'setting new Home'
+		Home home = new Home()
+		home.name = "newName"
+		home.address = "newAddress"
+		home = homeService.createObject(home)
 
 		and: 'setting new Complaint'
 		def complaint = [
 			username:shiroUser,
+			home:home,
 			description:"newDescription",
 			title:"newTitle"
 		]
@@ -212,6 +341,7 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		def complaint2 = [
 			id: complaint.id,
 			username:shiroUser,
+			home:home,
 			description:"newDescription",
 			title:""
 		]
@@ -230,10 +360,17 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		shiroUser.username = "username"
 		shiroUser.passwordHash = "password"
 		shiroUser = userService.createObject(shiroUser)
+		
+		and:'setting new Home'
+		Home home = new Home()
+		home.name = "newName"
+		home.address = "newAddress"
+		home = homeService.createObject(home)
 
 		and: 'setting new Complaint'
 		def complaint = [
 			username:shiroUser,
+			home:home,
 			description:"newDescription",
 			title:"newTitle"
 		]

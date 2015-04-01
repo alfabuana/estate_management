@@ -156,36 +156,48 @@ public class MyUI extends UI{
 			else{
 				switch(event.getParameters())
 				{
-					case "Home": 
+					case "Home":
 						panelContent.addComponent(new MasterHome())
-					break
-					case "Customer":
-//						panelContent.addComponent(new MasterCustomer())
-					break
-					case "Facility":
-//						panelContent.addComponent(new MasterFacility())
-					break
-					case "Booking Order":
-//						panelContent.addComponent(new MasterBooking())
-					break
+						break
 					case "User":
-//						panelContent.addComponent(new MasterUser())
-					break
-					case "Role":
-//						panelContent.addComponent(new MasterRole())
-					break
-					case "Delivery Order":
-//						panelContent.addComponent(new TrDeliveryOrder())
-					break
-					case "StockAdjusment":
-//						panelContent.addComponent(new MasterCalendar())
-					break
-					case "User":
-//						panelContent.addComponent(masterUser)
-					break
-					case "Role":
-//						panelContent.addComponent(masterRole)
-					break
+						panelContent.addComponent(new MasterUser())
+						break
+					case "User Role":
+						panelContent.addComponent(new MasterRole())
+						break
+					case "Vendor":
+						panelContent.addComponent(new MasterVendor())
+						break
+					case "Cash Bank":
+						panelContent.addComponent(new MasterCashBank())
+						break
+					case "Cash Bank Adjustment":
+						panelContent.addComponent(new MasterCashBankAdjustment())
+						break
+					case "Payment Request":
+						panelContent.addComponent(new MasterPaymentRequest())
+						break
+					case "Receipt Voucher":
+						panelContent.addComponent(new MasterReceiptVoucher())
+						break
+					case "Invoice":
+						panelContent.addComponent(new MasterInvoice())
+						break
+					case "Payment Voucher":
+						panelContent.addComponent(new MasterPaymentVoucher())
+						break
+					case "Post Project":
+						panelContent.addComponent(new MasterPostProject())
+						break
+					case "Complaint":
+						panelContent.addComponent(new MasterComplaint())
+						break
+					case "Home Assignment":
+						panelContent.addComponent(new MasterHomeAssignment())
+						break
+					case "Invoice Payment":
+						panelContent.addComponent(new MasterInvoicePayment())
+						break
 				}
 			}	
 		}
@@ -292,48 +304,49 @@ public class MyUI extends UI{
 	@Override
 	protected void init(VaadinRequest request) {
 		// TODO Auto-generated method stub
-		getPage().setTitle("FUTSAL BOOKING");
+		getPage().setTitle("ESTATE MANAGEMENT");
 		// Create a navigator to control the views
 		navigator = new Navigator(this, this);
 		 
 		// Create and register the views
-		navigator.addView("", new LoginForm());
+//		navigator.addView("", new LoginForm());
+		navigator.addView("", new MainView());
 		navigator.addView("MAINVIEW", new MainView());
 		
 		// We use a view change handler to ensure the user is always redirected
 		// to the login view if the user is not logged in.
 		//
-		navigator.addViewChangeListener(new ViewChangeListener() {
-
-			@Override
-			public boolean beforeViewChange(ViewChangeEvent event) {
-
-				// Check if a user has logged in
-				Subject currentUser = SecurityUtils.getSubject();
-				boolean isLoggedIn = currentUser.isAuthenticated();
-				boolean isLoginView = event.getNewView() instanceof LoginForm;
-
-				if (!isLoggedIn && !isLoginView) {
-					// Redirect to login view always if a user has not yet
-					// logged in
-					navigator.navigateTo(""/*LoginForm.NAME*/);
-					return false;
-
-				} else if (isLoggedIn && isLoginView) {
-					// If someone tries to access to login view while logged in,
-					// then cancel
-					navigator.navigateTo("MAINVIEW")
-					return false;
-				}
-
-				return true;
-			}
-
-			@Override
-			public void afterViewChange(ViewChangeEvent event) {
-
-			}
-		});
+//		navigator.addViewChangeListener(new ViewChangeListener() {
+//
+//			@Override
+//			public boolean beforeViewChange(ViewChangeEvent event) {
+//
+//				// Check if a user has logged in
+//				Subject currentUser = SecurityUtils.getSubject();
+//				boolean isLoggedIn = currentUser.isAuthenticated();
+//				boolean isLoginView = event.getNewView() instanceof LoginForm;
+//
+//				if (!isLoggedIn && !isLoginView) {
+//					// Redirect to login view always if a user has not yet
+//					// logged in
+//					navigator.navigateTo(""/*LoginForm.NAME*/);
+//					return false;
+//
+//				} else if (isLoggedIn && isLoginView) {
+//					// If someone tries to access to login view while logged in,
+//					// then cancel
+//					navigator.navigateTo("MAINVIEW")
+//					return false;
+//				}
+//
+//				return true;
+//			}
+//
+//			@Override
+//			public void afterViewChange(ViewChangeEvent event) {
+//
+//			}
+//		});
 	}
 
 }

@@ -43,13 +43,13 @@ class ReceiptVoucherValidationService {
 		}
 		return object
 	}
-	def dueDateNotNull(def object){
-		if (object.dueDate == null || object.dueDate == "")
-		{
-			object.errors.rejectValue('dueDate','null','Due Date tidak boleh kosong')
-		}
-		return object
-	}
+//	def dueDateNotNull(def object){
+//		if (object.dueDate == null || object.dueDate == "")
+//		{
+//			object.errors.rejectValue('dueDate','null','Due Date tidak boleh kosong')
+//		}
+//		return object
+//	}
 	def totalAmountNotNull(def object){
 		if (object.totalAmount == null || object.totalAmount == "")
 		{
@@ -69,8 +69,8 @@ class ReceiptVoucherValidationService {
 		if (object.errors.hasErrors()) return object
 		object = isGBCHNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = dueDateNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = dueDateNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = totalAmountNotNull(object)
 		return object
 	}
@@ -86,8 +86,8 @@ class ReceiptVoucherValidationService {
 		if (object.errors.hasErrors()) return object
 		object = isGBCHNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = dueDateNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = dueDateNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = totalAmountNotNull(object)
 		return object
 	}

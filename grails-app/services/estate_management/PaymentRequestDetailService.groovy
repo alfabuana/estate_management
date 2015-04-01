@@ -15,7 +15,13 @@ class PaymentRequestDetailService {
 	def getList(){
 		return PaymentRequestDetail.getAll()
 	}
+	
+	def getList(object){
+		def a = object.toLong()
+		return PaymentRequestDetail.findAll("from PaymentRequestDetail as b where b.paymentRequest.id=? and b.isDeleted =false",[a])
+	}
 	def createObject(object){
+		object.paymentRequest = PaymentRequest.get(object.paymentRequestId)
 		object.isDeleted = false
 		object.isConfirmed = false
 		object = paymentRequestDetailValidationService.createObjectValidation(object as PaymentRequestDetail)
@@ -28,9 +34,10 @@ class PaymentRequestDetailService {
 	}
 	def updateObject(def object){
 		def valObject = PaymentRequestDetail.read(object.id)
-		valObject.paymentRequest = object.paymentRequest
+//		valObject.paymentRequest = PaymentRequest.get(object.paymentRequestId)
 		valObject.code = object.code
-		valObject.amount = object.amount
+		valObject.amount = Double.parseDouble(object.amount)
+		valObject.description = object.description
 		valObject = paymentRequestDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -58,7 +65,7 @@ class PaymentRequestDetailService {
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			newObject.isConfirmed = true
-			newObject.confirmationDate = newObject.confirmationDate
+			newObject.confirmationDate = new Date()
 			newObject.save()
 		}
 	}

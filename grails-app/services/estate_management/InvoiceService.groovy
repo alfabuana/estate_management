@@ -32,8 +32,8 @@ class InvoiceService {
 		valObject.code = object.code
 		valObject.invoiceDate = object.invoiceDate
 		valObject.description = object.description
-		valObject.dueDate = object.dueDate
-		valObject.totalAmount = object.totalAmount
+//		valObject.dueDate = object.dueDate
+		valObject.totalAmount = Double.parseDouble(object.totalAmount)
 		valObject = invoiceValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -61,7 +61,7 @@ class InvoiceService {
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			newObject.isConfirmed = true
-			newObject.confirmationDate = newObject.confirmationDate
+			newObject.confirmationDate = new Date()
 			newObject.save()
 		}
 	}

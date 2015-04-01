@@ -19,6 +19,7 @@ class Invoice {
 	static hasmany = [invoiceDetails : InvoiceDetail]
 	static belongsTo = Invoice
     static constraints = {
+		dueDate(nullable:true)
 		confirmationDate(nullable : true)
     }
 }

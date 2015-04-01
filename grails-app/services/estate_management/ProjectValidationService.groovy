@@ -22,29 +22,29 @@ class ProjectValidationService {
 		}
 		return object
 	}
-	def amountAgreeNotNull(def object){
-		if (object.amountAgree == null || object.amountAgree == "")
-		{
-			object.errors.rejectValue('amountAgree','null','Amount Agree tidak boleh kosong')
-		}
-		return object
-	}
-	def amountDisagreeNotNull(def object){
-		if (object.amountDisagree == null || object.amountDisagree == "")
-		{
-			object.errors.rejectValue('amountDisagree','null','Amount Disagree tidak boleh kosong')
-		}
-		return object
-	}
+//	def amountAgreeNotNull(def object){
+//		if (object.amountAgree == null || object.amountAgree == "")
+//		{
+//			object.errors.rejectValue('amountAgree','null','Amount Agree tidak boleh kosong')
+//		}
+//		return object
+//	}
+//	def amountDisagreeNotNull(def object){
+//		if (object.amountDisagree == null || object.amountDisagree == "")
+//		{
+//			object.errors.rejectValue('amountDisagree','null','Amount Disagree tidak boleh kosong')
+//		}
+//		return object
+//	}
 	def createObjectValidation(def object)
 	{
 		object = titleNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = amountAgreeNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = amountDisagreeNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = amountAgreeNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = amountDisagreeNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -52,13 +52,21 @@ class ProjectValidationService {
 		object = titleNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = amountAgreeNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = amountDisagreeNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = amountAgreeNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = amountDisagreeNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)
+	{
+		return object
+	}
+	def confirmObjectValidation(object)
+	{
+		return object
+	}
+	def unConfirmObjectValidation(object)
 	{
 		return object
 	}

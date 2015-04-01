@@ -5,6 +5,7 @@ import java.util.Date;
 class PaymentRequestDetail {
 	PaymentRequest paymentRequest
 	String code
+	String description
 	Double amount
 	Boolean isConfirmed
 	Date confirmationDate

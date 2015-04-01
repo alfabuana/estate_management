@@ -29,7 +29,7 @@ class CashBankService {
 		def valObject = CashBank.read(object.id)
 		valObject.name = object.name
 		valObject.description = object.description
-		valObject.amount = object.amount
+		valObject.amount = Double.parseDouble(object.amount)
 		valObject.isBank = object.isBank
 		valObject = cashBankValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)

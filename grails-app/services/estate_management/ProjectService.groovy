@@ -16,7 +16,10 @@ class ProjectService {
 		return Project.getAll()
 	}
 	def createObject(object){
+		object.amountAgree = 0
+		object.amountDisagree = 0
 		object.isDeleted = false
+		object.isConfirmed = false
 		object = projectValidationService.createObjectValidation(object as Project)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -28,8 +31,6 @@ class ProjectService {
 		def valObject = Project.read(object.id)
 		valObject.title = object.title
 		valObject.description = object.description
-		valObject.amountAgree = object.amountAgree
-		valObject.amountDisagree = object.amountDisagree
 		valObject = projectValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -47,6 +48,28 @@ class ProjectService {
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			newObject.isDeleted = true
+			newObject.save()
+		}
+
+	}
+	def confirmObject(def object){
+		def newObject = Project.get(object.id)
+		newObject = projectValidationService.confirmObjectValidation(newObject)
+		if (newObject.errors.getErrorCount() == 0)
+		{
+			newObject.isConfirmed = true
+			newObject.confirmationDate = new Date()
+			newObject.save()
+		}
+
+	}
+	def unConfirmObject(def object){
+		def newObject = Project.get(object.id)
+		newObject = projectValidationService.unConfirmObjectValidation(newObject)
+		if (newObject.errors.getErrorCount() == 0)
+		{
+			newObject.isConfirmed = false
+			newObject.confirmationDate = null
 			newObject.save()
 		}
 

@@ -30,7 +30,7 @@ class CashBankAdjustmentService {
 		def valObject = CashBankAdjustment.read(object.id)
 		valObject.cashBank = object.cashBank
 		valObject.adjustmentDate = object.adjustmentDate
-		valObject.amount = object.amount
+		valObject.amount = Double.parseDouble(object.amount)
 		valObject.code = object.code
 		valObject = cashBankAdjustmentValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
@@ -58,7 +58,7 @@ class CashBankAdjustmentService {
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			newObject.isConfirmed = true
-			newObject.confirmationDate = newObject.confirmationDate
+			newObject.confirmationDate = new Date()
 			newObject.save()
 		}
 	}

@@ -15,7 +15,12 @@ class InvoicePaidDetailService {
 	def getList(){
 		return InvoicePaidDetail.getAll()
 	}
+	def getList(object){
+		def a = object.toLong()
+		return InvoicePaidDetail.findAll("from InvoicePaidDetail as b where b.invoicePaid.id=? and b.isDeleted =false",[a])
+	}
 	def createObject(object){
+		object.invoicePaid = InvoicePaid.get(object.invoicePaidId)
 		object.isDeleted = false
 		object = invoicePaidDetailValidationService.createObjectValidation(object as InvoicePaidDetail)
 		if (object.errors.getErrorCount() == 0)
@@ -26,7 +31,7 @@ class InvoicePaidDetailService {
 	}
 	def updateObject(def object){
 		def valObject = InvoicePaidDetail.read(object.id)
-		valObject.invoicePaid = object.invoicePaid
+//		valObject.invoicePaid = object.invoicePaid
 		valObject.attachmentUrl = object.attachmentUrl
 		valObject = invoicePaidDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)

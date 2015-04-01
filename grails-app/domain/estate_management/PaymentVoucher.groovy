@@ -21,6 +21,7 @@ class PaymentVoucher {
 	static hasmany = [paymentVoucherDetails : PaymentVoucherDetail]
 
     static constraints = {
+		dueDate(nullable:true)
 		confirmationDate (nullable : true)
 		reconciliationDate (nullable : true)
     }

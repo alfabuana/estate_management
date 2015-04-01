@@ -26,7 +26,6 @@ import org.apache.shiro.util.ThreadContext
 //import org.apache.shiro.web.util.SavedRequest
 
 import com.vaadin.annotations.Theme;
-import grails.converters.JSON
 
 //@Theme("Reindeer")
 class LoginForm extends CustomComponent implements View, Button.ClickListener {
@@ -198,7 +197,7 @@ class LoginForm extends CustomComponent implements View, Button.ClickListener {
 		
 		Subject currentUser = SecurityUtils.getSubject();
 		if ( !currentUser.isAuthenticated() ) {
-			def authToken = new UsernamePasswordToken(String.valueOf(username).toUpperCase(), password) //new Sha256Hash(password).toHex()
+			def authToken = new UsernamePasswordToken(String.valueOf(username).toUpperCase(), new Sha256Hash(password).toHex()) //new Sha256Hash(password).toHex()
 		
 			// Support for "remember me"
 			authToken.rememberMe = rememberMe
@@ -224,17 +223,15 @@ class LoginForm extends CustomComponent implements View, Button.ClickListener {
 				
 				currentUser.login(authToken) //SecurityUtils.subject.login(authToken)
 				//SecurityUtils.subject.getSession().setTimeout(300000)
-//				log.info "Welcome" //"Redirecting to '${targetUri}'."
+				log.info "Welcome" //"Redirecting to '${targetUri}'."
 //				redirect(uri: targetUri)
 				getUI().getPage().getCurrent().getJavaScript().execute("window.location.reload();");
 				}
 			catch (AuthenticationException ex){
 				// Authentication failed, so display the appropriate message
 				// on the login page.
-//				log.info "Authentication failure for user '${username}'."
-				println ex as JSON
+				log.info "Authentication failure for user '${username}'."
 				Notification.show("Login Failed\n",
-					
 					ex.message,
 					Notification.Type.ERROR_MESSAGE)
 				return false
@@ -242,7 +239,7 @@ class LoginForm extends CustomComponent implements View, Button.ClickListener {
 			catch (Exception ex){
 				// Authentication failed, so display the appropriate message
 				// on the login page.
-//				log.info "Authentication Exception for user '${username}'."
+				log.info "Authentication Exception for user '${username}'."
 				Notification.show("Login Failed\n",
 					ex.message,
 					Notification.Type.ERROR_MESSAGE)

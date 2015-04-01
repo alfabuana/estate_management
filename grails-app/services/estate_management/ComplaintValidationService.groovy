@@ -15,6 +15,13 @@ class ComplaintValidationService {
 		}
 		return object
 	}
+	def homeNotNull(def object){
+		if (object.home == null || object.home == "")
+		{
+			object.errors.rejectValue('home','null','Home tidak boleh kosong')
+		}
+		return object
+	}
 	def descriptionNotNull(def object){
 		if (object.description == null || object.description == "")
 		{
@@ -33,6 +40,8 @@ class ComplaintValidationService {
 	{
 		object = usernameNotNull(object)
 		if (object.errors.hasErrors()) return object
+		object = homeNotNull(object)
+		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = titleNotNull(object)
@@ -41,6 +50,8 @@ class ComplaintValidationService {
 	def updateObjectValidation(def object)
 	{
 		object = usernameNotNull(object)
+		if (object.errors.hasErrors()) return object
+		object = homeNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
 		if (object.errors.hasErrors()) return object
@@ -51,5 +62,12 @@ class ComplaintValidationService {
 	{
 		return object
 	}
-
+	def confirmObjectValidation(object)
+	{
+		return object
+	}
+	def unConfirmObjectValidation(object)
+	{
+		return object
+	}
 }

@@ -41,7 +41,7 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
-import estate_management.HomeService
+import estate_management.RoleService
 
 
 
@@ -49,7 +49,7 @@ import estate_management.HomeService
 
 import com.vaadin.grails.Grails
 
-class MasterHome extends VerticalLayout{
+class MasterRole extends VerticalLayout{
 	def selectedRow
 	def itemlist
 	GeneralFunction generalFunction = new GeneralFunction()
@@ -61,23 +61,21 @@ class MasterHome extends VerticalLayout{
 	
 	//==============================
 	private TextField textName
-	private TextField textAddress
-	
 	//==============================
 	
 	private Table table = new Table();
-	private BeanItemContainer<Home> tableContainer;
+	private BeanItemContainer<ShiroRole> tableContainer;
 	private FieldGroup fieldGroup;
 	private FormLayout layout
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "Home"
+	String Title = "User Role"
 //						Constant.MenuName.Item + ":";
 	
-	public MasterHome() {
+	public MasterRole() {
 //		currentUser = SecurityUtils.getSubject();
-//		table = new Table()
+		
 		initTable();
 		
 		HorizontalLayout menu = new HorizontalLayout()
@@ -96,7 +94,7 @@ class MasterHome extends VerticalLayout{
 				switch(selectedItem.getText())
 				{
 					case "Add":
-						def item = new BeanItem<Home>(tableContainer);
+						def item = new BeanItem<ShiroRole>(tableContainer);
 						windowAdd("Add");
 					break
 					case "Edit":
@@ -143,24 +141,22 @@ class MasterHome extends VerticalLayout{
 				try{
 					def object = [id:textId.getValue(),
 								  name:textName.getValue(),
-								  address:textAddress.getValue(),
 								  ]
 					
 					if (object.id == "")
 					{
-						object =  Grails.get(HomeService).createObject(object)
+						object =  Grails.get(RoleService).createObject(object)
 					}
 					else
 					{
-						object =  Grails.get(HomeService).updateObject(object)
+						object =  Grails.get(RoleService).updateObject(object)
 					}
 					
 					
 					if (object.errors.hasErrors())
 					{
 						textName.setData("name")
-						textAddress.setData("address")
-						Object[] tv = [textName,textAddress]
+						Object[] tv = [textName]
 						generalFunction.setErrorUI(tv,object)
 					}
 					else
@@ -193,7 +189,7 @@ class MasterHome extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(HomeService).softDeletedObject(object)
+						Grails.get(RoleService).softDeleteObject(object)
 						initTable()
 					} else {
 								
@@ -222,15 +218,10 @@ class MasterHome extends VerticalLayout{
 			textId.setReadOnly(true)
 			layout.addComponent(textId)
 			textName = new TextField("Name:");
-			textName.setPropertyDataSource(item.getItemProperty("name"))
+//			textName.setPropertyDataSource(item.getItemProperty("username"))
 			textName.setBuffered(true)
 			textName.setImmediate(false)
 			layout.addComponent(textName)
-			textAddress = new TextField("Address:");
-			textAddress.setPropertyDataSource(item.getItemProperty("address"))
-			textAddress.setBuffered(true)
-			textAddress.setImmediate(false)
-			layout.addComponent(textAddress)
 			layout.addComponent(createSaveButton())
 			layout.addComponent(createCancelButton())
 			getUI().addWindow(window);
@@ -258,8 +249,6 @@ class MasterHome extends VerticalLayout{
 			layout.addComponent(textId)
 			textName = new TextField("Name:")
 			layout.addComponent(textName)
-			textAddress = new TextField("Address:")
-			layout.addComponent(textAddress)
 			//			def textArea = new TextArea("Text Area")
 //			layout.addComponent(textArea)
 //			def dateField = new DateField("Date Field")
@@ -299,24 +288,21 @@ class MasterHome extends VerticalLayout{
 		}
 	 
 	 void initTable() {
-		
-		tableContainer = new BeanItemContainer<Home>(Home.class);
+		tableContainer = new BeanItemContainer<ShiroRole>(ShiroRole.class);
 		//fillTableContainer(tableContainer);
-	    itemlist = Grails.get(HomeService).getList()
+	    itemlist = Grails.get(RoleService).getList()
 		tableContainer.addAll(itemlist)
 //		tableContainer.addNestedContainerProperty("facility1.id")
 //		tableContainer.addNestedContainerProperty("facility1.nama")
 //		tableContainer.addNestedContainerProperty("customer1.id")
-		
+//		tableContainer.addNestedContainerProperty("customer1.nama")
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("name","Name")
-		table.setColumnHeader("address","Address")
-		table.visibleColumns = ["name","address","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["name","dateCreated","lastUpdated","isDeleted"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())
 		table.setSizeFull()
-		
 		
 //		table.addValueChangeListener(new Property.ValueChangeListener() {
 //			public void valueChange(ValueChangeEvent event) {

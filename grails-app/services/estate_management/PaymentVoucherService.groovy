@@ -33,8 +33,8 @@ class PaymentVoucherService {
 		valObject.code = object.code
 		valObject.paymentDate = object.paymentDate
 		valObject.isGBCH = object.isGBCH
-		valObject.dueDate = object.dueDate
-		valObject.totalAmount = object.totalAmount
+//		valObject.dueDate = object.dueDate
+		valObject.totalAmount = Double.parseDouble(object.totalAmount)
 		valObject = paymentVoucherValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -61,7 +61,7 @@ class PaymentVoucherService {
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			newObject.isConfirmed = true
-			newObject.confirmationDate = newObject.confirmationDate
+			newObject.confirmationDate = new Date()
 			newObject.save()
 		}
 	}

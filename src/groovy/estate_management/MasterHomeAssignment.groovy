@@ -28,6 +28,7 @@ import com.vaadin.ui.Button
 import com.vaadin.ui.ComboBox
 import com.vaadin.ui.Component
 import com.vaadin.shared.ui.datefield.Resolution
+import com.vaadin.ui.CheckBox
 import com.vaadin.ui.DateField
 import com.vaadin.ui.Field
 import com.vaadin.ui.FormLayout
@@ -41,7 +42,7 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
-import estate_management.HomeService
+import estate_management.HomeAssignmentService
 
 
 
@@ -49,7 +50,7 @@ import estate_management.HomeService
 
 import com.vaadin.grails.Grails
 
-class MasterHome extends VerticalLayout{
+class MasterHomeAssignment extends VerticalLayout{
 	def selectedRow
 	def itemlist
 	GeneralFunction generalFunction = new GeneralFunction()
@@ -57,27 +58,28 @@ class MasterHome extends VerticalLayout{
 	private Window window
 	private TextField textId
 	private TextField textSKU
-	private TextField textDescription
+//	private TextField textDescription
 	
 	//==============================
-	private TextField textName
-	private TextField textAddress
+	private ComboBox cmbHome
+	private ComboBox cmbUser
+	private DateField textAssignDate
 	
 	//==============================
 	
 	private Table table = new Table();
-	private BeanItemContainer<Home> tableContainer;
+	private BeanItemContainer<HomeAssignment> tableContainer;
 	private FieldGroup fieldGroup;
 	private FormLayout layout
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "Home"
+	String Title = "Home Assignment"
 //						Constant.MenuName.Item + ":";
 	
-	public MasterHome() {
+	public MasterHomeAssignment() {
 //		currentUser = SecurityUtils.getSubject();
-//		table = new Table()
+		
 		initTable();
 		
 		HorizontalLayout menu = new HorizontalLayout()
@@ -96,7 +98,7 @@ class MasterHome extends VerticalLayout{
 				switch(selectedItem.getText())
 				{
 					case "Add":
-						def item = new BeanItem<Home>(tableContainer);
+						def item = new BeanItem<HomeAssignment>(tableContainer);
 						windowAdd("Add");
 					break
 					case "Edit":
@@ -107,6 +109,14 @@ class MasterHome extends VerticalLayout{
 						if (table.getValue() != null)
 						windowDelete("Delete");
 					break;
+					case "Confirm":
+					if (table.getValue() != null)
+					windowConfirm("Confirm");
+				break;
+				case "Unconfirm":
+				if (table.getValue() != null)
+				windowUnConfirm("Unconfirm");
+			break;
 				break;
 				}
 			}
@@ -117,6 +127,8 @@ class MasterHome extends VerticalLayout{
 		MenuItem saveMenu =  menuBar.addItem("Add",mycommand)
 		MenuItem updateMenu = menuBar.addItem("Edit", mycommand)
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
+		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
+		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")	
 		//	END BUTTON MENU
@@ -142,25 +154,28 @@ class MasterHome extends VerticalLayout{
 			void buttonClick(Button.ClickEvent event) {
 				try{
 					def object = [id:textId.getValue(),
-								  name:textName.getValue(),
-								  address:textAddress.getValue(),
+								  home:cmbHome.getValue(),
+								  username:cmbUser.getValue(),
+								  assignDate:textAssignDate.getValue(),
 								  ]
 					
 					if (object.id == "")
 					{
-						object =  Grails.get(HomeService).createObject(object)
+						object =  Grails.get(HomeAssignmentService).createObject(object)
 					}
+					
 					else
 					{
-						object =  Grails.get(HomeService).updateObject(object)
+						object =  Grails.get(HomeAssignmentService).updateObject(object)
 					}
 					
 					
 					if (object.errors.hasErrors())
 					{
-						textName.setData("name")
-						textAddress.setData("address")
-						Object[] tv = [textName,textAddress]
+						cmbHome.setData("home")
+						cmbUser.setData("username")
+						textAssignDate.setData("assignDate")
+						Object[] tv = [cmbHome,cmbUser,textAssignDate]
 						generalFunction.setErrorUI(tv,object)
 					}
 					else
@@ -180,7 +195,6 @@ class MasterHome extends VerticalLayout{
 		  })
 	}
 	
-	
 //	===========================================
 //	WINDOW DELETE
 //	===========================================
@@ -193,7 +207,7 @@ class MasterHome extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(HomeService).softDeletedObject(object)
+						Grails.get(HomeAssignmentService).softDeletedObject(object)
 						initTable()
 					} else {
 								
@@ -206,6 +220,56 @@ class MasterHome extends VerticalLayout{
 //				Notification.Type.ERROR_MESSAGE);
 //		}
 	}
+	//	===========================================
+	//	WINDOW CONFIRM
+	//	===========================================
+		
+		//@RequiresPermissions("Master:Item:Delete")
+		private void windowConfirm(String caption) {
+	//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							Grails.get(HomeAssignmentService).confirmObject(object)
+							initTable()
+						} else {
+									
+						}
+					}
+				})
+	//		} else {
+	//			Notification.show("Access Denied\n",
+	//				"Anda tidak memiliki izin untuk Menghapus Record",
+	//				Notification.Type.ERROR_MESSAGE);
+	//		}
+		}
+		//	===========================================
+		//	WINDOW UNCONFIRM
+		//	===========================================
+			
+			//@RequiresPermissions("Master:Item:Delete")
+			private void windowUnConfirm(String caption) {
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+					ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+					new ConfirmDialog.Listener() {
+						public void onClose(ConfirmDialog dialog) {
+							if (dialog.isConfirmed()) {
+								def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+								Grails.get(HomeAssignmentService).unConfirmObject(object)
+								initTable()
+							} else {
+										
+							}
+						}
+					})
+		//		} else {
+		//			Notification.show("Access Denied\n",
+		//				"Anda tidak memiliki izin untuk Menghapus Record",
+		//				Notification.Type.ERROR_MESSAGE);
+		//		}
+			}
 //	========================================
 	//WINDOW EDIT
 //	========================================
@@ -221,16 +285,31 @@ class MasterHome extends VerticalLayout{
 			textId.setPropertyDataSource(item.getItemProperty("id"))
 			textId.setReadOnly(true)
 			layout.addComponent(textId)
-			textName = new TextField("Name:");
-			textName.setPropertyDataSource(item.getItemProperty("name"))
-			textName.setBuffered(true)
-			textName.setImmediate(false)
-			layout.addComponent(textName)
-			textAddress = new TextField("Address:");
-			textAddress.setPropertyDataSource(item.getItemProperty("address"))
-			textAddress.setBuffered(true)
-			textAddress.setImmediate(false)
-			layout.addComponent(textAddress)
+			cmbHome = new ComboBox("Home:");
+			def beanHome = new BeanItemContainer<Home>(Home.class)
+			def homeList = Grails.get(HomeService).getList()
+			beanHome.addAll(homeList)
+			cmbHome.setContainerDataSource(beanHome)
+			cmbHome.setItemCaptionPropertyId("name")
+			cmbHome.select(cmbHome.getItemIds().find{ it.id == item.getItemProperty("home.id").value})
+			cmbHome.setBuffered(true)
+			cmbHome.setImmediate(false)
+			layout.addComponent(cmbHome)
+			cmbUser = new ComboBox("User:");
+			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
+			def userList = Grails.get(UserService).getList()
+			beanUser.addAll(userList)
+			cmbUser.setContainerDataSource(beanUser)
+			cmbUser.setItemCaptionPropertyId("username")
+			cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("username.id").value})
+			cmbUser.setBuffered(true)
+			cmbUser.setImmediate(false)
+			layout.addComponent(cmbUser)
+			textAssignDate = new DateField("Assign Date:");
+			textAssignDate.setPropertyDataSource(item.getItemProperty("assignDate"))
+			textAssignDate.setBuffered(true)
+			textAssignDate.setImmediate(false)
+			layout.addComponent(textAssignDate)
 			layout.addComponent(createSaveButton())
 			layout.addComponent(createCancelButton())
 			getUI().addWindow(window);
@@ -241,7 +320,7 @@ class MasterHome extends VerticalLayout{
 //		}
 	}
 	
-	
+
 //	========================================
 	//WINDOW ADD
 //	========================================
@@ -256,18 +335,22 @@ class MasterHome extends VerticalLayout{
 			textId = new TextField("Id:");
 			textId.setReadOnly(true)
 			layout.addComponent(textId)
-			textName = new TextField("Name:")
-			layout.addComponent(textName)
-			textAddress = new TextField("Address:")
-			layout.addComponent(textAddress)
-			//			def textArea = new TextArea("Text Area")
-//			layout.addComponent(textArea)
-//			def dateField = new DateField("Date Field")
-//			layout.addComponent(dateField)
-//			def comboBox = new ComboBox("combo Box")
-//			comboBox.addItem("test")
-//			comboBox.addItem("test2")
-//			layout.addComponent(comboBox)
+			cmbHome = new ComboBox("Home:")
+			def beanHome = new BeanItemContainer<Home>(Home.class)
+			def homeList = Grails.get(HomeService).getList()
+			beanHome.addAll(homeList)
+			cmbHome.setContainerDataSource(beanHome)
+			cmbHome.setItemCaptionPropertyId("name")
+			layout.addComponent(cmbHome)
+			cmbUser = new ComboBox("User:")
+			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
+			def userList = Grails.get(UserService).getList()
+			beanUser.addAll(userList)
+			cmbUser.setContainerDataSource(beanUser)
+			cmbUser.setItemCaptionPropertyId("username")
+			layout.addComponent(cmbUser)
+			textAssignDate = new DateField("Assign Date:")
+			layout.addComponent(textAssignDate)
 //			
 //			===================
 			//TOMBOL SAVE
@@ -299,24 +382,26 @@ class MasterHome extends VerticalLayout{
 		}
 	 
 	 void initTable() {
-		
-		tableContainer = new BeanItemContainer<Home>(Home.class);
+		tableContainer = new BeanItemContainer<HomeAssignment>(HomeAssignment.class);
 		//fillTableContainer(tableContainer);
-	    itemlist = Grails.get(HomeService).getList()
+	    itemlist = Grails.get(HomeAssignmentService).getList()
 		tableContainer.addAll(itemlist)
-//		tableContainer.addNestedContainerProperty("facility1.id")
-//		tableContainer.addNestedContainerProperty("facility1.nama")
-//		tableContainer.addNestedContainerProperty("customer1.id")
-		
+		tableContainer.addNestedContainerProperty("home.id")
+		tableContainer.addNestedContainerProperty("home.name")
+		tableContainer.addNestedContainerProperty("username.id")
+		tableContainer.addNestedContainerProperty("username.username")
 		table.setContainerDataSource(tableContainer);
-		table.setColumnHeader("name","Name")
-		table.setColumnHeader("address","Address")
-		table.visibleColumns = ["name","address","dateCreated","lastUpdated","isDeleted"]
+		table.setColumnHeader("home.name","Home Name")
+		table.setColumnHeader("username.username","Username")
+		table.setColumnHeader("assignDate","Assign Date")
+//		table.setColumnHeader("durasi","Duration")
+//		table.setColumnHeader("dateStartUsing","Date Start Using")
+//		table.setColumnHeader("dateEndUsing","Date End Using")
+		table.visibleColumns = ["home.name","username.username","assignDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())
 		table.setSizeFull()
-		
 		
 //		table.addValueChangeListener(new Property.ValueChangeListener() {
 //			public void valueChange(ValueChangeEvent event) {
