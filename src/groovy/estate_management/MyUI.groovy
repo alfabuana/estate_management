@@ -198,6 +198,15 @@ public class MyUI extends UI{
 					case "Invoice Payment":
 						panelContent.addComponent(new MasterInvoicePayment())
 						break
+					case "Invoice Clearance":
+						panelContent.addComponent(new MasterInvoiceClearance())
+						break
+					case "Project Voting":
+						panelContent.addComponent(new MasterProjectVote())
+						break
+					case "Maintenance Fee":
+						panelContent.addComponent(new MasterMaintenance())
+						break
 				}
 			}	
 		}

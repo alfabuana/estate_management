@@ -30,7 +30,7 @@ class CashBankMutationService {
 		def valObject = CashBankMutation.read(object.id)
 		valObject.sourceCashBank = object.sourceCashBank
 		valObject.targetCashBank = object.targetCashBank
-		valObject.amount = object.amount
+		valObject.amount = Double.parseDouble(object.amount)
 		valObject.code = object.code
 		valObject = cashBankMutationValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)

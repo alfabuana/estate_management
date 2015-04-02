@@ -67,6 +67,7 @@ class MasterInvoicePayment extends VerticalLayout{
 	private TextField textId
 	
 	//==============================
+	private ComboBox cmbInvoice
 	private ComboBox cmbUser
 	private TextField textDescription
 	private DateField textPaidDate
@@ -78,7 +79,7 @@ class MasterInvoicePayment extends VerticalLayout{
 	
 	private Table table = new Table();
 	private Table tableDetail = new Table()
-	private BeanItemContainer<Project> tableContainer;
+	private BeanItemContainer<InvoicePaid> tableContainer;
 	private BeanItemContainer tableDetailContainer
 	private FieldGroup fieldGroup;
 	private FormLayout layout
@@ -193,6 +194,7 @@ class MasterInvoicePayment extends VerticalLayout{
 			void buttonClick(Button.ClickEvent event) {
 				try{
 					def object = [id:textId.getValue(),
+								invoice:cmbInvoice.getValue(),
 								  username:cmbUser.getValue(),
 								  description:textDescription.getValue(),
 								  paidDate:textPaidDate.getValue()
@@ -210,10 +212,11 @@ class MasterInvoicePayment extends VerticalLayout{
 					
 					if (object.errors.hasErrors())
 					{
+						cmbInvoice.setDate("invoice")
 						cmbUser.setData("username")
 						textDescription.setData("description")
 						textPaidDate.setdata("paidDate")
-						Object[] tv = [cmbUser,textDescription,textPaidDate]
+						Object[] tv = [cmbInvoice,cmbUser,textDescription,textPaidDate]
 						generalFunction.setErrorUI(tv,object)
 					}
 					else
@@ -390,6 +393,16 @@ class MasterInvoicePayment extends VerticalLayout{
 			textId.setPropertyDataSource(item.getItemProperty("id"))
 			textId.setReadOnly(true)
 			layout.addComponent(textId)
+			cmbInvoice = new ComboBox("Invoice:");
+			def beanInvoice = new BeanItemContainer<Invoice>(Invoice.class)
+			def invoiceList = Grails.get(InvoiceService).getList()
+			beanInvoice.addAll(invoiceList)
+			cmbInvoice.setContainerDataSource(beanInvoice)
+			cmbInvoice.setItemCaptionPropertyId("code")
+			cmbInvoice.select(cmbInvoice.getItemIds().find{ it.id == item.getItemProperty("invoice.id").value})
+			cmbInvoice.setBuffered(true)
+			cmbInvoice.setImmediate(false)
+			layout.addComponent(cmbInvoice)
 			cmbUser = new ComboBox("User:");
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
 			def userList = Grails.get(UserService).getList()
@@ -435,6 +448,13 @@ class MasterInvoicePayment extends VerticalLayout{
 			textId = new TextField("Id:");
 			textId.setReadOnly(true)
 			layout.addComponent(textId)
+			cmbInvoice = new ComboBox("Invoice:")
+			def beanInvoice = new BeanItemContainer<Invoice>(Invoice.class)
+			def invoiceList = Grails.get(InvoiceService).getList()
+			beanInvoice.addAll(invoiceList)
+			cmbInvoice.setContainerDataSource(beanInvoice)
+			cmbInvoice.setItemCaptionPropertyId("code")
+			layout.addComponent(cmbInvoice)
 			cmbUser = new ComboBox("User:")
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
 			def userList = Grails.get(UserService).getList()
@@ -571,24 +591,47 @@ class MasterInvoicePayment extends VerticalLayout{
 //		table.markAsDirtyRecursive();
 		}
 	 
-	 void initTable() {
+//	 void initTable() {
 		
-		tableContainer = new BeanItemContainer<InvoicePaid>(InvoicePaid.class);
-		//fillTableContainer(tableContainer);
-	    itemlist = Grails.get(InvoicePaidService).getList()
-		tableContainer.addAll(itemlist)
-		tableContainer.addNestedContainerProperty("username.id")
-		tableContainer.addNestedContainerProperty("username.username")
-//		tableContainer.addNestedContainerProperty("customer1.id")
-		table.setColumnHeader("paidDate","Paid Date")
-		table.setColumnHeader("username.username","Username")
-		table.setContainerDataSource(tableContainer);
-		table.visibleColumns = ["username.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
-		table.setSelectable(true)
-		table.setImmediate(false)
-//		table.setPageLength(table.size())
-		table.setSizeFull()
-		
+//		tableContainer = new BeanItemContainer<InvoicePaid>(InvoicePaid.class);
+//		//fillTableContainer(tableContainer);
+//	    itemlist = Grails.get(InvoicePaidService).getList()
+//		tableContainer.addAll(itemlist)
+//		tableContainer.addNestedContainerProperty("username.id")
+//		tableContainer.addNestedContainerProperty("username.username")
+////		tableContainer.addNestedContainerProperty("customer1.id")
+//		table.setColumnHeader("paidDate","Paid Date")
+//		table.setColumnHeader("username.username","Username")
+//		table.setContainerDataSource(tableContainer);
+//		table.visibleColumns = ["username.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+//		table.setSelectable(true)
+//		table.setImmediate(false)
+////		table.setPageLength(table.size())
+//		table.setSizeFull()
+		 
+		 void initTable() {
+			 tableContainer = new BeanItemContainer<InvoicePaid>(InvoicePaid.class);
+			 //fillTableContainer(tableContainer);
+			 itemlist = Grails.get(InvoicePaidService).getList()
+			 tableContainer.addAll(itemlist)
+			 tableContainer.addNestedContainerProperty("invoice.id")
+			 tableContainer.addNestedContainerProperty("invoice.code")
+			 tableContainer.addNestedContainerProperty("username.id")
+			 tableContainer.addNestedContainerProperty("username.username")
+			 table.setContainerDataSource(tableContainer);
+			 table.setColumnHeader("invoiceDate","Invoice Date")
+			 table.setColumnHeader("username.username","Username")
+			 table.setColumnHeader("totalAmount","Total Amount")
+			 table.setColumnHeader("invoice.code","Invoice Code")
+	 //		table.setColumnHeader("startTime","Start Time")
+	 //		table.setColumnHeader("durasi","Duration")
+	 //		table.setColumnHeader("dateStartUsing","Date Start Using")
+	 //		table.setColumnHeader("dateEndUsing","Date End Using")
+			 table.visibleColumns = ["invoice.code","username.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+			 table.setSelectable(true)
+			 table.setImmediate(false)
+	 //		table.setPageLength(table.size())
+			 table.setSizeFull()
 		
 		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 			@Override

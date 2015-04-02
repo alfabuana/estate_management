@@ -33,9 +33,9 @@ class ReceivableService {
 		valObject.receivableSourceDetailId = object.receivableSourceDetailId
 		valObject.code = object.code
 		valObject.dueDate = object.dueDate
-		valObject.amount = object.amount
-		valObject.remainingAmount = object.remainingAmount
-		valObject.pendingClearanceAmount = object.pendingClearanceAmount
+		valObject.amount = Double.parseDouble(object.amount)
+		valObject.remainingAmount = Double.parseDouble(object.remainingAmount)
+		valObject.pendingClearanceAmount = Double.parseDouble(object.pendingClearanceAmount)
 		valObject = receivableValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{

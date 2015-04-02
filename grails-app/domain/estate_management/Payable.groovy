@@ -20,5 +20,6 @@ class Payable {
 
     static constraints = {
 		completionDate (nullable : true)
+		dueDate (nullable : true)
     }
 }

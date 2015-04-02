@@ -15,6 +15,13 @@ class InvoicePaidValidationService {
 		}
 		return object
 	}
+	def invoiceNotNull(def object){
+		if (object.invoice == null || object.invoice == "")
+		{
+			object.errors.rejectValue('invoice','null','Invoice tidak boleh kosong')
+		}
+		return object
+	}
 	def descriptionNotNull(def object){
 		if (object.description == null || object.description == "")
 		{
@@ -31,6 +38,8 @@ class InvoicePaidValidationService {
 	}
 	def createObjectValidation(def object)
 	{
+		object = invoiceNotNull(object)
+		if (object.errors.hasErrors()) return object
 		object = usernameNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
@@ -40,6 +49,8 @@ class InvoicePaidValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = invoiceNotNull(object)
+		if (object.errors.hasErrors()) return object
 		object = usernameNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)

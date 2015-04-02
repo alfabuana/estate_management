@@ -51,4 +51,12 @@ class MaintenanceValidationService {
 	{
 		return object
 	}
+	def confirmObjectValidation(object)
+	{
+		return object
+	}
+	def unConfirmObjectValidation(object)
+	{
+		return object
+	}
 }

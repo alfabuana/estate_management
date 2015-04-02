@@ -1,5 +1,7 @@
 package estate_management
 
+import java.awt.event.ItemEvent;
+
 import grails.transaction.Transactional
 
 @Transactional
@@ -62,6 +64,24 @@ class InvoiceService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			for (detail in newObject.invoiceDetails.findAll{ it.isDeleted == false })
+			{
+				detail.isConfirmed == true
+				detail.confirmationDate = new Date()
+				Receivable receivable = new Receivable()
+				receivable.username = newObject.username
+				receivable.receivableSource = "invoice"
+				receivable.receivableSourceId = newObject.id
+				receivable.receivableSourceDetailId = detail.id
+				receivable.code = newObject.code
+				receivable.dueDate = newObject.dueDate
+				receivable.amount = detail.amount
+				receivable.remainingAmount = detail.amount
+				receivable.pendingClearanceAmount = 0
+				receivable.isCompleted = false
+				receivable.isDeleted = false
+				receivable.save()
+			}
 			newObject.save()
 		}
 	}
@@ -72,6 +92,18 @@ class InvoiceService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			for (detail in newObject.invoiceDetails.findAll{ it.isDeleted == false })
+			{
+				Receivable receivable = Receivable.find{
+					receivableSource == "invoice"&&
+					receivableSourceId == newObject.id &&
+					receivableSourceDetailId == detail.id
+				}
+				receivable.isDeleted = false
+				receivable.save()
+				detail.isConfirmed = false
+				detail.confirmationDate = null
+			}
 			newObject.save()
 		}
 	}

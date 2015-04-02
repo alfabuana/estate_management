@@ -16,7 +16,7 @@ class Invoice {
 	Date 		dateCreated // Predefined names by Grails will be filled automatically
 	Date 		lastUpdated // Predefined names by Grails will be filled automatically
 
-	static hasmany = [invoiceDetails : InvoiceDetail]
+	static hasMany = [invoiceDetails : InvoiceDetail]
 	static belongsTo = Invoice
     static constraints = {
 		dueDate(nullable:true)

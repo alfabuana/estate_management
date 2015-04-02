@@ -63,6 +63,19 @@ class ReceiptVoucherService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			for (detail in newObject.receiptVoucherDetails.findAll{ it.isDeleted == false })
+			{
+				detail.isConfirmed = true
+				detail.confirmationDate = new Date()
+				Receivable receivable = Receivable.find{
+					id == newObject.receivable.id
+				}
+				receivable.remainingAmount =receivable.remainingAmount - detail.amount
+				if(receivable.remainingAmount == 0)
+				{
+					receivable.isCompleted = true
+				}
+			}
 			newObject.save()
 		}
 	}

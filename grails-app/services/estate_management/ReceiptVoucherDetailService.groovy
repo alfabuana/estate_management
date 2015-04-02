@@ -23,6 +23,7 @@ class ReceiptVoucherDetailService {
 		object.receiptVoucher = ReceiptVoucher.get(object.receiptVoucherId)
 		object.isDeleted = false
 		object.isConfirmed = false
+		object.amount = object.receivable.amount
 		object = receiptVoucherDetailValidationService.createObjectValidation(object as ReceiptVoucherDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -36,7 +37,7 @@ class ReceiptVoucherDetailService {
 //		valObject.receiptVoucher = object.receiptVoucher
 		valObject.receivable = object.receivable
 		valObject.code = object.code
-		valObject.amount = object.amount
+		valObject.amount = object.receivable.amount
 		valObject.description = object.description
 		valObject = receiptVoucherDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)

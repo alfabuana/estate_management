@@ -27,6 +27,7 @@ class InvoicePaidService {
 	}
 	def updateObject(def object){
 		def valObject = InvoicePaid.read(object.id)
+		valObject.invoice = object.invoice
 		valObject.username = object.username
 		valObject.description = object.description
 		valObject.paidDate = object.paidDate

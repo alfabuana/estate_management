@@ -18,7 +18,7 @@ class ReceiptVoucher {
 	Date 		dateCreated // Predefined names by Grails will be filled automatically
 	Date 		lastUpdated // Predefined names by Grails will be filled automatically
 
-	static hasmany = [receiptVoucherDetails : ReceiptVoucherDetail]
+	static hasMany = [receiptVoucherDetails : ReceiptVoucherDetail]
 	
     static constraints = {
 		dueDate(nullable:true)

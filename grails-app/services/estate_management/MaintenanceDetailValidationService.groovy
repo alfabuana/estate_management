@@ -1,0 +1,43 @@
+package estate_management
+
+import grails.transaction.Transactional
+
+@Transactional
+class MaintenanceDetailValidationService {
+
+    def serviceMethod() {
+
+    }
+	def maintenanceNotNull(def object){
+		if (object.maintenance == null || object.maintenance == "")
+		{
+			object.errors.rejectValue('maintenance','null','Maintenance tidak boleh kosong')
+		}
+		return object
+	}
+	def usernameNotNull(def object){
+		if (object.username == null || object.username == "")
+		{
+			object.errors.rejectValue('username','null','Username tidak boleh kosong')
+		}
+		return object
+	}
+	def createObjectValidation(def object)
+	{
+		object = maintenanceNotNull(object)
+		if (object.errors.hasErrors()) return object
+		object = usernameNotNull(object)
+		return object
+	}
+	def updateObjectValidation(def object)
+	{
+		object = maintenanceNotNull(object)
+		if (object.errors.hasErrors()) return object
+		object = usernameNotNull(object)
+		return object
+	}
+	def softdeleteObjectValidation(object)
+	{
+		return object
+	}
+}

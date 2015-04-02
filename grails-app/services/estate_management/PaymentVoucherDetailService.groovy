@@ -23,6 +23,7 @@ class PaymentVoucherDetailService {
 		object.paymentVoucher = PaymentVoucher.get(object.paymentVoucherId)
 		object.isDeleted = false
 		object.isConfirmed = false
+		object.amount = object.payable.amount
 		object = paymentVoucherDetailValidationService.createObjectValidation(object as PaymentVoucherDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -35,7 +36,7 @@ class PaymentVoucherDetailService {
 //		valObject.paymentVoucher = object.paymentVoucher
 		valObject.payable = object.payable
 		valObject.code = object.code
-		valObject.amount = Double.parseDouble(object.amount)
+		valObject.amount = object.payable.amount
 		valObject.description = object.description
 		valObject = paymentVoucherDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)

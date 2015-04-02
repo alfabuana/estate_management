@@ -1,12 +1,17 @@
 package estate_management
 
 import java.awt.event.ItemEvent;
+
 import estate_management.widget.GeneralFunction
 
 
 
 
+
+
 import org.vaadin.dialogs.ConfirmDialog
+
+
 
 
 import com.vaadin.data.Property
@@ -42,7 +47,11 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
+
 import estate_management.ReceiptVoucherService
+import grails.converters.JSON
+
+
 
 
 
@@ -71,6 +80,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 	private TextField textTotalAmount
 	
 	private TextField textIdDetail
+	private ComboBox cmbReceivableDetail
 	private TextField textCodeDetail
 	private TextField textAmountDetail
 	private TextField textDescriptionDetail
@@ -86,7 +96,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "Receipt Request"
+	String Title = "Receipt Voucher"
 //						Constant.MenuName.Item + ":";
 	
 	public MasterReceiptVoucher() {
@@ -212,7 +222,6 @@ class MasterReceiptVoucher extends VerticalLayout{
 						object =  Grails.get(ReceiptVoucherService).updateObject(object)
 					}
 					
-					
 					if (object.errors.hasErrors())
 					{
 						cmbUser.setData("username")
@@ -241,7 +250,53 @@ class MasterReceiptVoucher extends VerticalLayout{
 			}
 		  })
 	}
-	
+	private Button createSaveDetailButton() {
+		def saveButton = new Button("Save", new Button.ClickListener() {
+
+					void buttonClick(Button.ClickEvent event) {
+						try{
+							def object = [id:textIdDetail.getValue(),
+								receiptVoucherId : textId.getValue(),
+								receivable:cmbReceivableDetail.getValue(),
+								code:textCodeDetail.getValue(),
+								amount:textAmountDetail.getValue().toString(),
+								description:textDescriptionDetail.getValue()
+							]
+
+							if (object.id == "")
+							{
+								object =  Grails.get(ReceiptVoucherDetailService).createObject(object)
+							}
+							else
+							{
+								object =  Grails.get(ReceiptVoucherDetailService).updateObject(object)
+							}
+							if (object.errors.hasErrors())
+							{
+								cmbReceivableDetail.setData("receivable")
+								textCodeDetail.setData("code")
+								textAmountDetail.setData("amount")
+								textDescriptionDetail.setData("description")
+								Object[] tv = [cmbReceivableDetail,textCodeDetail,textAmountDetail,textDescriptionDetail]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								window.close()
+							}
+							initTableDetail()
+						}catch (Exception e)
+						{
+							Notification.show("Error\n",
+									e.getMessage(),
+									Notification.Type.ERROR_MESSAGE);
+						}
+
+
+					}
+				})
+	}
+
 //	===========================================
 //	WINDOW DELETE
 //	===========================================
@@ -267,6 +322,32 @@ class MasterReceiptVoucher extends VerticalLayout{
 //				Notification.Type.ERROR_MESSAGE);
 //		}
 	}
+	//	===========================================
+	//	WINDOW DELETE DETAIL
+	//	===========================================
+
+	//@RequiresPermissions("Master:Item:Delete")
+	private void windowDeleteDetail(String caption) {
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id").toString()]
+							Grails.get(ReceiptVoucherDetailService).softDeletedObject(object)
+							initTableDetail()
+						} else {
+
+						}
+					}
+				})
+		//		} else {
+		//			Notification.show("Access Denied\n",
+		//				"Anda tidak memiliki izin untuk Menghapus Record",
+		//				Notification.Type.ERROR_MESSAGE);
+		//		}
+	}
+
 	//	===========================================
 	//	WINDOW CONFIRM
 	//	===========================================
@@ -455,7 +536,126 @@ class MasterReceiptVoucher extends VerticalLayout{
 //				Notification.Type.ERROR_MESSAGE);
 //		}
 	}
-	
+	//	=======================
+	//	WINDOW ADD DETAIL
+	//	=======================
+	private void windowAddDetail(item,String caption) {
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+		window = new Window(caption)
+		window.setModal(true)
+		def layout3 = new FormLayout()
+		layout3.setMargin(true)
+		window.setContent(layout3)
+		textId = new TextField("Product Id:")
+		textId.setPropertyDataSource(item.getItemProperty("id"))
+		textId.setReadOnly(true)
+		layout3.addComponent(textId)
+		textIdDetail = new TextField("Detail Id:")
+		textIdDetail.setReadOnly(true)
+		layout3.addComponent(textIdDetail)
+		textCodeDetail = new TextField("Code:");
+		layout3.addComponent(textCodeDetail)
+		cmbReceivableDetail = new ComboBox("Receivable:")
+		def beanReceivable = new BeanItemContainer<Receivable>(Receivable.class)
+		def receivableList = Grails.get(ReceivableService).getList()
+		beanReceivable.addAll(receivableList)
+		cmbReceivableDetail.setContainerDataSource(beanReceivable)
+		cmbReceivableDetail.setItemCaptionPropertyId("code")
+		layout3.addComponent(cmbReceivableDetail)
+		textAmountDetail = new TextField("Amount:");
+		textAmountDetail.setReadOnly(true)
+		layout3.addComponent(textAmountDetail)
+		textDescriptionDetail = new TextField("Description:");
+		layout3.addComponent(textDescriptionDetail)
+		//		comb = new ComboBox("Sales Order Detail Item:")
+		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
+		//			itemlist = Grails.get(SalesOrderDetailService).getListForCombo(item.getItemProperty("salesOrder.id").toString())
+		//			tableSearchContainer.addAll(itemlist)
+		//			tableSearchContainer.addNestedContainerProperty("item.sku");
+		//			comb.setContainerDataSource(tableSearchContainer)
+
+		//			comb.setItemCaptionPropertyId("item.sku")
+		//		layout3.addComponent(comb)
+		//			textQuantity = new TextField("Quantity:")
+		//		layout3.addComponent(textQuantity)
+		layout3.addComponent(createSaveDetailButton())
+		layout3.addComponent(createCancelButton())
+
+		getUI().addWindow(window);
+		//		} else {
+		//			Notification.show("Access Denied\n",
+		//					"Anda tidak memiliki izin untuk Mengubah Record",
+		//					Notification.Type.ERROR_MESSAGE);
+		//		}
+	}
+	//	========================
+	//	WINDOW EDIT DETAIL
+	//	========================
+	//@RequiresPermissions("Transaction:DeliveryOrder:Edit")
+	private void windowEditDetail(item,itemDetail,String caption) {
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+		window = new Window(caption)
+		window.setModal(true)
+		def layout3 = new FormLayout()
+		layout3.setMargin(true)
+		window.setContent(layout3)
+		textId = new TextField("Master Id:")
+		textId.setPropertyDataSource(item.getItemProperty("id"))
+		textId.setReadOnly(true)
+		layout3.addComponent(textId)
+		textIdDetail = new TextField("Detail Id:")
+		textIdDetail.setPropertyDataSource(itemDetail.getItemProperty("id"))
+		textIdDetail.setReadOnly(true)
+		layout3.addComponent(textIdDetail)
+		textCodeDetail = new TextField("Code:");
+		textCodeDetail.setPropertyDataSource(itemDetail.getItemProperty("code"))
+		textCodeDetail.setBuffered(true)
+		textCodeDetail.setImmediate(false)
+		layout3.addComponent(textCodeDetail)
+		cmbReceivableDetail = new ComboBox("Receivable:");
+		def beanReceivable = new BeanItemContainer<Receivable>(Receivable.class)
+		def receivableList = Grails.get(ReceivableService).getList()
+		beanReceivable.addAll(receivableList)
+		cmbReceivableDetail.setContainerDataSource(beanReceivable)
+		cmbReceivableDetail.setItemCaptionPropertyId("code")
+		cmbReceivableDetail.select(cmbReceivableDetail.getItemIds().find{ it.id == itemDetail.getItemProperty("receivable.id").value})
+		cmbReceivableDetail.setBuffered(true)
+		cmbReceivableDetail.setImmediate(false)
+		layout3.addComponent(cmbReceivableDetail)
+		//		comb = new ComboBox("Item:")
+
+		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
+		//			itemlist = Grails.get(SalesOrderDetailService).getListForCombo(item.getItemProperty("salesOrder.id").toString())
+		//			tableSearchContainer.addAll(itemlist)
+		//			tableSearchContainer.addNestedContainerProperty("item.sku");
+		//			comb.setContainerDataSource(tableSearchContainer)
+
+		//		comb.setItemCaptionPropertyId("item.sku")
+		//		layout3.addComponent(comb)
+		//		comb.select(comb.getItemIds().find{ it.id == itemDetail.getItemProperty("salesOrderDetail.id").value})
+		//
+		//		layout3.addComponent(comb)
+		textAmountDetail = new TextField("Amount:")
+//		textAmountDetail.setPropertyDataSource(itemDetail.getItemProperty("amount"))
+		textAmountDetail.setValue(itemDetail.getItemProperty("amount").toString())
+		textAmountDetail.setBuffered(true)
+		textAmountDetail.setReadOnly(true)
+		layout3.addComponent(textAmountDetail)
+		textDescriptionDetail = new TextField("Description:")
+		textDescriptionDetail.setPropertyDataSource(itemDetail.getItemProperty("description"))
+		textDescriptionDetail.setBuffered(true)
+		layout3.addComponent(textDescriptionDetail)
+		layout3.addComponent(createSaveDetailButton())
+		layout3.addComponent(createCancelButton())
+
+		getUI().addWindow(window);
+		//		} else {
+		//			Notification.show("Access Denied\n",
+		//					"Anda tidak memiliki izin untuk Mengubah Record",
+		//					Notification.Type.ERROR_MESSAGE);
+		//		}
+	}
+
 	 void updateTable() {
 //		if (table.size() > MAX_PAGE_LENGTH) {
 //		table.setPageLength(MAX_PAGE_LENGTH);
@@ -524,13 +724,15 @@ table.addValueChangeListener(new Property.ValueChangeListener() {
 		 def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
 		 def itemListDetail = Grails.get(ReceiptVoucherDetailService).getList(ind)
 		 tableDetailContainer.addNestedContainerProperty("receiptVoucher.id")
+		 tableDetailContainer.addNestedContainerProperty("receivable.id");
+		 tableDetailContainer.addNestedContainerProperty("receivable.code");
 		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
 		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
 		 //		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
 		 tableDetailContainer.addAll(itemListDetail)
 		 tableDetail.setColumnHeader("receiptVoucher.id","Receipt Voucher Id")
 		 tableDetail.setContainerDataSource(tableDetailContainer);
-		 tableDetail.visibleColumns = ["receiptVoucher.id","receivable","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
+		 tableDetail.visibleColumns = ["receiptVoucher.id","receivable.code","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
 		 tableDetail.setSelectable(true)
 		 tableDetail.setImmediate(false)
 		 tableDetail.setVisible(true)

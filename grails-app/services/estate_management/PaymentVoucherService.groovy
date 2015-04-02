@@ -62,6 +62,19 @@ class PaymentVoucherService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			for (detail in newObject.paymentVoucherDetails.findAll{ it.isDeleted == false })
+			{
+				detail.isConfirmed = true
+				detail.confirmationDate = new Date()
+				Payable payable = Payable.find{
+					id == newObject.payable.id
+				}
+				payable.remainingAmount =payable.remainingAmount - detail.amount
+				if(payable.remainingAmount == 0)
+				{
+					payable.isCompleted = true
+				}
+			}
 			newObject.save()
 		}
 	}

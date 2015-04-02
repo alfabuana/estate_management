@@ -1,5 +1,6 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 @Transactional
@@ -62,6 +63,24 @@ class PaymentRequestService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			for (detail in newObject.paymentRequestDetails.findAll{ it.isDeleted == false })
+			{
+				detail.isConfirmed == true
+				detail.confirmationDate = new Date()
+				Payable payable = new Payable()
+				payable.username = newObject.username
+				payable.payableSource = "paymentRequest"
+				payable.payableSourceId = newObject.id
+				payable.payableSourceDetailId = detail.id
+				payable.code = newObject.code
+				payable.dueDate = newObject.dueDate
+				payable.amount = detail.amount
+				payable.remainingAmount = detail.amount
+				payable.pendingClearanceAmount = 0
+				payable.isCompleted = false
+				payable.isDeleted = false
+				payable.save()
+			}
 			newObject.save()
 		}
 	}
@@ -72,6 +91,18 @@ class PaymentRequestService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			for (detail in newObject.paymentRequestDetails.findAll{ it.isDeleted == false })
+			{
+				Payable payable = Payable.find{
+					payableSource == "paymentRequest"&&
+					payableSourceId == newObject.id &&
+					payableSourceDetailId == detail.id
+				}
+				payable.isDeleted = false
+				payable.save()
+				detail.isConfirmed = false
+				detail.confirmationDate = null
+			}
 			newObject.save()
 		}
 	}

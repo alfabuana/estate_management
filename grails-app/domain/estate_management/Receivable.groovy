@@ -18,5 +18,6 @@ class Receivable {
 
 	static constraints = {
 		completionDate (nullable : true)
+		dueDate(nullable : true)
 	}
 }

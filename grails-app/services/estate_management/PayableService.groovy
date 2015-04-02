@@ -33,9 +33,9 @@ class PayableService {
 		valObject.payableSourceDetailId = object.payableSourceDetailId
 		valObject.code = object.code
 		valObject.dueDate = object.dueDate
-		valObject.amount = object.amount
-		valObject.remainingAmount = object.remainingAmount
-		valObject.pendingClearanceAmount = object.pendingClearanceAmount
+		valObject.amount = Double.parseDouble(object.amount)
+		valObject.remainingAmount = Double.parseDouble(object.remainingAmount)
+		valObject.pendingClearanceAmount = Double.parseDouble(object.pendingClearanceAmount)
 		valObject = payableValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
