@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class PaymentRequestDetailService {
 	PaymentRequestDetailValidationService paymentRequestDetailValidationService
+	PaymentRequestService	paymentRequestService
 
 	def serviceMethod() {
 
@@ -28,6 +29,8 @@ class PaymentRequestDetailService {
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			paymentRequestService.calculateTotal(object.paymentRequest.id)
+			
 		}
 
 		return object
@@ -42,6 +45,7 @@ class PaymentRequestDetailService {
 		if (valObject.errors.getErrorCount() == 0)
 		{
 			valObject.save()
+			paymentRequestService.calculateTotal(valObject.paymentRequest.id)
 		}
 		else
 		{
@@ -57,6 +61,7 @@ class PaymentRequestDetailService {
 		{
 			newObject.isDeleted = true
 			newObject.save()
+			paymentRequestService.calculateTotal(newObject.paymentRequest.id)
 		}
 	}
 	def confirmObject(def object){

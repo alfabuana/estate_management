@@ -291,6 +291,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 								window.close()
 							}
 							initTableDetail()
+							initTable()
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -315,8 +316,16 @@ class MasterPaymentVoucher extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentVoucherService).softDeletedObject(object)
-							initTable()
+							object = Grails.get(PaymentVoucherService).softDeletedObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 
 						}
@@ -340,8 +349,17 @@ class MasterPaymentVoucher extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentVoucherDetailService).softDeletedObject(object)
-							initTableDetail()
+							object = Grails.get(PaymentVoucherDetailService).softDeletedObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTableDetail()
+								initTable()
+							}
 						} else {
 
 						}
@@ -366,8 +384,17 @@ class MasterPaymentVoucher extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentVoucherService).confirmObject(object)
-							initTable()
+							object = Grails.get(PaymentVoucherService).confirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
+
 						} else {
 
 						}
@@ -391,8 +418,16 @@ class MasterPaymentVoucher extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentVoucherService).unConfirmObject(object)
-							initTable()
+							object = Grails.get(PaymentVoucherService).unConfirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 
 						}
@@ -462,6 +497,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textTotalAmount = new TextField("Total Amount:");
 		//			textTotalAmount.setPropertyDataSource(item.getItemProperty("totalAmount"))
 		textTotalAmount.setValue(item.getItemProperty("totalAmount").toString())
+		textTotalAmount.setReadOnly(true)
 		textTotalAmount.setBuffered(true)
 		textTotalAmount.setImmediate(false)
 		layout.addComponent(textTotalAmount)
@@ -513,6 +549,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		//			textDueDate = new DateField("Due Date:")
 		//			layout.addComponent(textDueDate)
 		textTotalAmount = new TextField("Total Amount:")
+		textTotalAmount.setReadOnly(true)
 		layout.addComponent(textTotalAmount)
 		//			def textArea = new TextArea("Text Area")
 		//			layout.addComponent(textArea)
@@ -642,7 +679,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		//
 		//		layout3.addComponent(comb)
 		textAmountDetail = new TextField("Amount:")
-//		textAmountDetail.setPropertyDataSource(itemDetail.getItemProperty("amount"))
+		//		textAmountDetail.setPropertyDataSource(itemDetail.getItemProperty("amount"))
 		textAmountDetail.setValue(itemDetail.getItemProperty("amount").toString())
 		textAmountDetail.setBuffered(true)
 		textAmountDetail.setReadOnly(true)

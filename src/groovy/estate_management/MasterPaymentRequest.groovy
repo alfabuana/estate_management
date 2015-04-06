@@ -276,6 +276,7 @@ class MasterPaymentRequest extends VerticalLayout{
 								window.close()
 							}
 							initTableDetail()
+							initTable()
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -300,8 +301,16 @@ class MasterPaymentRequest extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentRequestService).softDeletedObject(object)
-							initTable()
+							object = Grails.get(PaymentRequestService).softDeletedObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 
 						}
@@ -325,8 +334,17 @@ class MasterPaymentRequest extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentRequestDetailService).softDeletedObject(object)
-							initTableDetail()
+							object = Grails.get(PaymentRequestDetailService).softDeletedObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTableDetail()
+								initTable()
+							}
 						} else {
 
 						}
@@ -350,8 +368,16 @@ class MasterPaymentRequest extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentRequestService).confirmObject(object)
-							initTable()
+							object = Grails.get(PaymentRequestService).confirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 
 						}
@@ -375,8 +401,16 @@ class MasterPaymentRequest extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentRequestService).unConfirmObject(object)
-							initTable()
+							object = Grails.get(PaymentRequestService).unConfirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 
 						}
@@ -426,6 +460,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		textAmount = new TextField("Amount:");
 		//			textAmount.setPropertyDataSource(item.getItemProperty("amount"))
 		textAmount.setValue(item.getItemProperty("amount").toString())
+		textAmount.setReadOnly(true)
 		textAmount.setBuffered(true)
 		textAmount.setImmediate(false)
 		layout.addComponent(textAmount)
@@ -471,6 +506,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		textCode = new TextField("Code:")
 		layout.addComponent(textCode)
 		textAmount = new TextField("Amount:")
+		textAmount.setReadOnly(true)
 		layout.addComponent(textAmount)
 		textRequestDate = new DateField("Request Date:")
 		layout.addComponent(textRequestDate)

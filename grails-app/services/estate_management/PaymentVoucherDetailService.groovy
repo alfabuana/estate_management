@@ -5,7 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class PaymentVoucherDetailService {
 	PaymentVoucherDetailValidationService paymentVoucherDetailValidationService
-
+	PaymentVoucherService paymentVoucherService
 	def serviceMethod() {
 
 	}
@@ -27,7 +27,8 @@ class PaymentVoucherDetailService {
 		object = paymentVoucherDetailValidationService.createObjectValidation(object as PaymentVoucherDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
-			object =object.save()
+			object = object.save()
+			paymentVoucherService.calculateTotal(object.paymentVoucher.id)
 		}
 		return object
 	}
@@ -42,6 +43,8 @@ class PaymentVoucherDetailService {
 		if (valObject.errors.getErrorCount() == 0)
 		{
 			valObject.save()
+			paymentVoucherService.calculateTotal(valObject.paymentVoucher.id)
+			
 		}
 		else
 		{
@@ -56,6 +59,7 @@ class PaymentVoucherDetailService {
 		{
 			newObject.isDeleted = true
 			newObject.save()
+			paymentVoucherService.calculateTotal(newObject.paymentVoucher.id)
 		}
 
 	}

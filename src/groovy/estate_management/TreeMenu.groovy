@@ -51,6 +51,10 @@ class TreeMenu extends Tree{
 		addItem("Cash Bank Adjustment")
 		setParent("Cash Bank Adjustment", "Finance")
 		setChildrenAllowed( "Cash Bank Adjustment", false)
+		
+		addItem("Cash Bank Mutation")
+		setParent("Cash Bank Mutation", "Finance")
+		setChildrenAllowed( "Cash Bank Mutation", false)
 
 		addItem("Payment Request")
 		setParent("Payment Request", "Finance")

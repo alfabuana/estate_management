@@ -50,6 +50,7 @@ import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
 
 import estate_management.InvoiceService
+import grails.converters.JSON
 
 
 
@@ -266,7 +267,7 @@ class MasterInvoice extends VerticalLayout{
 							{
 								object =  Grails.get(InvoiceDetailService).updateObject(object)
 							}
-							
+							println object as JSON
 							if (object.errors.hasErrors())
 							{
 								textCodeDetail.setData("code")
@@ -279,6 +280,7 @@ class MasterInvoice extends VerticalLayout{
 								window.close()
 							}
 							initTableDetail()
+							initTable()
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -303,8 +305,16 @@ class MasterInvoice extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(InvoiceService).softDeletedObject(object)
-						initTable()
+						object = Grails.get(InvoiceService).softDeletedObject(object)
+						if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 					} else {
 								
 					}
@@ -328,8 +338,17 @@ class MasterInvoice extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id").toString()]
-							Grails.get(InvoiceDetailService).softDeletedObject(object)
-							initTableDetail()
+							object  = Grails.get(InvoiceDetailService).softDeletedObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTableDetail()
+								initTable()
+							}
 						} else {
 
 						}
@@ -353,8 +372,16 @@ class MasterInvoice extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(InvoiceService).confirmObject(object)
-							initTable()
+							object = Grails.get(InvoiceService).confirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 									
 						}
@@ -378,8 +405,16 @@ class MasterInvoice extends VerticalLayout{
 						public void onClose(ConfirmDialog dialog) {
 							if (dialog.isConfirmed()) {
 								def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-								Grails.get(InvoiceService).unConfirmObject(object)
+								object = Grails.get(InvoiceService).unConfirmObject(object)
+								if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
 								initTable()
+							}
 							} else {
 										
 							}
@@ -441,6 +476,7 @@ class MasterInvoice extends VerticalLayout{
 			textTotalAmount.setValue(item.getItemProperty("totalAmount").toString())
 			textTotalAmount.setBuffered(true)
 			textTotalAmount.setImmediate(false)
+			textTotalAmount.setReadOnly(true)
 			layout.addComponent(textTotalAmount)
 			layout.addComponent(createSaveButton())
 			layout.addComponent(createCancelButton())
@@ -484,6 +520,7 @@ class MasterInvoice extends VerticalLayout{
 //			layout.addComponent(textDueDate)
 			textTotalAmount = new TextField("Total Amount:")
 			layout.addComponent(textTotalAmount)
+			textTotalAmount.setReadOnly(true)
 			
 //			def textArea = new TextArea("Text Area")
 //			layout.addComponent(textArea)

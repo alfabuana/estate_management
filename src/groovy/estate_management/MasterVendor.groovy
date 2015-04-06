@@ -202,8 +202,16 @@ class MasterVendor extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(VendorService).softDeletedObject(object)
-						initTable()
+						object = Grails.get(VendorService).softDeletedObject(object)
+						if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 					} else {
 								
 					}

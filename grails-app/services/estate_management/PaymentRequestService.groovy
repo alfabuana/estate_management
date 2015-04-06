@@ -16,9 +16,21 @@ class PaymentRequestService {
 	def getList(){
 		return PaymentRequest.getAll()
 	}
+	def calculateTotal(def objectId){
+		def valObject = PaymentRequest.read(objectId)
+		Double total = 0
+		for (i in valObject.paymentRequestDetails.findAll{it.isDeleted == false})
+		{
+			total = total + i.amount
+		}
+		valObject.amount = total
+		valObject.save()
+		return valObject
+	}
 	def createObject(object){
 		object.isDeleted = false
 		object.isConfirmed = false
+		object.amount = 0
 		object = paymentRequestValidationService.createObjectValidation(object as PaymentRequest)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -32,7 +44,7 @@ class PaymentRequestService {
 		valObject.username = object.username
 		valObject.description = object.description
 		valObject.code = object.code
-		valObject.amount = Double.parseDouble(object.amount)
+//		valObject.amount = Double.parseDouble(object.amount)
 		valObject.dueDate = object.dueDate
 		valObject.requestDate = object.requestDate
 		valObject = paymentRequestValidationService.updateObjectValidation(valObject)
@@ -65,7 +77,7 @@ class PaymentRequestService {
 			newObject.confirmationDate = new Date()
 			for (detail in newObject.paymentRequestDetails.findAll{ it.isDeleted == false })
 			{
-				detail.isConfirmed == true
+				detail.isConfirmed = true
 				detail.confirmationDate = new Date()
 				Payable payable = new Payable()
 				payable.username = newObject.username
@@ -83,28 +95,35 @@ class PaymentRequestService {
 			}
 			newObject.save()
 		}
+		return newObject
 	}
 	def unConfirmObject(def object){
 		def newObject = PaymentRequest.get(object.id)
+		println newObject as JSON
 		newObject = paymentRequestValidationService.unConfirmObjectValidation(newObject)
 		if (newObject.errors.getErrorCount() == 0)
 		{
-			newObject.isConfirmed = false
-			newObject.confirmationDate = null
+			
 			for (detail in newObject.paymentRequestDetails.findAll{ it.isDeleted == false })
 			{
 				Payable payable = Payable.find{
 					payableSource == "paymentRequest"&&
 					payableSourceId == newObject.id &&
-					payableSourceDetailId == detail.id
+					payableSourceDetailId == detail.id && 
+					isDeleted == false
 				}
-				payable.isDeleted = false
+				payable.isDeleted = true
 				payable.save()
+				
 				detail.isConfirmed = false
 				detail.confirmationDate = null
+				detail.save()
 			}
+			newObject.isConfirmed = false
+			newObject.confirmationDate = null
 			newObject.save()
 		}
+		return newObject
 	}
 
 

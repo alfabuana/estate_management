@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class ReceiptVoucherService {
 	ReceiptVoucherValidationService receiptVoucherValidationService
+	CashMutationService	cashMutationService
 
 	def serviceMethod() {
 
@@ -15,10 +16,22 @@ class ReceiptVoucherService {
 	def getList(){
 		return ReceiptVoucher.getAll()
 	}
+	def calculateTotal(def objectId){
+		def valObject = ReceiptVoucher.read(objectId)
+		Double total = 0
+		for (i in valObject.receiptVoucherDetails.findAll{it.isDeleted == false})
+		{
+			total = total + i.amount
+		}
+		valObject.totalAmount = total
+		valObject.save()
+		return valObject
+	}
 	def createObject(object){
 		object.isDeleted = false
 		object.isConfirmed = false
 		object.isReconciled = false
+		object.totalAmount = 0
 		object = receiptVoucherValidationService.createObjectValidation(object as ReceiptVoucher)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -34,7 +47,7 @@ class ReceiptVoucherService {
 		valObject.receiptDate = object.receiptDate
 		valObject.isGBCH = object.isGBCH
 //		valObject.dueDate = object.dueDate
-		valObject.totalAmount = Double.parseDouble(object.totalAmount)
+//		valObject.totalAmount = Double.parseDouble(object.totalAmount)
 		valObject = receiptVoucherValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -52,6 +65,10 @@ class ReceiptVoucherService {
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			newObject.isDeleted = true
+			for (detail in newObject.receiptVoucherDetails.findAll{ it.isDeleted == false })
+			{
+				detail.isDeleted = true
+			}
 			newObject.save()
 		}
 
@@ -68,7 +85,7 @@ class ReceiptVoucherService {
 				detail.isConfirmed = true
 				detail.confirmationDate = new Date()
 				Receivable receivable = Receivable.find{
-					id == newObject.receivable.id
+					id == detail.receivable.id
 				}
 				receivable.remainingAmount =receivable.remainingAmount - detail.amount
 				if(receivable.remainingAmount == 0)
@@ -76,17 +93,53 @@ class ReceiptVoucherService {
 					receivable.isCompleted = true
 				}
 			}
+			CashBank cashBank = CashBank.find {id == newObject.cashBank.id	}
+			def status = "plus"
+			def sourceDocumentType = "ReceiptVoucher"
+			def sourceDocumentCode = newObject.code
+			def sourceDocumentId = newObject.id
+			def amount = newObject.totalAmount
+			def mutationDate = newObject.confirmationDate
+			cashMutationService.createObject(cashBank, status,
+				sourceDocumentType, sourceDocumentCode, sourceDocumentId,
+				 amount, mutationDate)
 			newObject.save()
 		}
+		return newObject
 	}
 	def unConfirmObject(def object){
 		def newObject = ReceiptVoucher.get(object.id)
 		newObject = receiptVoucherValidationService.unConfirmObjectValidation(newObject)
 		if (newObject.errors.getErrorCount() == 0)
 		{
+			
+			for (detail in newObject.receiptVoucherDetails.findAll{ it.isDeleted == false })
+			{
+				detail.isConfirmed = false
+				detail.confirmationDate = null
+				Receivable receivable = Receivable.find{
+					id == detail.receivable.id
+				}
+				receivable.remainingAmount =receivable.remainingAmount + detail.amount
+				if(receivable.remainingAmount == 0)
+				{
+					receivable.isCompleted = true
+				}
+			}
+			CashBank cashBank = CashBank.find {id == newObject.cashBank.id	}
+			def status = "minus"
+			def sourceDocumentType = "ReceiptVoucher"
+			def sourceDocumentCode = newObject.code
+			def sourceDocumentId = newObject.id
+			def amount = newObject.totalAmount
+			def mutationDate = newObject.confirmationDate
+			cashMutationService.createObject(cashBank, status,
+				sourceDocumentType, sourceDocumentCode, sourceDocumentId,
+				 amount, mutationDate)
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
 			newObject.save()
 		}
+		return newObject
 	}
 }

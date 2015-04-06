@@ -207,8 +207,16 @@ class MasterHomeAssignment extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(HomeAssignmentService).softDeletedObject(object)
-						initTable()
+						object = Grails.get(HomeAssignmentService).softDeletedObject(object)
+						if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 					} else {
 								
 					}

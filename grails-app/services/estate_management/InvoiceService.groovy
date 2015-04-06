@@ -17,10 +17,22 @@ class InvoiceService {
 	def getList(){
 		return Invoice.getAll()
 	}
+	def calculateTotal(def objectId){
+		def valObject = Invoice.read(objectId)
+		Double total = 0
+		for (i in valObject.invoiceDetails.findAll{it.isDeleted == false})
+		{
+			total = total + i.amount
+		}
+		valObject.totalAmount = total
+		valObject.save()
+		return valObject
+	}
 	def createObject(object){
 		object.isDeleted = false
 		object.isConfirmed = false
 		object.isCleared = false
+		object.totalAmount = 0
 		object = invoiceValidationService.createObjectValidation(object as Invoice)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -35,7 +47,7 @@ class InvoiceService {
 		valObject.invoiceDate = object.invoiceDate
 		valObject.description = object.description
 //		valObject.dueDate = object.dueDate
-		valObject.totalAmount = Double.parseDouble(object.totalAmount)
+//		valObject.totalAmount = Double.parseDouble(object.totalAmount)
 		valObject = invoiceValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -66,7 +78,7 @@ class InvoiceService {
 			newObject.confirmationDate = new Date()
 			for (detail in newObject.invoiceDetails.findAll{ it.isDeleted == false })
 			{
-				detail.isConfirmed == true
+				detail.isConfirmed = true
 				detail.confirmationDate = new Date()
 				Receivable receivable = new Receivable()
 				receivable.username = newObject.username
@@ -84,6 +96,7 @@ class InvoiceService {
 			}
 			newObject.save()
 		}
+		return newObject
 	}
 	def unConfirmObject(def object){
 		def newObject = Invoice.get(object.id)
@@ -97,14 +110,16 @@ class InvoiceService {
 				Receivable receivable = Receivable.find{
 					receivableSource == "invoice"&&
 					receivableSourceId == newObject.id &&
-					receivableSourceDetailId == detail.id
+					receivableSourceDetailId == detail.id &&
+					isDeleted == false
 				}
-				receivable.isDeleted = false
+				receivable.isDeleted = true
 				receivable.save()
 				detail.isConfirmed = false
 				detail.confirmationDate = null
 			}
 			newObject.save()
 		}
+		return newObject
 	}
 }

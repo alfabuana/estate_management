@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class ReceiptVoucherDetailService {
 	ReceiptVoucherDetailValidationService receiptVoucherDetailValidationService
+	ReceiptVoucherService receiptVoucherService
 
 	def serviceMethod() {
 
@@ -28,6 +29,7 @@ class ReceiptVoucherDetailService {
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			receiptVoucherService.calculateTotal(object.receiptVoucher.id)
 		}
 		return object
 	}
@@ -43,6 +45,7 @@ class ReceiptVoucherDetailService {
 		if (valObject.errors.getErrorCount() == 0)
 		{
 			valObject.save()
+			receiptVoucherService.calculateTotal(valObject.receiptVoucher.id)
 		}
 		else
 		{
@@ -57,6 +60,7 @@ class ReceiptVoucherDetailService {
 		{
 			newObject.isDeleted = true
 			newObject.save()
+			receiptVoucherService.calculateTotal(newObject.receiptVoucher.id)
 		}
 
 	}

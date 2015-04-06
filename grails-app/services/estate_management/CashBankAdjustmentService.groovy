@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class CashBankAdjustmentService {
 	CashBankAdjustmentValidationService cashBankAdjustmentValidationService
+	CashMutationService	cashMutationService
 
 	def serviceMethod() {
 
@@ -59,6 +60,16 @@ class CashBankAdjustmentService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			CashBank cashBank = CashBank.find {id == newObject.cashBank.id	}
+			def status = "plus"
+			def sourceDocumentType = "cashBankAdjustment"
+			def sourceDocumentCode = newObject.code
+			def sourceDocumentId = newObject.id
+			def amount = newObject.amount
+			def mutationDate = newObject.confirmationDate
+			cashMutationService.createObject(cashBank, status,
+					sourceDocumentType, sourceDocumentCode, sourceDocumentId,
+					amount, mutationDate)
 			newObject.save()
 		}
 	}
@@ -67,6 +78,17 @@ class CashBankAdjustmentService {
 		newObject = cashBankAdjustmentValidationService.unConfirmObjectValidation(newObject)
 		if (newObject.errors.getErrorCount() == 0)
 		{
+			
+			CashBank cashBank = CashBank.find {id == newObject.cashBank.id	}
+			def status = "minus"
+			def sourceDocumentType = "cashBankAdjustment"
+			def sourceDocumentCode = newObject.code
+			def sourceDocumentId = newObject.id
+			def amount = newObject.amount
+			def mutationDate = newObject.confirmationDate
+			cashMutationService.createObject(cashBank, status,
+					sourceDocumentType, sourceDocumentCode, sourceDocumentId,
+					amount, mutationDate)
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
 			newObject.save()

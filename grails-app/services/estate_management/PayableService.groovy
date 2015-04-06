@@ -12,9 +12,11 @@ class PayableService {
 	def getObjectById(def object){
 		return Payable.get(object)
 	}
+	
 	def getList(){
-		return Payable.getAll()
+		return Payable.findAll{isDeleted==false}
 	}
+	
 	def createObject(object){
 		object.isDeleted = false
 		object.isCompleted = false

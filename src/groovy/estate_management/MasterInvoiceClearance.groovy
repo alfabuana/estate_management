@@ -340,8 +340,16 @@ class MasterInvoiceClearance extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(InvoicePaidService).confirmObject(object)
-							initTable()
+							object = Grails.get(InvoicePaidService).confirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 									
 						}
@@ -365,8 +373,16 @@ class MasterInvoiceClearance extends VerticalLayout{
 						public void onClose(ConfirmDialog dialog) {
 							if (dialog.isConfirmed()) {
 								def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-								Grails.get(InvoicePaidService).unConfirmObject(object)
+								object = Grails.get(InvoicePaidService).unConfirmObject(object)
+								if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
 								initTable()
+							}
 							} else {
 										
 							}

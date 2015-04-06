@@ -285,6 +285,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 								window.close()
 							}
 							initTableDetail()
+							initTable()
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -309,8 +310,16 @@ class MasterReceiptVoucher extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(ReceiptVoucherService).softDeletedObject(object)
-						initTable()
+						object = Grails.get(ReceiptVoucherService).softDeletedObject(object)
+						if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 					} else {
 								
 					}
@@ -334,8 +343,17 @@ class MasterReceiptVoucher extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id").toString()]
-							Grails.get(ReceiptVoucherDetailService).softDeletedObject(object)
-							initTableDetail()
+							object = Grails.get(ReceiptVoucherDetailService).softDeletedObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTableDetail()
+								initTable()
+							}
 						} else {
 
 						}
@@ -360,8 +378,16 @@ class MasterReceiptVoucher extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(ReceiptVoucherService).confirmObject(object)
-							initTable()
+							object = Grails.get(ReceiptVoucherService).confirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 									
 						}
@@ -385,8 +411,16 @@ class MasterReceiptVoucher extends VerticalLayout{
 						public void onClose(ConfirmDialog dialog) {
 							if (dialog.isConfirmed()) {
 								def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-								Grails.get(ReceiptVoucherService).unConfirmObject(object)
+								object = Grails.get(ReceiptVoucherService).unConfirmObject(object)
+								if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
 								initTable()
+							}
 							} else {
 										
 							}
@@ -458,6 +492,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 			textTotalAmount.setValue(item.getItemProperty("totalAmount").toString())
 			textTotalAmount.setBuffered(true)
 			textTotalAmount.setImmediate(false)
+			textTotalAmount.setReadOnly(true)
 			layout.addComponent(textTotalAmount)
 			layout.addComponent(createSaveButton())
 			layout.addComponent(createCancelButton())
@@ -508,6 +543,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 //			layout.addComponent(textDueDate)
 			textTotalAmount = new TextField("Total Amount:")
 			layout.addComponent(textTotalAmount)
+			textTotalAmount.setReadOnly(true)
 //			def textArea = new TextArea("Text Area")
 //			layout.addComponent(textArea)
 //			def dateField = new DateField("Date Field")

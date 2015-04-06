@@ -285,8 +285,16 @@ class MasterPostProject extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(ProjectService).softDeletedObject(object)
-						initTable()
+						object = Grails.get(ProjectService).softDeletedObject(object)
+						if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 					} else {
 								
 					}
@@ -310,8 +318,16 @@ class MasterPostProject extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id").toString()]
-							Grails.get(ProjectDetailService).softDeletedObject(object)
-							initTableDetail()
+							object = Grails.get(ProjectDetailService).softDeletedObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTableDetail()
+							}
 						} else {
 
 						}
@@ -336,8 +352,16 @@ class MasterPostProject extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(ProjectService).confirmObject(object)
-							initTable()
+							object = Grails.get(ProjectService).confirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 									
 						}
@@ -361,8 +385,16 @@ class MasterPostProject extends VerticalLayout{
 						public void onClose(ConfirmDialog dialog) {
 							if (dialog.isConfirmed()) {
 								def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-								Grails.get(ProjectService).unConfirmObject(object)
+								object = Grails.get(ProjectService).unConfirmObject(object)
+								if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
 								initTable()
+							}
 							} else {
 										
 							}

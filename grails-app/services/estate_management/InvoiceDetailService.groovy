@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class InvoiceDetailService {
 	InvoiceDetailValidationService invoiceDetailValidationService
+	InvoiceService	invoiceService
 
 	def serviceMethod() {
 
@@ -27,18 +28,20 @@ class InvoiceDetailService {
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			invoiceService.calculateTotal(object.invoice.id)
 		}
 		return object
 	}
 	def updateObject(def object){
 		def valObject = InvoiceDetail.read(object.id)
-		valObject.invoice = object.invoice
+//		valObject.invoice = object.invoice
 		valObject.code = object.code
 		valObject.amount = Double.parseDouble(object.amount)
 		valObject = invoiceDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
 			valObject.save()
+			invoiceService.calculateTotal(valObject.invoice.id)
 		}
 		else
 		{
@@ -53,6 +56,7 @@ class InvoiceDetailService {
 		{
 			newObject.isDeleted = true
 			newObject.save()
+			invoiceService.calculateTotal(newObject.invoice.id)
 		}
 
 	}

@@ -5,7 +5,8 @@ import grails.transaction.Transactional
 @Transactional
 class CashBankMutationService {
 	CashBankMutationValidationService cashBankMutationValidationService
-
+	CashMutationService	cashMutationService
+	
 	def serviceMethod() {
 
 	}
@@ -59,15 +60,59 @@ class CashBankMutationService {
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			newObject.isConfirmed = true
-			newObject.confirmationDate = newObject.confirmationDate
+			newObject.confirmationDate = new Date()
+			CashBank cashBank = CashBank.find {id == newObject.sourceCashBank.id	}
+			def status = "minus"
+			def sourceDocumentType = "CashBankMutation"
+			def sourceDocumentCode = newObject.code
+			def sourceDocumentId = newObject.id
+			def amount = newObject.amount
+			def mutationDate = newObject.confirmationDate
+			cashMutationService.createObject(cashBank, status,
+				sourceDocumentType, sourceDocumentCode, sourceDocumentId,
+				 amount, mutationDate)
+			
+			 cashBank = CashBank.find {id == newObject.targetCashBank.id	}
+			 status = "plus"
+			 sourceDocumentType = "CashBankMutation"
+			 sourceDocumentCode = newObject.code
+			 sourceDocumentId = newObject.id
+			 amount = newObject.amount
+			 mutationDate = newObject.confirmationDate
+			cashMutationService.createObject(cashBank, status,
+				sourceDocumentType, sourceDocumentCode, sourceDocumentId,
+				 amount, mutationDate)
 			newObject.save()
 		}
 	}
+	
 	def unConfirmObject(def object){
 		def newObject = CashBankMutation.get(object.id)
 		newObject = cashBankMutationValidationService.softdeleteObjectValidation(newObject)
 		if (newObject.errors.getErrorCount() == 0)
 		{
+			
+			CashBank cashBank = CashBank.find {id == newObject.sourceCashBank.id	}
+			def status = "plus"
+			def sourceDocumentType = "CashBankMutation"
+			def sourceDocumentCode = newObject.code
+			def sourceDocumentId = newObject.id
+			def amount = newObject.amount
+			def mutationDate = newObject.confirmationDate
+			cashMutationService.createObject(cashBank, status,
+				sourceDocumentType, sourceDocumentCode, sourceDocumentId,
+				 amount, mutationDate)
+			
+			 cashBank = CashBank.find {id == newObject.targetCashBank.id	}
+			 status = "minus"
+			 sourceDocumentType = "CashBankMutation"
+			 sourceDocumentCode = newObject.code
+			 sourceDocumentId = newObject.id
+			 amount = newObject.amount
+			 mutationDate = newObject.confirmationDate
+			cashMutationService.createObject(cashBank, status,
+				sourceDocumentType, sourceDocumentCode, sourceDocumentId,
+				 amount, mutationDate)
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
 			newObject.save()
