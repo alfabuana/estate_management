@@ -1,10 +1,12 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 @Transactional
 class ProjectVoteService {
 	ProjectVoteValidationService projectVoteValidationService
+	ProjectService projectService
 
 	def serviceMethod() {
 
@@ -48,6 +50,41 @@ class ProjectVoteService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
-
+	}
+	
+	def agreeObject(def object){
+		object.username = ShiroUser.find{
+			username == object.username
+		}
+		object.project = Project.find{
+			id == object.projectid
+		}
+		object.isAgree = true
+		object.isDeleted = false
+		object = projectVoteValidationService.createObjectValidation(object as ProjectVote)
+		if (object.errors.getErrorCount() == 0)
+		{
+			object = object.save()
+			projectService.calculateTotal(object.project.id)
+		}
+		return object
+	}
+	
+	def disagreeObject(def object){
+		object.username = ShiroUser.find{
+			username == object.username
+		}
+		object.project = Project.find{
+			id == object.projectid
+		}
+		object.isAgree = false
+		object.isDeleted = false
+		object = projectVoteValidationService.createObjectValidation(object as ProjectVote)
+		if (object.errors.getErrorCount() == 0)
+		{
+			object = object.save()
+			projectService.calculateTotal(object.project.id)
+		}
+		return object
 	}
 }

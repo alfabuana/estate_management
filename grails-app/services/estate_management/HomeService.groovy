@@ -16,6 +16,10 @@ class HomeService {
 	def getList(){
 		return Home.getAll()
 	}
+	
+	def getListDeleted(){
+		return Home.findAll{isDeleted == false}
+	}
 	def createObject(object){
 		
 		object.isDeleted = false

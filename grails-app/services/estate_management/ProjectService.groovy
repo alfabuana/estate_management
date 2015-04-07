@@ -15,11 +15,37 @@ class ProjectService {
 	def getList(){
 		return Project.getAll()
 	}
+	
+	def getListConfirm(){
+		return Project.findAll{isConfirmed == true && isDeleted == false}
+	}
+	
+	def calculateTotal(def objectId){
+		def valObject = Project.read(objectId)
+		Double totalAgree = 0
+		Double totalDisagree = 0 
+		for (i in valObject.projectVotes.findAll{it.isDeleted == false})
+		{
+			if (i.isAgree == true){
+				totalAgree = totalAgree + 1
+			}
+			else
+			{
+				totalDisagree = totalDisagree + 1
+			}
+		}
+		valObject.amountAgree = totalAgree
+		valObject.amountDisagree = totalDisagree
+		valObject.save()
+		return valObject
+	}
+	
 	def createObject(object){
 		object.amountAgree = 0
 		object.amountDisagree = 0
 		object.isDeleted = false
 		object.isConfirmed = false
+		object.isFinished = false
 		object = projectValidationService.createObjectValidation(object as Project)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -31,6 +57,7 @@ class ProjectService {
 		def valObject = Project.read(object.id)
 		valObject.title = object.title
 		valObject.description = object.description
+		valObject.complaint = object.complaint
 		valObject = projectValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -70,6 +97,28 @@ class ProjectService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.save()
+		}
+
+	}
+	def finishObject(def object){
+		def newObject = Project.get(object.id)
+		newObject = projectValidationService.finishObjectValidation(newObject)
+		if (newObject.errors.getErrorCount() == 0)
+		{
+			newObject.isFinished = true
+			newObject.finishDate = new Date()
+			newObject.save()
+		}
+
+	}
+	def unFinishObject(def object){
+		def newObject = Project.get(object.id)
+		newObject = projectValidationService.unFinishObjectValidation(newObject)
+		if (newObject.errors.getErrorCount() == 0)
+		{
+			newObject.isFinished = false
+			newObject.finishDate = null
 			newObject.save()
 		}
 

@@ -127,7 +127,7 @@ class MasterProjectVote extends VerticalLayout{
 								break;
 							case "Disagree":
 								if (table.getValue() != null)
-									windowDiasgree("Disagree");
+									windowDisagree("Disagree");
 								break;
 //							case "AddDetail":
 //								if (table.getValue() != null)
@@ -153,7 +153,7 @@ class MasterProjectVote extends VerticalLayout{
 //		MenuItem updateMenu = menuBar.addItem("Edit", mycommand)
 //		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem agreeMenu = menuBar.addItem("Agree", mycommand)
-		MenuItem disagreeMenu = menuBar.addItem("Disgree", mycommand)
+		MenuItem disagreeMenu = menuBar.addItem("Disagree", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")	
 		//	END BUTTON MENU
@@ -324,56 +324,74 @@ class MasterProjectVote extends VerticalLayout{
 //		//		}
 //	}
 
-//	//	===========================================
-//	//	WINDOW CONFIRM
-//	//	===========================================
-//		
-//		//@RequiresPermissions("Master:Item:Delete")
-//		private void windowConfirm(String caption) {
-//	//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
-//				ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
-//				new ConfirmDialog.Listener() {
-//					public void onClose(ConfirmDialog dialog) {
-//						if (dialog.isConfirmed()) {
-//							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-//							Grails.get(ProjectService).confirmObject(object)
-//							initTable()
-//						} else {
-//									
-//						}
-//					}
-//				})
-//	//		} else {
-//	//			Notification.show("Access Denied\n",
-//	//				"Anda tidak memiliki izin untuk Menghapus Record",
-//	//				Notification.Type.ERROR_MESSAGE);
-//	//		}
-//		}
-//		//	===========================================
-//		//	WINDOW UNCONFIRM
-//		//	===========================================
-//			
-//			//@RequiresPermissions("Master:Item:Delete")
-//			private void windowUnConfirm(String caption) {
-//		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
-//					ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
-//					new ConfirmDialog.Listener() {
-//						public void onClose(ConfirmDialog dialog) {
-//							if (dialog.isConfirmed()) {
-//								def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-//								Grails.get(ProjectService).unConfirmObject(object)
-//								initTable()
-//							} else {
-//										
-//							}
-//						}
-//					})
-//		//		} else {
-//		//			Notification.show("Access Denied\n",
-//		//				"Anda tidak memiliki izin untuk Menghapus Record",
-//		//				Notification.Type.ERROR_MESSAGE);
-//		//		}
-//			}
+	//	===========================================
+	//	WINDOW AGREE
+	//	===========================================
+		
+		//@RequiresPermissions("Master:Item:Delete")
+		private void windowAgree(String caption) {
+	//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [projectid:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+											,username : String.valueOf(getSession().getAttribute("user"))]
+							object = Grails.get(ProjectVoteService).agreeObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = []
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
+						} else {
+									
+						}
+					}
+				})
+	//		} else {
+	//			Notification.show("Access Denied\n",
+	//				"Anda tidak memiliki izin untuk Menghapus Record",
+	//				Notification.Type.ERROR_MESSAGE);
+	//		}
+		}
+		//	===========================================
+		//	WINDOW DISAGREE
+		//	===========================================
+			
+			//@RequiresPermissions("Master:Item:Delete")
+			private void windowDisagree(String caption) {
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+					ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+					new ConfirmDialog.Listener() {
+						public void onClose(ConfirmDialog dialog) {
+							if (dialog.isConfirmed()) {
+								def object = [projectid:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+									,username : String.valueOf(getSession().getAttribute("user"))]
+								object = Grails.get(ProjectVoteService).disagreeObject(object)
+								if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
+							} else {
+										
+							}
+						}
+					})
+		//		} else {
+		//			Notification.show("Access Denied\n",
+		//				"Anda tidak memiliki izin untuk Menghapus Record",
+		//				Notification.Type.ERROR_MESSAGE);
+		//		}
+			}
 ////	========================================
 //	//WINDOW EDIT
 ////	========================================
@@ -557,7 +575,7 @@ class MasterProjectVote extends VerticalLayout{
 		
 		tableContainer = new BeanItemContainer<Project>(Project.class);
 		//fillTableContainer(tableContainer);
-	    itemlist = Grails.get(ProjectService).getList()
+	    itemlist = Grails.get(ProjectService).getListConfirm()
 		tableContainer.addAll(itemlist)
 //		tableContainer.addNestedContainerProperty("facility1.id")
 //		tableContainer.addNestedContainerProperty("facility1.nama")

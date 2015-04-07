@@ -15,6 +15,10 @@ class CashBankService {
 	def getList(){
 		return CashBank.getAll()
 	}
+	def getListDeleted(){
+		return CashBank.findAll{isDeleted == false}
+	}
+	
 	def createObject(object){
 		object.isDeleted = false
 		object = cashBankValidationService.createObjectValidation(object as CashBank)

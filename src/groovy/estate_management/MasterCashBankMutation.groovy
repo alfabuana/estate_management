@@ -313,7 +313,7 @@ class MasterCashBankMutation extends VerticalLayout{
 		layout.addComponent(textId)
 		cmbSourceCashBank = new ComboBox("Source Cash Bank:");
 		def beanCashBank = new BeanItemContainer<CashBank>(CashBank.class)
-		def cashBankList = Grails.get(CashBankService).getList()
+		def cashBankList = Grails.get(CashBankService).getListDeleted()
 		beanCashBank.addAll(cashBankList)
 		cmbSourceCashBank.setContainerDataSource(beanCashBank)
 		cmbSourceCashBank.setItemCaptionPropertyId("name")
@@ -369,7 +369,7 @@ class MasterCashBankMutation extends VerticalLayout{
 		layout.addComponent(textId)
 		cmbSourceCashBank = new ComboBox("Source Cash Bank:")
 		def beanCashBank = new BeanItemContainer<CashBank>(CashBank.class)
-		def cashBankList = Grails.get(CashBankService).getList()
+		def cashBankList = Grails.get(CashBankService).getListDeleted()
 		beanCashBank.addAll(cashBankList)
 		cmbSourceCashBank.setContainerDataSource(beanCashBank)
 		cmbSourceCashBank.setItemCaptionPropertyId("name")

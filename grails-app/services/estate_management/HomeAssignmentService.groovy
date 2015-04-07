@@ -5,7 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class HomeAssignmentService {
 	HomeAssignmentValidationService homeAssignmentValidationService
-
+	HomeDetailService homeDetailService
 	def serviceMethod() {
 
 	}
@@ -60,7 +60,27 @@ class HomeAssignmentService {
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
 			newObject.save()
+
+			HomeDetail homeDetail = HomeDetail.find{
+				home == newObject.home && username == newObject.username
+			}
+			if (homeDetail == null)
+			{
+				homeDetail = new HomeDetail()
+				homeDetail.home = newObject.home
+				homeDetail.username = newObject.username
+				homeDetail.lastAssignDate = newObject.assignDate
+				homeDetailService.createObject(homeDetail)
+			}
+			else
+			{
+				homeDetail.isDeleted = false
+				homeDetail.lastAssignDate = newObject.assignDate
+				homeDetailService.updateObject(homeDetail)
+			}
+
 		}
+		return newObject
 	}
 	def unConfirmObject(def object){
 		def newObject = HomeAssignment.get(object.id)
@@ -70,7 +90,13 @@ class HomeAssignmentService {
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
 			newObject.save()
+			HomeDetail homeDetail = HomeDetail.find{
+				home == newObject.home && username == newObject.username
+			}
+			homeDetail.isDeleted = true
+			homeDetail.save()
 		}
+		return newObject
 	}
 
 

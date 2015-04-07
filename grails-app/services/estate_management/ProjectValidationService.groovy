@@ -42,8 +42,6 @@ class ProjectValidationService {
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
 //		if (object.errors.hasErrors()) return object
-//		object = amountAgreeNotNull(object)
-//		if (object.errors.hasErrors()) return object
 //		object = amountDisagreeNotNull(object)
 		return object
 	}
@@ -52,8 +50,6 @@ class ProjectValidationService {
 		object = titleNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = amountAgreeNotNull(object)
 //		if (object.errors.hasErrors()) return object
 //		object = amountDisagreeNotNull(object)
 		return object
@@ -67,6 +63,14 @@ class ProjectValidationService {
 		return object
 	}
 	def unConfirmObjectValidation(object)
+	{
+		return object
+	}
+	def finishObjectValidation(object)
+	{
+		return object
+	}
+	def unFinishObjectValidation(object)
 	{
 		return object
 	}

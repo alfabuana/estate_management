@@ -10,7 +10,9 @@ import estate_management.widget.GeneralFunction
 
 
 
+
 import org.vaadin.dialogs.ConfirmDialog
+
 
 
 
@@ -51,6 +53,8 @@ import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
 
 import estate_management.ComplaintService
+import grails.converters.JSON
+
 
 
 
@@ -135,6 +139,14 @@ class MasterComplaint extends VerticalLayout{
 						if (table.getValue() != null)
 						windowUnConfirm("Unconfirm");
 					break;
+					case "Clear":
+					if (table.getValue() != null)
+						windowClear("Clear");
+					break;
+				case "Unclear":
+					if (table.getValue() != null)
+						windowUnclear("Unclear");
+					break;
 				case "AddDetail":
 				if (table.getValue() != null)
 					windowAddDetail(tableContainer.getItem(table.getValue()),"AddDetail");
@@ -160,6 +172,8 @@ class MasterComplaint extends VerticalLayout{
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
 		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
+		MenuItem clearMenu = menuBar.addItem("Clear", mycommand)
+		MenuItem unclearMenu = menuBar.addItem("Unclear", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")	
 		//	END BUTTON MENU
@@ -200,12 +214,12 @@ class MasterComplaint extends VerticalLayout{
 			void buttonClick(Button.ClickEvent event) {
 				try{
 					def object = [id:textId.getValue(),
-								  username:cmbUser.getValue(),
+								  username:String.valueOf(getSession().getAttribute("user")),
 								  home:cmbHome.getValue(),
 								  title:textTitle.getValue(),
 								  description:textDescription.getValue()
 								  ]
-					
+				
 					if (object.id == "")
 					{
 						object =  Grails.get(ComplaintService).createObject(object)
@@ -214,7 +228,6 @@ class MasterComplaint extends VerticalLayout{
 					{
 						object =  Grails.get(ComplaintService).updateObject(object)
 					}
-					
 					
 					if (object.errors.hasErrors())
 					{
@@ -405,6 +418,75 @@ class MasterComplaint extends VerticalLayout{
 //				Notification.Type.ERROR_MESSAGE);
 //		}
 	}
+			//	===========================================
+			//	WINDOW CLEAR
+			//	===========================================
+		
+			//@RequiresPermissions("Master:Item:Delete")
+			private void windowClear(String caption) {
+				//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+						new ConfirmDialog.Listener() {
+							public void onClose(ConfirmDialog dialog) {
+								if (dialog.isConfirmed()) {
+									def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+									object = Grails.get(ComplaintService).clearObject(object)
+									if (object.errors.hasErrors())
+									{
+										Object[] tv = [textId]
+										generalFunction.setErrorUI(tv,object)
+									}
+									else
+									{
+										initTable()
+									}
+								} else {
+		
+								}
+							}
+						})
+				//		} else {
+				//			Notification.show("Access Denied\n",
+				//				"Anda tidak memiliki izin untuk Menghapus Record",
+				//				Notification.Type.ERROR_MESSAGE);
+				//		}
+			}
+		
+		
+			//	===========================================
+			//	WINDOW UNCLEAR
+			//	===========================================
+		
+			//@RequiresPermissions("Master:Item:Delete")
+			private void windowUnclear(String caption) {
+				//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+						new ConfirmDialog.Listener() {
+							public void onClose(ConfirmDialog dialog) {
+								if (dialog.isConfirmed()) {
+									def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+									object = Grails.get(ComplaintService).unClearObject(object)
+									if (object.errors.hasErrors())
+									{
+										Object[] tv = [textId]
+										generalFunction.setErrorUI(tv,object)
+									}
+									else
+									{
+										initTable()
+									}
+								} else {
+		
+								}
+							}
+						})
+				//		} else {
+				//			Notification.show("Access Denied\n",
+				//				"Anda tidak memiliki izin untuk Menghapus Record",
+				//				Notification.Type.ERROR_MESSAGE);
+				//		}
+			}
+		
 //	========================================
 	//WINDOW EDIT
 //	========================================
@@ -422,17 +504,18 @@ class MasterComplaint extends VerticalLayout{
 			layout.addComponent(textId)
 			cmbUser = new ComboBox("User:");
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-			def userList = Grails.get(UserService).getList()
+			def userList = Grails.get(UserService).getListDeleted()
 			beanUser.addAll(userList)
 			cmbUser.setContainerDataSource(beanUser)
 			cmbUser.setItemCaptionPropertyId("username")
 			cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("username.id").value})
 			cmbUser.setBuffered(true)
 			cmbUser.setImmediate(false)
+			cmbUser.setReadOnly(true)
 			layout.addComponent(cmbUser)
 			cmbHome = new ComboBox("Home:");
 			def beanHome = new BeanItemContainer<Home>(Home.class)
-			def homeList = Grails.get(HomeService).getList()
+			def homeList = Grails.get(HomeService).getListDeleted()
 			beanHome.addAll(homeList)
 			cmbHome.setContainerDataSource(beanHome)
 			cmbHome.setItemCaptionPropertyId("name")
@@ -477,14 +560,15 @@ class MasterComplaint extends VerticalLayout{
 			layout.addComponent(textId)
 			cmbUser = new ComboBox("User:")
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-			def userList = Grails.get(UserService).getList()
+			def userList = Grails.get(UserService).getListDeleted()
 			beanUser.addAll(userList)
 			cmbUser.setContainerDataSource(beanUser)
 			cmbUser.setItemCaptionPropertyId("username")
+			cmbUser.setReadOnly(true)
 			layout.addComponent(cmbUser)
 			cmbHome = new ComboBox("Home:")
 			def beanHome = new BeanItemContainer<Home>(Home.class)
-			def homeList = Grails.get(HomeService).getList()
+			def homeList = Grails.get(HomeService).getListDeleted()
 			beanHome.addAll(homeList)
 			cmbHome.setContainerDataSource(beanHome)
 			cmbHome.setItemCaptionPropertyId("name")
@@ -635,7 +719,7 @@ class MasterComplaint extends VerticalLayout{
 //		table.setColumnHeader("durasi","Duration")
 //		table.setColumnHeader("dateStartUsing","Date Start Using")
 //		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["username.username","home.name","title","description","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["username.username","home.name","title","description","isConfirmed","confirmationDate","isCleared","clearDate","dateCreated","lastUpdated","isDeleted"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

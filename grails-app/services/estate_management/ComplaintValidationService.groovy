@@ -8,6 +8,7 @@ class ComplaintValidationService {
     def serviceMethod() {
 
     }
+	
 	def usernameNotNull(def object){
 		if (object.username == null || object.username == "")
 		{
@@ -67,6 +68,14 @@ class ComplaintValidationService {
 		return object
 	}
 	def unConfirmObjectValidation(object)
+	{
+		return object
+	}
+	def clearObjectValidation(object)
+	{
+		return object
+	}
+	def unClearObjectValidation(object)
 	{
 		return object
 	}

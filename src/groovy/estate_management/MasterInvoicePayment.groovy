@@ -48,6 +48,7 @@ import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
 
 import estate_management.ProjectService
+import grails.converters.JSON
 
 
 
@@ -195,7 +196,7 @@ class MasterInvoicePayment extends VerticalLayout{
 				try{
 					def object = [id:textId.getValue(),
 								invoice:cmbInvoice.getValue(),
-								  username:cmbUser.getValue(),
+								  username:String.valueOf(getSession().getAttribute("user")),
 								  description:textDescription.getValue(),
 								  paidDate:textPaidDate.getValue()
 								  ]
@@ -427,7 +428,7 @@ class MasterInvoicePayment extends VerticalLayout{
 			layout.addComponent(textId)
 			cmbInvoice = new ComboBox("Invoice:");
 			def beanInvoice = new BeanItemContainer<Invoice>(Invoice.class)
-			def invoiceList = Grails.get(InvoiceService).getList()
+			def invoiceList = Grails.get(InvoiceService).getListDeleted()
 			beanInvoice.addAll(invoiceList)
 			cmbInvoice.setContainerDataSource(beanInvoice)
 			cmbInvoice.setItemCaptionPropertyId("code")
@@ -437,13 +438,14 @@ class MasterInvoicePayment extends VerticalLayout{
 			layout.addComponent(cmbInvoice)
 			cmbUser = new ComboBox("User:");
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-			def userList = Grails.get(UserService).getList()
+			def userList = Grails.get(UserService).getListDeleted()
 			beanUser.addAll(userList)
 			cmbUser.setContainerDataSource(beanUser)
 			cmbUser.setItemCaptionPropertyId("username")
 			cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("username.id").value})
 			cmbUser.setBuffered(true)
 			cmbUser.setImmediate(false)
+			cmbUser.setReadOnly(true)
 			layout.addComponent(cmbUser)
 			textDescription = new TextField("Description:");
 			textDescription.setPropertyDataSource(item.getItemProperty("description"))
@@ -482,17 +484,18 @@ class MasterInvoicePayment extends VerticalLayout{
 			layout.addComponent(textId)
 			cmbInvoice = new ComboBox("Invoice:")
 			def beanInvoice = new BeanItemContainer<Invoice>(Invoice.class)
-			def invoiceList = Grails.get(InvoiceService).getList()
+			def invoiceList = Grails.get(InvoiceService).getListDeleted()
 			beanInvoice.addAll(invoiceList)
 			cmbInvoice.setContainerDataSource(beanInvoice)
 			cmbInvoice.setItemCaptionPropertyId("code")
 			layout.addComponent(cmbInvoice)
 			cmbUser = new ComboBox("User:")
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-			def userList = Grails.get(UserService).getList()
+			def userList = Grails.get(UserService).getListDeleted()
 			beanUser.addAll(userList)
 			cmbUser.setContainerDataSource(beanUser)
 			cmbUser.setItemCaptionPropertyId("username")
+			cmbUser.setReadOnly(true)
 			layout.addComponent(cmbUser)
 			textDescription = new TextField("Description:")
 			layout.addComponent(textDescription)

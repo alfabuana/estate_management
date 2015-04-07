@@ -66,17 +66,18 @@ class MasterPostProject extends VerticalLayout{
 	private Window window
 	private TextField textId
 	private TextField textSKU
-//	private TextField textDescription
-	
+	//	private TextField textDescription
+
 	//==============================
 	private TextField textTitle
 	private TextField textDescription
-	
+	private ComboBox cmbComplaint
+
 	private TextField textIdDetail
 	private TextField textAttachmentUrlDetail
-	
+
 	//==============================
-	
+
 	private Table table = new Table();
 	private Table tableDetail = new Table()
 	private BeanItemContainer<Project> tableContainer;
@@ -87,22 +88,22 @@ class MasterPostProject extends VerticalLayout{
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
 	String Title = "Project"
-//						Constant.MenuName.Item + ":";
-	
+	//						Constant.MenuName.Item + ":";
+
 	public MasterPostProject() {
-//		currentUser = SecurityUtils.getSubject();
-//		table = new Table()
+		//		currentUser = SecurityUtils.getSubject();
+		//		table = new Table()
 		initTable();
-		
+
 		HorizontalLayout menu = new HorizontalLayout()
 		menu.setWidth("100%")
-//		menu.addComponent(createAddButton())
-//		menu.addComponent(createUpdateButton())
-//		menu.addComponent(createDeleteButton())
-//		
+		//		menu.addComponent(createAddButton())
+		//		menu.addComponent(createUpdateButton())
+		//		menu.addComponent(createDeleteButton())
+		//
 		addComponent(menu)
-		
-		
+
+
 		//		EVENT CLICK MENUBAR
 		menuBar = new MenuBar()
 		MenuBar.Command mycommand = new MenuBar.Command() {
@@ -129,6 +130,14 @@ class MasterPostProject extends VerticalLayout{
 								if (table.getValue() != null)
 									windowUnConfirm("Unconfirm");
 								break;
+							case "Finish":
+								if (table.getValue() != null)
+									windowFinish("Finish");
+								break;
+							case "Unfinish":
+								if (table.getValue() != null)
+									windowUnFinish("Unfinish");
+								break;
 							case "AddDetail":
 								if (table.getValue() != null)
 									windowAddDetail(tableContainer.getItem(table.getValue()),"AddDetail");
@@ -146,18 +155,20 @@ class MasterPostProject extends VerticalLayout{
 						}
 					}
 				};
-//	END EVENT CLICK
-	
-	// UNTUK BUTTON MENU 
+		//	END EVENT CLICK
+
+		// UNTUK BUTTON MENU
 		MenuItem saveMenu =  menuBar.addItem("Add",mycommand)
 		MenuItem updateMenu = menuBar.addItem("Edit", mycommand)
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
 		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
+		MenuItem finishMenu = menuBar.addItem("Finish", mycommand)
+		MenuItem unFinishMenu = menuBar.addItem("Unfinish", mycommand)
 		menu.addComponent(menuBar)
-		menuBar.setWidth("100%")	
+		menuBar.setWidth("100%")
 		//	END BUTTON MENU
-	
+
 		addComponent(table)
 		//		======================
 		//		View Detail
@@ -174,64 +185,66 @@ class MasterPostProject extends VerticalLayout{
 		//		==========================
 		//		ENd View Detail
 		//		==========================
-//		table.setPageLength(table.size())
+		//		table.setPageLength(table.size())
 	}
-	
-	
+
+
 	private Button createCancelButton() {
 		def saveButton = new Button("Cancel", new Button.ClickListener() {
-			void buttonClick(Button.ClickEvent event) {
-//				window.setCaption(textSKU.getValue())
-//				textSKU.discard()
-				window.close()
-			}
-		  })
-	}
-	
-	private Button createSaveButton() {
-		def saveButton = new Button("Save", new Button.ClickListener() {
-			
-			void buttonClick(Button.ClickEvent event) {
-				try{
-					def object = [id:textId.getValue(),
-								  title:textTitle.getValue(),
-								  description:textDescription.getValue(),
-								  ]
-					
-					if (object.id == "")
-					{
-						object =  Grails.get(ProjectService).createObject(object)
-					}
-					else
-					{
-						object =  Grails.get(ProjectService).updateObject(object)
-					}
-					
-					
-					if (object.errors.hasErrors())
-					{
-						textTitle.setData("title")
-						textDescription.setData("description")
-						Object[] tv = [textTitle,textDescription]
-						generalFunction.setErrorUI(tv,object)
-					}
-					else
-					{
+					void buttonClick(Button.ClickEvent event) {
+						//				window.setCaption(textSKU.getValue())
+						//				textSKU.discard()
 						window.close()
 					}
-					initTable()
-				}catch (Exception e)
-				{
-					Notification.show("Error\n",
-						e.getMessage(),
-						Notification.Type.ERROR_MESSAGE);
-				}
-				 
-				
-			}
-		  })
+				})
 	}
-	
+
+	private Button createSaveButton() {
+		def saveButton = new Button("Save", new Button.ClickListener() {
+
+					void buttonClick(Button.ClickEvent event) {
+						try{
+							def object = [id:textId.getValue(),
+								title:textTitle.getValue(),
+								description:textDescription.getValue(),
+								complaint:cmbComplaint.getValue()
+							]
+
+							if (object.id == "")
+							{
+								object =  Grails.get(ProjectService).createObject(object)
+							}
+							else
+							{
+								object =  Grails.get(ProjectService).updateObject(object)
+							}
+
+
+							if (object.errors.hasErrors())
+							{
+								textTitle.setData("title")
+								textDescription.setData("description")
+								cmbComplaint.setData("complaint")
+								Object[] tv = [textTitle,textDescription,cmbComplaint]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								window.close()
+							}
+							initTable()
+						}catch (Exception e)
+						{
+							Notification.show("Error\n",
+									e.getMessage(),
+									Notification.Type.ERROR_MESSAGE);
+						}
+
+
+					}
+				})
+	}
+
 	private Button createSaveDetailButton() {
 		def saveButton = new Button("Save", new Button.ClickListener() {
 
@@ -241,7 +254,7 @@ class MasterPostProject extends VerticalLayout{
 								projectId:textId.getValue(),
 								attachmentUrl:textAttachmentUrlDetail.getValue()
 							]
-							
+
 							if (object.id == "")
 							{
 								object =  Grails.get(ProjectDetailService).createObject(object)
@@ -273,20 +286,20 @@ class MasterPostProject extends VerticalLayout{
 				})
 	}
 
-//	===========================================
-//	WINDOW DELETE
-//	===========================================
-	
+	//	===========================================
+	//	WINDOW DELETE
+	//	===========================================
+
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDelete(String caption) {
-//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
-			ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
-			new ConfirmDialog.Listener() {
-				public void onClose(ConfirmDialog dialog) {
-					if (dialog.isConfirmed()) {
-						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						object = Grails.get(ProjectService).softDeletedObject(object)
-						if (object.errors.hasErrors())
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							object = Grails.get(ProjectService).softDeletedObject(object)
+							if (object.errors.hasErrors())
 							{
 								Object[] tv = [textId]
 								generalFunction.setErrorUI(tv,object)
@@ -295,16 +308,16 @@ class MasterPostProject extends VerticalLayout{
 							{
 								initTable()
 							}
-					} else {
-								
+						} else {
+
+						}
 					}
-				}
-			})
-//		} else {
-//			Notification.show("Access Denied\n",
-//				"Anda tidak memiliki izin untuk Menghapus Record",
-//				Notification.Type.ERROR_MESSAGE);
-//		}
+				})
+		//		} else {
+		//			Notification.show("Access Denied\n",
+		//				"Anda tidak memiliki izin untuk Menghapus Record",
+		//				Notification.Type.ERROR_MESSAGE);
+		//		}
 	}
 	//	===========================================
 	//	WINDOW DELETE DETAIL
@@ -343,11 +356,11 @@ class MasterPostProject extends VerticalLayout{
 	//	===========================================
 	//	WINDOW CONFIRM
 	//	===========================================
-		
-		//@RequiresPermissions("Master:Item:Delete")
-		private void windowConfirm(String caption) {
-	//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
-				ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+
+	//@RequiresPermissions("Master:Item:Delete")
+	private void windowConfirm(String caption) {
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
@@ -363,30 +376,30 @@ class MasterPostProject extends VerticalLayout{
 								initTable()
 							}
 						} else {
-									
+
 						}
 					}
 				})
-	//		} else {
-	//			Notification.show("Access Denied\n",
-	//				"Anda tidak memiliki izin untuk Menghapus Record",
-	//				Notification.Type.ERROR_MESSAGE);
-	//		}
-		}
-		//	===========================================
-		//	WINDOW UNCONFIRM
-		//	===========================================
-			
-			//@RequiresPermissions("Master:Item:Delete")
-			private void windowUnConfirm(String caption) {
+		//		} else {
+		//			Notification.show("Access Denied\n",
+		//				"Anda tidak memiliki izin untuk Menghapus Record",
+		//				Notification.Type.ERROR_MESSAGE);
+		//		}
+	}
+	//	===========================================
+	//	WINDOW UNCONFIRM
+	//	===========================================
+
+	//@RequiresPermissions("Master:Item:Delete")
+	private void windowUnConfirm(String caption) {
 		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
-					ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
-					new ConfirmDialog.Listener() {
-						public void onClose(ConfirmDialog dialog) {
-							if (dialog.isConfirmed()) {
-								def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-								object = Grails.get(ProjectService).unConfirmObject(object)
-								if (object.errors.hasErrors())
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							object = Grails.get(ProjectService).unConfirmObject(object)
+							if (object.errors.hasErrors())
 							{
 								Object[] tv = [textId]
 								generalFunction.setErrorUI(tv,object)
@@ -395,98 +408,183 @@ class MasterPostProject extends VerticalLayout{
 							{
 								initTable()
 							}
-							} else {
-										
-							}
+						} else {
+
 						}
-					})
+					}
+				})
 		//		} else {
 		//			Notification.show("Access Denied\n",
 		//				"Anda tidak memiliki izin untuk Menghapus Record",
 		//				Notification.Type.ERROR_MESSAGE);
 		//		}
-			}
-//	========================================
+	}
+	//	===========================================
+	//	WINDOW FINISH
+	//	===========================================
+
+	//@RequiresPermissions("Master:Item:Delete")
+	private void windowFinish(String caption) {
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							object = Grails.get(ProjectService).finishObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
+						} else {
+
+						}
+					}
+				})
+		//		} else {
+		//			Notification.show("Access Denied\n",
+		//				"Anda tidak memiliki izin untuk Menghapus Record",
+		//				Notification.Type.ERROR_MESSAGE);
+		//		}
+	}
+
+
+	//	===========================================
+	//	WINDOW UNFINISH
+	//	===========================================
+
+	//@RequiresPermissions("Master:Item:Delete")
+	private void windowUnFinish(String caption) {
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							object = Grails.get(ProjectService).unFinishObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
+						} else {
+
+						}
+					}
+				})
+		//		} else {
+		//			Notification.show("Access Denied\n",
+		//				"Anda tidak memiliki izin untuk Menghapus Record",
+		//				Notification.Type.ERROR_MESSAGE);
+		//		}
+	}
+	//	========================================
 	//WINDOW EDIT
-//	========================================
+	//	========================================
 	//@RequiresPermissions("Master:Item:Edit")
 	private void windowEdit(def item,String caption) {
-//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
-			window = new Window(caption);
-			window.setModal(true);
-			layout = new FormLayout();
-			layout.setMargin(true);
-			window.setContent(layout);
-			textId = new TextField("Id:");
-			textId.setPropertyDataSource(item.getItemProperty("id"))
-			textId.setReadOnly(true)
-			layout.addComponent(textId)
-			textTitle = new TextField("Title:");
-			textTitle.setPropertyDataSource(item.getItemProperty("title"))
-			textTitle.setBuffered(true)
-			textTitle.setImmediate(false)
-			layout.addComponent(textTitle)
-			textDescription = new TextField("Description:");
-			textDescription.setPropertyDataSource(item.getItemProperty("description"))
-			textDescription.setBuffered(true)
-			textDescription.setImmediate(false)
-			layout.addComponent(textDescription)
-			layout.addComponent(createSaveButton())
-			layout.addComponent(createCancelButton())
-			getUI().addWindow(window);
-//		} else {
-//			Notification.show("Access Denied\n",
-//				"Anda tidak memiliki izin untuk Mengubah Record",
-//				Notification.Type.ERROR_MESSAGE);
-//		}
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+		window = new Window(caption);
+		window.setModal(true);
+		layout = new FormLayout();
+		layout.setMargin(true);
+		window.setContent(layout);
+		textId = new TextField("Id:");
+		textId.setPropertyDataSource(item.getItemProperty("id"))
+		textId.setReadOnly(true)
+		layout.addComponent(textId)
+		textTitle = new TextField("Title:");
+		textTitle.setPropertyDataSource(item.getItemProperty("title"))
+		textTitle.setBuffered(true)
+		textTitle.setImmediate(false)
+		layout.addComponent(textTitle)
+		textDescription = new TextField("Description:");
+		textDescription.setPropertyDataSource(item.getItemProperty("description"))
+		textDescription.setBuffered(true)
+		textDescription.setImmediate(false)
+		layout.addComponent(textDescription)
+		cmbComplaint = new ComboBox("Complaint");
+		def beanComplaint = new BeanItemContainer<Complaint>(Complaint.class)
+		def complaintList = Grails.get(ComplaintService).getListDeleted()
+		beanComplaint.addAll(complaintList)
+		cmbComplaint.setContainerDataSource(beanComplaint)
+		cmbComplaint.setItemCaptionPropertyId("title")
+		cmbComplaint.select(cmbComplaint.getItemIds().find{ it.id == item.getItemProperty("complaint.id").value})
+		cmbComplaint.setBuffered(true)
+		cmbComplaint.setImmediate(false)
+		layout.addComponent(cmbComplaint)
+		layout.addComponent(createSaveButton())
+		layout.addComponent(createCancelButton())
+		getUI().addWindow(window);
+		//		} else {
+		//			Notification.show("Access Denied\n",
+		//				"Anda tidak memiliki izin untuk Mengubah Record",
+		//				Notification.Type.ERROR_MESSAGE);
+		//		}
 	}
-	
-	
-//	========================================
+
+
+	//	========================================
 	//WINDOW ADD
-//	========================================
+	//	========================================
 	//@RequiresPermissions("Master:Item:Add")
 	private void windowAdd(String caption) {
-//		if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
-			window = new Window(caption);
-			window.setModal(true);
-			def layout = new FormLayout();
-			layout.setMargin(true);
-			window.setContent(layout);
-			textId = new TextField("Id:");
-			textId.setReadOnly(true)
-			layout.addComponent(textId)
-			textTitle = new TextField("Title:")
-			layout.addComponent(textTitle)
-			textDescription = new TextField("Description:")
-			layout.addComponent(textDescription)
-			//			def textArea = new TextArea("Text Area")
-//			layout.addComponent(textArea)
-//			def dateField = new DateField("Date Field")
-//			layout.addComponent(dateField)
-//			def comboBox = new ComboBox("combo Box")
-//			comboBox.addItem("test")
-//			comboBox.addItem("test2")
-//			layout.addComponent(comboBox)
-//			
-//			===================
-			//TOMBOL SAVE
-//			===================
-			layout.addComponent(createSaveButton())
-//			==================
-			
-//			===================
-//			TOMBOL CANCEL
-//			===================
-			layout.addComponent(createCancelButton())
-			
-//			===================
-			getUI().addWindow(window);
-//		} else {
-//			Notification.show("Access Denied\n",
-//				"Anda tidak memiliki izin untuk Membuat Record",
-//				Notification.Type.ERROR_MESSAGE);
-//		}
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
+		window = new Window(caption);
+		window.setModal(true);
+		def layout = new FormLayout();
+		layout.setMargin(true);
+		window.setContent(layout);
+		textId = new TextField("Id:");
+		textId.setReadOnly(true)
+		layout.addComponent(textId)
+		textTitle = new TextField("Title:")
+		layout.addComponent(textTitle)
+		textDescription = new TextField("Description:")
+		layout.addComponent(textDescription)
+		cmbComplaint = new ComboBox("Complaint:")
+		def beanComplaint = new BeanItemContainer<Complaint>(Complaint.class)
+		def complaintList = Grails.get(ComplaintService).getListDeleted()
+		beanComplaint.addAll(complaintList)
+		cmbComplaint.setContainerDataSource(beanComplaint)
+		cmbComplaint.setItemCaptionPropertyId("title")
+		layout.addComponent(cmbComplaint)
+		//			def textArea = new TextArea("Text Area")
+		//			layout.addComponent(textArea)
+		//			def dateField = new DateField("Date Field")
+		//			layout.addComponent(dateField)
+		//			def comboBox = new ComboBox("combo Box")
+		//			comboBox.addItem("test")
+		//			comboBox.addItem("test2")
+		//			layout.addComponent(comboBox)
+		//
+		//			===================
+		//TOMBOL SAVE
+		//			===================
+		layout.addComponent(createSaveButton())
+		//			==================
+
+		//			===================
+		//			TOMBOL CANCEL
+		//			===================
+		layout.addComponent(createCancelButton())
+
+		//			===================
+		getUI().addWindow(window);
+		//		} else {
+		//			Notification.show("Access Denied\n",
+		//				"Anda tidak memiliki izin untuk Membuat Record",
+		//				Notification.Type.ERROR_MESSAGE);
+		//		}
 	}
 	//	=======================
 	//	WINDOW ADD DETAIL
@@ -576,43 +674,43 @@ class MasterPostProject extends VerticalLayout{
 		//		}
 	}
 
-	 void updateTable() {
-//		if (table.size() > MAX_PAGE_LENGTH) {
-//		table.setPageLength(MAX_PAGE_LENGTH);
-//		} else {
-//		table.setPageLength(table.size());
-//		}
-//		table.markAsDirtyRecursive();
-		}
-	 
-	 void initTable() {
-		
+	void updateTable() {
+		//		if (table.size() > MAX_PAGE_LENGTH) {
+		//		table.setPageLength(MAX_PAGE_LENGTH);
+		//		} else {
+		//		table.setPageLength(table.size());
+		//		}
+		//		table.markAsDirtyRecursive();
+	}
+
+	void initTable() {
+
 		tableContainer = new BeanItemContainer<Project>(Project.class);
 		//fillTableContainer(tableContainer);
-	    itemlist = Grails.get(ProjectService).getList()
+		itemlist = Grails.get(ProjectService).getList()
 		tableContainer.addAll(itemlist)
-//		tableContainer.addNestedContainerProperty("facility1.id")
-//		tableContainer.addNestedContainerProperty("facility1.nama")
-//		tableContainer.addNestedContainerProperty("customer1.id")
+		tableContainer.addNestedContainerProperty("complaint.id")
+		tableContainer.addNestedContainerProperty("complaint.title")
+		//		tableContainer.addNestedContainerProperty("customer1.id")
 		table.setColumnHeader("amountAgree","Amount Agree")
 		table.setColumnHeader("amountDisagree","Amount Disagree")
 		table.setContainerDataSource(tableContainer);
-		table.visibleColumns = ["title","description","amountAgree","amountDisagree","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["title","description","complaint.title","amountAgree","amountDisagree","isConfirmed","confirmationDate","isFinished","finishDate","dateCreated","lastUpdated","isDeleted"]
 		table.setSelectable(true)
 		table.setImmediate(false)
-//		table.setPageLength(table.size())
+		//		table.setPageLength(table.size())
 		table.setSizeFull()
-		
-		
+
+
 		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
-			@Override
-			public void itemClick(ItemClickEvent itemClickEvent) {
+					@Override
+					public void itemClick(ItemClickEvent itemClickEvent) {
 
-				//				selectedRow = table.getValue()
+						//				selectedRow = table.getValue()
 
-				//				print selectedRow
-			}
-		});
+						//				print selectedRow
+					}
+				});
 		table.addValueChangeListener(new Property.ValueChangeListener() {
 					public void valueChange(ValueChangeEvent event) {
 						selectedRow = table.getValue()
@@ -656,8 +754,8 @@ class MasterPostProject extends VerticalLayout{
 	//		});
 
 }
-	
-	
-	
+
+
+
 
 

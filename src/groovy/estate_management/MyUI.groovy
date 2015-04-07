@@ -321,44 +321,44 @@ public class MyUI extends UI{
 		navigator = new Navigator(this, this);
 
 		// Create and register the views
-		//		navigator.addView("", new LoginForm());
-		navigator.addView("", new MainView());
+		navigator.addView("", new LoginForm());
+		//		navigator.addView("", new MainView());
 		navigator.addView("MAINVIEW", new MainView());
 
 		// We use a view change handler to ensure the user is always redirected
 		// to the login view if the user is not logged in.
 		//
-		//		navigator.addViewChangeListener(new ViewChangeListener() {
-		//
-		//			@Override
-		//			public boolean beforeViewChange(ViewChangeEvent event) {
-		//
-		//				// Check if a user has logged in
-		//				Subject currentUser = SecurityUtils.getSubject();
-		//				boolean isLoggedIn = currentUser.isAuthenticated();
-		//				boolean isLoginView = event.getNewView() instanceof LoginForm;
-		//
-		//				if (!isLoggedIn && !isLoginView) {
-		//					// Redirect to login view always if a user has not yet
-		//					// logged in
-		//					navigator.navigateTo(""/*LoginForm.NAME*/);
-		//					return false;
-		//
-		//				} else if (isLoggedIn && isLoginView) {
-		//					// If someone tries to access to login view while logged in,
-		//					// then cancel
-		//					navigator.navigateTo("MAINVIEW")
-		//					return false;
-		//				}
-		//
-		//				return true;
-		//			}
-		//
-		//			@Override
-		//			public void afterViewChange(ViewChangeEvent event) {
-		//
-		//			}
-		//		});
+		navigator.addViewChangeListener(new ViewChangeListener() {
+
+					@Override
+					public boolean beforeViewChange(ViewChangeEvent event) {
+
+						// Check if a user has logged in
+						Subject currentUser = SecurityUtils.getSubject();
+						boolean isLoggedIn = currentUser.isAuthenticated();
+						boolean isLoginView = event.getNewView() instanceof LoginForm;
+
+						if (!isLoggedIn && !isLoginView) {
+							// Redirect to login view always if a user has not yet
+							// logged in
+							navigator.navigateTo(""/*LoginForm.NAME*/);
+							return false;
+
+						} else if (isLoggedIn && isLoginView) {
+							// If someone tries to access to login view while logged in,
+							// then cancel
+							navigator.navigateTo("MAINVIEW")
+							return false;
+						}
+
+						return true;
+					}
+
+					@Override
+					public void afterViewChange(ViewChangeEvent event) {
+
+					}
+				});
 	}
 
 }

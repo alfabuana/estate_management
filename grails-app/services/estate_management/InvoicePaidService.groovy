@@ -16,6 +16,9 @@ class InvoicePaidService {
 		return InvoicePaid.getAll()
 	}
 	def createObject(object){
+		object.username = ShiroUser.find{
+			username == object.username
+		}
 		object.isDeleted = false
 		object.isConfirmed = false
 		object = invoicePaidValidationService.createObjectValidation(object as InvoicePaid)
@@ -28,7 +31,7 @@ class InvoicePaidService {
 	def updateObject(def object){
 		def valObject = InvoicePaid.read(object.id)
 		valObject.invoice = object.invoice
-		valObject.username = object.username
+//		valObject.username = object.username
 		valObject.description = object.description
 		valObject.paidDate = object.paidDate
 		valObject = invoicePaidValidationService.updateObjectValidation(valObject)

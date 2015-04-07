@@ -54,6 +54,7 @@ class MasterHome extends VerticalLayout{
 	def itemlist
 	GeneralFunction generalFunction = new GeneralFunction()
 	private MenuBar menuBar
+	private MenuBar menuBarDetail
 	private Window window
 	private TextField textId
 	private TextField textSKU
@@ -66,7 +67,9 @@ class MasterHome extends VerticalLayout{
 	//==============================
 	
 	private Table table = new Table();
+	private Table tableDetail = new Table()
 	private BeanItemContainer<Home> tableContainer;
+	private BeanItemContainer tableDetailContainer
 	private FieldGroup fieldGroup;
 	private FormLayout layout
 	private Action actionDelete = new Action("Delete");
@@ -122,6 +125,7 @@ class MasterHome extends VerticalLayout{
 		//	END BUTTON MENU
 	
 		addComponent(table)
+		addComponent(tableDetail)
 //		table.setPageLength(table.size())
 	}
 	
@@ -324,7 +328,50 @@ class MasterHome extends VerticalLayout{
 		table.setImmediate(false)
 //		table.setPageLength(table.size())
 		table.setSizeFull()
-		
+		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
+			@Override
+			public void itemClick(ItemClickEvent itemClickEvent) {
+
+				//				selectedRow = table.getValue()
+
+				//				print selectedRow
+			}
+		});
+table.addValueChangeListener(new Property.ValueChangeListener() {
+			public void valueChange(ValueChangeEvent event) {
+				selectedRow = table.getValue()
+				if (selectedRow != null) {
+					initTableDetail()
+
+				}
+				else
+				{
+					tableDetail.setVisible(false)
+//					menuBarDetail.setVisible(false)
+				}
+			}
+		})
+
+}
+void initTableDetail() {
+ tableDetailContainer = new BeanItemContainer<HomeDetail>(HomeDetail.class);
+ def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+ def itemListDetail = Grails.get(HomeDetailService).getListForMasterHome(ind)
+ tableDetailContainer.addNestedContainerProperty("username.username")
+ //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
+ //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
+ //		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
+ tableDetailContainer.addAll(itemListDetail)
+// tableDetail.setColumnHeader("invoice.id","Invoice Id")
+ tableDetail.setContainerDataSource(tableDetailContainer);
+ tableDetail.visibleColumns = ["username.username","isDeleted","dateCreated","lastUpdated"]
+ tableDetail.setSelectable(true)
+ tableDetail.setImmediate(false)
+ tableDetail.setVisible(true)
+ tableDetail.setSizeFull()
+// menuBarDetail.setVisible(true)
+}
+
 		
 //		table.addValueChangeListener(new Property.ValueChangeListener() {
 //			public void valueChange(ValueChangeEvent event) {
@@ -336,5 +383,5 @@ class MasterHome extends VerticalLayout{
 	
 	
 	
-}
+
 

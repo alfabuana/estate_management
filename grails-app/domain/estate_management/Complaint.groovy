@@ -9,6 +9,8 @@ class Complaint {
 	String		title
 	Boolean		isConfirmed
 	Date		confirmationDate
+	Boolean		isCleared
+	Date		clearDate
 	Boolean 	isDeleted
 	Date 		dateCreated // Predefined names by Grails will be filled automatically
 	Date 		lastUpdated // Predefined names by Grails will be filled automatically
@@ -17,5 +19,6 @@ class Complaint {
 
     static constraints = {
 		confirmationDate(nullable:true)
+		clearDate(nullable : true)
     }
 }

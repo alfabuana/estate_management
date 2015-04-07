@@ -15,6 +15,16 @@ class HomeDetailService {
 	def getList(){
 		return HomeDetail.getAll()
 	}
+	def getListForMasterHome(def object){
+		return HomeDetail.findAll{
+			home.id == object && isDeleted == false
+		}
+	}
+	def getListForMasterUser(def object){
+		return HomeDetail.findAll{
+			username.id == object && isDeleted == false
+		}
+	}
 	def createObject(object){
 		object.isDeleted = false
 		object = homeDetailValidationService.createObjectValidation(object as HomeDetail)

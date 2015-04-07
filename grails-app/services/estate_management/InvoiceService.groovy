@@ -17,6 +17,9 @@ class InvoiceService {
 	def getList(){
 		return Invoice.getAll()
 	}
+	def getListDeleted(){
+		return Invoice.findAll{isDeleted == false}
+	}
 	def calculateTotal(def objectId){
 		def valObject = Invoice.read(objectId)
 		Double total = 0

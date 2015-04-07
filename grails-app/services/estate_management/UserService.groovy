@@ -23,7 +23,9 @@ class UserService {
 	def getList(){
 		return ShiroUser.getAll()
 	}
-	
+	def getListDeleted(){
+		return ShiroUser.findAll{isDeleted == false}
+	}
 	def createObject(object){
 		ShiroUser newObject = new ShiroUser()
 		newObject.username = String.valueOf(object.username).toUpperCase()

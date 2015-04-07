@@ -1,7 +1,5 @@
 package estate_management
 
-import java.util.Date;
-
 class ShiroRole {
     String name
 

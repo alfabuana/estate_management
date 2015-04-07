@@ -197,7 +197,7 @@ class LoginForm extends CustomComponent implements View, Button.ClickListener {
 		
 		Subject currentUser = SecurityUtils.getSubject();
 		if ( !currentUser.isAuthenticated() ) {
-			def authToken = new UsernamePasswordToken(String.valueOf(username).toUpperCase(), new Sha256Hash(password).toHex()) //new Sha256Hash(password).toHex()
+			def authToken = new UsernamePasswordToken(String.valueOf(username).toUpperCase(), password) //new Sha256Hash(password).toHex()
 		
 			// Support for "remember me"
 			authToken.rememberMe = rememberMe

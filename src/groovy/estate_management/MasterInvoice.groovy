@@ -443,7 +443,7 @@ class MasterInvoice extends VerticalLayout{
 			layout.addComponent(textId)
 			cmbUser = new ComboBox("User:");
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-			def userList = Grails.get(UserService).getList()
+			def userList = Grails.get(UserService).getListDeleted()
 			beanUser.addAll(userList)
 			cmbUser.setContainerDataSource(beanUser)
 			cmbUser.setItemCaptionPropertyId("username")
@@ -505,7 +505,7 @@ class MasterInvoice extends VerticalLayout{
 			layout.addComponent(textId)
 			cmbUser = new ComboBox("User:")
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-			def userList = Grails.get(UserService).getList()
+			def userList = Grails.get(UserService).getListDeleted()
 			beanUser.addAll(userList)
 			cmbUser.setContainerDataSource(beanUser)
 			cmbUser.setItemCaptionPropertyId("username")
