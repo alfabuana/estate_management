@@ -6,6 +6,7 @@ import grails.transaction.Transactional
 @Transactional
 class ComplaintService {
 	ComplaintValidationService complaintValidationService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -20,17 +21,17 @@ class ComplaintService {
 		return Complaint.findAll{isDeleted == false}
 	}
 	def createObject(object){
-		object.username = ShiroUser.find{
-			username == object.username
-		}
+		object.user = userService.getObjectByUserName(object.username)
 		object.isDeleted = false
 		object.isConfirmed = false
 		object.isCleared = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = complaintValidationService.createObjectValidation(object as Complaint)
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
 		}
+		return object
 	}
 	def updateObject(def object){
 		
@@ -42,6 +43,7 @@ class ComplaintService {
 		valObject.description = object.description
 		valObject.title = object.title
 		valObject.home = object.home
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = complaintValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -61,7 +63,7 @@ class ComplaintService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
-
+		return newObject
 	}
 	def confirmObject(def object){
 		def newObject = Complaint.get(object.id)
@@ -70,10 +72,12 @@ class ComplaintService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date() 
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
-
+		return newObject
 	}
+	
 	def unConfirmObject(def object){
 		def newObject = Complaint.get(object.id)
 		newObject = complaintValidationService.unConfirmObjectValidation(newObject)
@@ -83,10 +87,11 @@ class ComplaintService {
 			newObject.confirmationDate = null
 			newObject.save()
 		}
-
+		return newObject
 	}
 	def clearObject(def object){
 		def newObject = Complaint.get(object.id)
+		
 		newObject = complaintValidationService.clearObjectValidation(newObject)
 		if (newObject.errors.getErrorCount() == 0)
 		{
@@ -94,8 +99,9 @@ class ComplaintService {
 			newObject.clearDate = new Date()
 			newObject.save()
 		}
-
+		return newObject
 	}
+	
 	def unClearObject(def object){
 		def newObject = Complaint.get(object.id)
 		newObject = complaintValidationService.unClearObjectValidation(newObject)
@@ -103,8 +109,9 @@ class ComplaintService {
 		{
 			newObject.isCleared = false
 			newObject.clearDate = null
+			newObject.confirmedBy = null
 			newObject.save()
 		}
-
+		return newObject
 	}
 }

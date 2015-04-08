@@ -6,6 +6,7 @@ import grails.transaction.Transactional
 class InvoiceDetailService {
 	InvoiceDetailValidationService invoiceDetailValidationService
 	InvoiceService	invoiceService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -24,6 +25,7 @@ class InvoiceDetailService {
 		object.invoice = Invoice.get(object.invoiceId)
 		object.isDeleted = false
 		object.isConfirmed = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = invoiceDetailValidationService.createObjectValidation(object as InvoiceDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -37,6 +39,7 @@ class InvoiceDetailService {
 //		valObject.invoice = object.invoice
 		valObject.code = object.code
 		valObject.amount = Double.parseDouble(object.amount)
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = invoiceDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -67,6 +70,7 @@ class InvoiceDetailService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
 	}
@@ -77,6 +81,7 @@ class InvoiceDetailService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			newObject.save()
 		}
 	}

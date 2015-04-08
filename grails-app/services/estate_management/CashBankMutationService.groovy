@@ -1,11 +1,13 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 @Transactional
 class CashBankMutationService {
 	CashBankMutationValidationService cashBankMutationValidationService
 	CashMutationService	cashMutationService
+	UserService userService
 	
 	def serviceMethod() {
 
@@ -19,6 +21,7 @@ class CashBankMutationService {
 	def createObject(object){
 		object.isDeleted = false
 		object.isConfirmed = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = cashBankMutationValidationService.createObjectValidation(object as CashBankMutation)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -33,6 +36,7 @@ class CashBankMutationService {
 		valObject.targetCashBank = object.targetCashBank
 		valObject.amount = Double.parseDouble(object.amount)
 		valObject.code = object.code
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = cashBankMutationValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -53,14 +57,16 @@ class CashBankMutationService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 	}
 	def confirmObject(def object){
 		def newObject = CashBankMutation.get(object.id)
-		newObject = cashBankMutationValidationService.softdeleteObjectValidation(newObject)
+		newObject = cashBankMutationValidationService.confirmObjectValidation(newObject)
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			CashBank cashBank = CashBank.find {id == newObject.sourceCashBank.id	}
 			def status = "minus"
 			def sourceDocumentType = "CashBankMutation"
@@ -84,11 +90,12 @@ class CashBankMutationService {
 				 amount, mutationDate)
 			newObject.save()
 		}
+		return newObject
 	}
 	
 	def unConfirmObject(def object){
 		def newObject = CashBankMutation.get(object.id)
-		newObject = cashBankMutationValidationService.softdeleteObjectValidation(newObject)
+		newObject = cashBankMutationValidationService.unConfirmObjectValidation(newObject)
 		if (newObject.errors.getErrorCount() == 0)
 		{
 			
@@ -115,8 +122,10 @@ class CashBankMutationService {
 				 amount, mutationDate)
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			newObject.save()
 		}
+		return newObject
 	}
 
 

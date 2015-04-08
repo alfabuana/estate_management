@@ -43,6 +43,7 @@ import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
 import estate_management.CashBankMutationService
+import grails.converters.JSON
 
 
 
@@ -157,7 +158,8 @@ class MasterCashBankMutation extends VerticalLayout{
 								sourceCashBank:cmbSourceCashBank.getValue(),
 								targetCashBank:cmbTargetCashBank.getValue(),
 								amount:textAmount.getValue(),
-								code:textCode.getValue()
+								code:textCode.getValue(),
+								username:getSession().getAttribute("user")
 							]
 
 							if (object.id == "")
@@ -168,7 +170,7 @@ class MasterCashBankMutation extends VerticalLayout{
 							{
 								object =  Grails.get(CashBankMutationService).updateObject(object)
 							}
-
+							println object as JSON
 
 							if (object.errors.hasErrors())
 							{
@@ -241,7 +243,8 @@ class MasterCashBankMutation extends VerticalLayout{
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
-							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
 							object = Grails.get(CashBankMutationService).confirmObject(object)
 							if (object.errors.hasErrors())
 							{
@@ -317,7 +320,7 @@ class MasterCashBankMutation extends VerticalLayout{
 		beanCashBank.addAll(cashBankList)
 		cmbSourceCashBank.setContainerDataSource(beanCashBank)
 		cmbSourceCashBank.setItemCaptionPropertyId("name")
-		cmbSourceCashBank.select(cmbSourceCashBank.getItemIds().find{ it.id == item.getItemProperty("cashBank.id").value})
+		cmbSourceCashBank.select(cmbSourceCashBank.getItemIds().find{ it.id == item.getItemProperty("sourceCashBank.id").value})
 		cmbSourceCashBank.setBuffered(true)
 		cmbSourceCashBank.setImmediate(false)
 		layout.addComponent(cmbSourceCashBank)
@@ -327,7 +330,7 @@ class MasterCashBankMutation extends VerticalLayout{
 		beanCashBank.addAll(cashBankList)
 		cmbTargetCashBank.setContainerDataSource(beanCashBank)
 		cmbTargetCashBank.setItemCaptionPropertyId("name")
-		cmbTargetCashBank.select(cmbTargetCashBank.getItemIds().find{ it.id == item.getItemProperty("cashBank.id").value})
+		cmbTargetCashBank.select(cmbTargetCashBank.getItemIds().find{ it.id == item.getItemProperty("targetCashBank.id").value})
 		cmbTargetCashBank.setBuffered(true)
 		cmbTargetCashBank.setImmediate(false)
 		layout.addComponent(cmbTargetCashBank)
@@ -429,14 +432,21 @@ class MasterCashBankMutation extends VerticalLayout{
 		itemlist = Grails.get(CashBankMutationService).getList()
 		tableContainer.addAll(itemlist)
 //		tableContainer.addNestedContainerProperty("cashBank.id")
+		
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
+		tableContainer.addNestedContainerProperty("confirmedBy.username")
 		tableContainer.addNestedContainerProperty("sourceCashBank.name")
+		tableContainer.addNestedContainerProperty("sourceCashBank.id")
 		tableContainer.addNestedContainerProperty("targetCashBank.name")
+		tableContainer.addNestedContainerProperty("targetCashBank.id")
+		
 		//		tableContainer.addNestedContainerProperty("customer1.id")
 
 		table.setContainerDataSource(tableContainer);
 //		table.setColumnHeader("cashBank.name","Cash Bank Name")
 //		table.setColumnHeader("adjustmentDate","Adjustment Date")
-		table.visibleColumns = ["sourceCashBank.name","targetCashBank.name","amount","code","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["sourceCashBank.name","targetCashBank.name","amount","code","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())

@@ -6,6 +6,8 @@ class Vendor {
 	String telephone
 	String fax
 	String email
+	ShiroUser createdBy
+	ShiroUser updatedBy
 	
 	Boolean isDeleted
 	Date dateCreated
@@ -16,5 +18,7 @@ class Vendor {
 		telephone (nullable : true)
 		fax (nullable : true)
 		email (nullable : true)
+		createdBy(nullable : true)
+		updatedBy(nullable : true)
     }
 }

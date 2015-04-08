@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class InvoicePaidDetailService {
 	InvoicePaidDetailValidationService invoicePaidDetailValidationService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -22,6 +23,7 @@ class InvoicePaidDetailService {
 	def createObject(object){
 		object.invoicePaid = InvoicePaid.get(object.invoicePaidId)
 		object.isDeleted = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = invoicePaidDetailValidationService.createObjectValidation(object as InvoicePaidDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -33,6 +35,7 @@ class InvoicePaidDetailService {
 		def valObject = InvoicePaidDetail.read(object.id)
 //		valObject.invoicePaid = object.invoicePaid
 		valObject.attachmentUrl = object.attachmentUrl
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = invoicePaidDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{

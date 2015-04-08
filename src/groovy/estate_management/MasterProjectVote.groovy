@@ -577,13 +577,19 @@ class MasterProjectVote extends VerticalLayout{
 		//fillTableContainer(tableContainer);
 	    itemlist = Grails.get(ProjectService).getListConfirm()
 		tableContainer.addAll(itemlist)
+		tableContainer.addNestedContainerProperty("createdBy.id")
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.id")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
+		tableContainer.addNestedContainerProperty("confirmedBy.id")
+		tableContainer.addNestedContainerProperty("confirmedBy.username")
 //		tableContainer.addNestedContainerProperty("facility1.id")
 //		tableContainer.addNestedContainerProperty("facility1.nama")
 //		tableContainer.addNestedContainerProperty("customer1.id")
 		table.setColumnHeader("amountAgree","Amount Agree")
 		table.setColumnHeader("amountDisagree","Amount Disagree")
 		table.setContainerDataSource(tableContainer);
-		table.visibleColumns = ["title","description","amountAgree","amountDisagree","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["title","description","amountAgree","amountDisagree","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

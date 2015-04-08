@@ -1,11 +1,11 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
-
 @Transactional
 class CashBankService {
 	CashBankValidationService cashBankValidationService
-
+	UserService userService
 	def serviceMethod() {
 
 	}
@@ -21,12 +21,13 @@ class CashBankService {
 	
 	def createObject(object){
 		object.isDeleted = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = cashBankValidationService.createObjectValidation(object as CashBank)
+		
 		if (object.errors.getErrorCount() == 0)
 		{
-			object =object.save()
+			object.save()
 		}
-
 		return object
 	}
 	def updateObject(def object){
@@ -35,6 +36,7 @@ class CashBankService {
 		valObject.description = object.description
 		valObject.amount = Double.parseDouble(object.amount)
 		valObject.isBank = object.isBank
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = cashBankValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{

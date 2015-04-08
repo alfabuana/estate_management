@@ -138,8 +138,8 @@ class MasterPaymentRequest extends VerticalLayout{
 							case "EditDetail":
 								if (tableDetail.getValue() != null)
 									windowEditDetail(tableContainer.getItem(table.getValue()),
-										tableDetailContainer.getItem(tableDetail.getValue())
-										,"EditDetail");
+											tableDetailContainer.getItem(tableDetail.getValue())
+											,"EditDetail");
 								break;
 							case "DeleteDetail":
 								if (tableDetail.getValue() != null)
@@ -199,7 +199,8 @@ class MasterPaymentRequest extends VerticalLayout{
 						try{
 							def object = [id:textId.getValue(),
 								//								paymentRequestId : textId.getValue(),
-								username:cmbUser.getValue(),
+								user:cmbUser.getValue(),
+								username:String.valueOf(getSession().getAttribute("user")),
 								description:textDescription.getValue(),
 								code:textCode.getValue(),
 								amount:textAmount.getValue().toString(),
@@ -251,7 +252,8 @@ class MasterPaymentRequest extends VerticalLayout{
 								paymentRequestId : textId.getValue(),
 								code:textCodeDetail.getValue(),
 								amount:textAmountDetail.getValue().toString(),
-								description:textDescriptionDetail.getValue()
+								description:textDescriptionDetail.getValue(),
+								username:getSession().getAttribute("user")
 							]
 
 							if (object.id == "")
@@ -262,7 +264,7 @@ class MasterPaymentRequest extends VerticalLayout{
 							{
 								object =  Grails.get(PaymentRequestDetailService).updateObject(object)
 							}
-							
+
 							if (object.errors.hasErrors())
 							{
 								textCodeDetail.setData("code")
@@ -367,7 +369,8 @@ class MasterPaymentRequest extends VerticalLayout{
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
-							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
 							object = Grails.get(PaymentRequestService).confirmObject(object)
 							if (object.errors.hasErrors())
 							{
@@ -443,7 +446,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		beanUser.addAll(userList)
 		cmbUser.setContainerDataSource(beanUser)
 		cmbUser.setItemCaptionPropertyId("username")
-		cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("username.id").value})
+		cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("user.id").value})
 		cmbUser.setBuffered(true)
 		cmbUser.setImmediate(false)
 		layout.addComponent(cmbUser)
@@ -620,7 +623,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		//
 		//		layout3.addComponent(comb)
 		textAmountDetail = new TextField("Amount:")
-//		textAmountDetail.setPropertyDataSource(itemDetail.getItemProperty("amount"))
+		//		textAmountDetail.setPropertyDataSource(itemDetail.getItemProperty("amount"))
 		textAmountDetail.setValue(itemDetail.getItemProperty("amount").toString())
 		textAmountDetail.setBuffered(true)
 		layout3.addComponent(textAmountDetail)
@@ -654,17 +657,24 @@ class MasterPaymentRequest extends VerticalLayout{
 		//fillTableContainer(tableContainer);
 		itemlist = Grails.get(PaymentRequestService).getList()
 		tableContainer.addAll(itemlist)
-		tableContainer.addNestedContainerProperty("username.id")
-		tableContainer.addNestedContainerProperty("username.username")
+		tableContainer.addNestedContainerProperty("createdBy.id")
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.id")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
+		tableContainer.addNestedContainerProperty("confirmedBy.id")
+		tableContainer.addNestedContainerProperty("confirmedBy.username")
+		tableContainer.addNestedContainerProperty("user.id")
+		tableContainer.addNestedContainerProperty("user.username")
 		table.setContainerDataSource(tableContainer);
-		table.setColumnHeader("username.username","Username")
+		table.setColumnHeader("user.username","Username")
 		table.setColumnHeader("requestDate","Request Date")
 		//		table.setColumnHeader("startDate","Start Date")
 		//		table.setColumnHeader("startTime","Start Time")
 		//		table.setColumnHeader("durasi","Duration")
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["username.username","description","code","amount","requestDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["user.username","description","code","amount","requestDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"
+]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
@@ -701,13 +711,19 @@ class MasterPaymentRequest extends VerticalLayout{
 		def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
 		def itemListDetail = Grails.get(PaymentRequestDetailService).getList(ind)
 		tableDetailContainer.addNestedContainerProperty("paymentRequest.id")
+		tableDetailContainer.addNestedContainerProperty("createdBy.id")
+		tableDetailContainer.addNestedContainerProperty("createdBy.username")
+		tableDetailContainer.addNestedContainerProperty("updatedBy.id")
+		tableDetailContainer.addNestedContainerProperty("updatedBy.username")
+		tableDetailContainer.addNestedContainerProperty("confirmedBy.id")
+		tableDetailContainer.addNestedContainerProperty("confirmedBy.username")
 		//					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
 		//					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
 		//		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
 		tableDetailContainer.addAll(itemListDetail)
 		tableDetail.setColumnHeader("paymentRequest.id","Payment Request Id")
 		tableDetail.setContainerDataSource(tableDetailContainer);
-		tableDetail.visibleColumns = ["paymentRequest.id","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
+		tableDetail.visibleColumns = ["paymentRequest.id","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated","createdBy.username","updatedBy.username","confirmedBy.username"]
 		tableDetail.setSelectable(true)
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)

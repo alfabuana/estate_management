@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class ProjectService {
 	ProjectValidationService projectValidationService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -46,6 +47,7 @@ class ProjectService {
 		object.isDeleted = false
 		object.isConfirmed = false
 		object.isFinished = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = projectValidationService.createObjectValidation(object as Project)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -58,6 +60,7 @@ class ProjectService {
 		valObject.title = object.title
 		valObject.description = object.description
 		valObject.complaint = object.complaint
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = projectValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -86,6 +89,7 @@ class ProjectService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
 
@@ -97,6 +101,7 @@ class ProjectService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			newObject.save()
 		}
 

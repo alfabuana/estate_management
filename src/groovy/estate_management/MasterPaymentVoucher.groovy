@@ -210,7 +210,8 @@ class MasterPaymentVoucher extends VerticalLayout{
 					void buttonClick(Button.ClickEvent event) {
 						try{
 							def object = [id:textId.getValue(),
-								username:cmbUser.getValue(),
+								user:cmbUser.getValue(),
+								username:String.valueOf(getSession().getAttribute("user")),
 								cashBank:cmbCashBank.getValue(),
 								code:textCode.getValue(),
 								paymentDate:textPaymentDate.getValue(),
@@ -266,7 +267,8 @@ class MasterPaymentVoucher extends VerticalLayout{
 								payable:cmbPayableDetail.getValue(),
 								code:textCodeDetail.getValue(),
 								amount:textAmountDetail.getValue().toString(),
-								description:textDescriptionDetail.getValue()
+								description:textDescriptionDetail.getValue(),
+								username:getSession().getAttribute("user")
 							]
 
 							if (object.id == "")
@@ -383,7 +385,8 @@ class MasterPaymentVoucher extends VerticalLayout{
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
-							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
 							object = Grails.get(PaymentVoucherService).confirmObject(object)
 							if (object.errors.hasErrors())
 							{
@@ -460,7 +463,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		beanUser.addAll(userList)
 		cmbUser.setContainerDataSource(beanUser)
 		cmbUser.setItemCaptionPropertyId("username")
-		cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("username.id").value})
+		cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("user.id").value})
 		cmbUser.setBuffered(true)
 		cmbUser.setImmediate(false)
 		layout.addComponent(cmbUser)
@@ -713,19 +716,25 @@ class MasterPaymentVoucher extends VerticalLayout{
 		//fillTableContainer(tableContainer);
 		itemlist = Grails.get(PaymentVoucherService).getList()
 		tableContainer.addAll(itemlist)
-		tableContainer.addNestedContainerProperty("username.id")
-		tableContainer.addNestedContainerProperty("username.username")
+		tableContainer.addNestedContainerProperty("createdBy.id")
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.id")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
+		tableContainer.addNestedContainerProperty("confirmedBy.id")
+		tableContainer.addNestedContainerProperty("confirmedBy.username")
+		tableContainer.addNestedContainerProperty("user.id")
+		tableContainer.addNestedContainerProperty("user.username")
 		tableContainer.addNestedContainerProperty("cashBank.id")
 		tableContainer.addNestedContainerProperty("cashBank.name")
 		table.setContainerDataSource(tableContainer);
-		table.setColumnHeader("username.username","Username")
+		table.setColumnHeader("user.username","Username")
 		table.setColumnHeader("cashBank.name","Cash Bank Name")
 		table.setColumnHeader("paymentDate","Payment Date")
 		table.setColumnHeader("totalAmount","Total Amount")
 		//		table.setColumnHeader("durasi","Duration")
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["username.username","cashBank.name","code","paymentDate","isGBCH","dueDate","isReconciled","reconciliationDate","totalAmount","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["user.username","cashBank.name","code","paymentDate","isGBCH","dueDate","isReconciled","reconciliationDate","totalAmount","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())

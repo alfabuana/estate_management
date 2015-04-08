@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class ReceivableService {
 	ReceivableValidationService receivableValidationService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -18,6 +19,7 @@ class ReceivableService {
 	def createObject(object){
 		object.isDeleted = false
 		object.isCompleted = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = receivableValidationService.createObjectValidation(object as Receivable)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -27,7 +29,7 @@ class ReceivableService {
 	}
 	def updateObject(def object){
 		def valObject = Receivable.read(object.id)
-		valObject.username = object.username
+		valObject.user = object.user
 		valObject.receivableSource = object.receivableSource
 		valObject.receivableSourceId = object.receivableSourceId
 		valObject.receivableSourceDetailId = object.receivableSourceDetailId
@@ -36,6 +38,7 @@ class ReceivableService {
 		valObject.amount = Double.parseDouble(object.amount)
 		valObject.remainingAmount = Double.parseDouble(object.remainingAmount)
 		valObject.pendingClearanceAmount = Double.parseDouble(object.pendingClearanceAmount)
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = receivableValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{

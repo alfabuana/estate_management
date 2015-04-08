@@ -43,6 +43,7 @@ import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
 import estate_management.HomeAssignmentService
+import grails.converters.JSON
 
 
 
@@ -155,7 +156,8 @@ class MasterHomeAssignment extends VerticalLayout{
 				try{
 					def object = [id:textId.getValue(),
 								  home:cmbHome.getValue(),
-								  username:cmbUser.getValue(),
+								  user:cmbUser.getValue(),
+								  username:String.valueOf(getSession().getAttribute("user")),
 								  assignDate:textAssignDate.getValue(),
 								  ]
 					
@@ -239,7 +241,8 @@ class MasterHomeAssignment extends VerticalLayout{
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
-							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
 							Grails.get(HomeAssignmentService).confirmObject(object)
 							initTable()
 						} else {
@@ -309,7 +312,7 @@ class MasterHomeAssignment extends VerticalLayout{
 			beanUser.addAll(userList)
 			cmbUser.setContainerDataSource(beanUser)
 			cmbUser.setItemCaptionPropertyId("username")
-			cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("username.id").value})
+			cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("user.id").value})
 			cmbUser.setBuffered(true)
 			cmbUser.setImmediate(false)
 			layout.addComponent(cmbUser)
@@ -394,18 +397,24 @@ class MasterHomeAssignment extends VerticalLayout{
 		//fillTableContainer(tableContainer);
 	    itemlist = Grails.get(HomeAssignmentService).getList()
 		tableContainer.addAll(itemlist)
+		tableContainer.addNestedContainerProperty("createdBy.id")
+		tableContainer.addNestedContainerProperty("updatedBy.id")
+		tableContainer.addNestedContainerProperty("confirmedBy.id")
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
+		tableContainer.addNestedContainerProperty("confirmedBy.username")
 		tableContainer.addNestedContainerProperty("home.id")
 		tableContainer.addNestedContainerProperty("home.name")
-		tableContainer.addNestedContainerProperty("username.id")
-		tableContainer.addNestedContainerProperty("username.username")
+		tableContainer.addNestedContainerProperty("user.id")
+		tableContainer.addNestedContainerProperty("user.username")
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("home.name","Home Name")
-		table.setColumnHeader("username.username","Username")
+		table.setColumnHeader("user.username","Username")
 		table.setColumnHeader("assignDate","Assign Date")
 //		table.setColumnHeader("durasi","Duration")
 //		table.setColumnHeader("dateStartUsing","Date Start Using")
 //		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["home.name","username.username","assignDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["home.name","user.username","assignDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

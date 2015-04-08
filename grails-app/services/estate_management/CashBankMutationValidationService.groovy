@@ -1,5 +1,6 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 @Transactional
@@ -8,6 +9,20 @@ class CashBankMutationValidationService {
     def serviceMethod() {
 
     }
+	def isConfirmed(def object){
+		if (object.isConfirmed == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah terconfirm')
+		}
+		return object
+	}
+	def isNotConfirmed(def object){
+		if (object.isConfirmed == false)
+		{
+			object.errors.rejectValue(null,'null','Belum terconfirm')
+		}
+		return object
+	}
 	def sourceCashBankNotNull(def object){
 		if (object.sourceCashBank == null || object.sourceCashBank == "")
 		{
@@ -64,10 +79,15 @@ class CashBankMutationValidationService {
 	}
 	def confirmObjectValidation(object)
 	{
+		object = isConfirmed(object)
+		println object as JSON
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def unConfirmObjectValidation(object)
 	{
+		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 }

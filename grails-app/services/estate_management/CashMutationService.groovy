@@ -1,5 +1,6 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 @Transactional
@@ -41,9 +42,8 @@ class CashMutationService {
 				cashBank2.amount = cashBank2.amount - amount
 			}
 			cashBank2.save()
-			cashMutation = cashMutation.save()
+			cashMutation.save()
 		}
-
 		return cashMutation
 	}
 	def softDeletedObject(def object){

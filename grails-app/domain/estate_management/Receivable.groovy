@@ -1,7 +1,7 @@
 package estate_management
 
 class Receivable {
-	ShiroUser	username
+	ShiroUser	user
 	String 		receivableSource
 	Integer 	receivableSourceId
 	Integer 	receivableSourceDetailId
@@ -12,6 +12,8 @@ class Receivable {
 	Double 		pendingClearanceAmount
 	Boolean 	isCompleted
 	Date 		completionDate
+	ShiroUser createdBy
+	ShiroUser updatedBy
 	Boolean 	isDeleted
 	Date 		dateCreated // Predefined names by Grails will be filled automatically
 	Date 		lastUpdated // Predefined names by Grails will be filled automatically
@@ -19,5 +21,7 @@ class Receivable {
 	static constraints = {
 		completionDate (nullable : true)
 		dueDate(nullable : true)
+		createdBy(nullable : true)
+		updatedBy(nullable : true)
 	}
 }

@@ -7,6 +7,7 @@ import grails.transaction.Transactional
 @Transactional
 class InvoiceService {
 	InvoiceValidationService invoiceValidationService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -36,6 +37,7 @@ class InvoiceService {
 		object.isConfirmed = false
 		object.isCleared = false
 		object.totalAmount = 0
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = invoiceValidationService.createObjectValidation(object as Invoice)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -45,12 +47,13 @@ class InvoiceService {
 	}
 	def updateObject(def object){
 		def valObject = Invoice.read(object.id)
-		valObject.username = object.username
+		valObject.user = object.user
 		valObject.code = object.code
 		valObject.invoiceDate = object.invoiceDate
 		valObject.description = object.description
 //		valObject.dueDate = object.dueDate
 //		valObject.totalAmount = Double.parseDouble(object.totalAmount)
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = invoiceValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -79,12 +82,14 @@ class InvoiceService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			for (detail in newObject.invoiceDetails.findAll{ it.isDeleted == false })
 			{
 				detail.isConfirmed = true
 				detail.confirmationDate = new Date()
+				detail.confirmedBy = userService.getObjectByUserName(object.username)
 				Receivable receivable = new Receivable()
-				receivable.username = newObject.username
+				receivable.user = newObject.user
 				receivable.receivableSource = "invoice"
 				receivable.receivableSourceId = newObject.id
 				receivable.receivableSourceDetailId = detail.id
@@ -108,6 +113,7 @@ class InvoiceService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			for (detail in newObject.invoiceDetails.findAll{ it.isDeleted == false })
 			{
 				Receivable receivable = Receivable.find{
@@ -120,6 +126,7 @@ class InvoiceService {
 				receivable.save()
 				detail.isConfirmed = false
 				detail.confirmationDate = null
+				detail.confirmedBy = null
 			}
 			newObject.save()
 		}

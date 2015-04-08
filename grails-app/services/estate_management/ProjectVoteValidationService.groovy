@@ -10,7 +10,7 @@ class ProjectVoteValidationService {
     }
 	def alreadyVote(def object){
 		def projectVote = ProjectVote.find {
-			username == object.username &&
+			user == object.user &&
 					project == object.project
 		}
 		if (projectVote != null)
@@ -22,7 +22,7 @@ class ProjectVoteValidationService {
 	}
 	
 	def usernameNotNull(def object){
-		if (object.username == null || object.username == "")
+		if (object.user == null || object.user == "")
 		{
 			object.errors.rejectValue('username','null','Username tidak boleh kosong')
 		}

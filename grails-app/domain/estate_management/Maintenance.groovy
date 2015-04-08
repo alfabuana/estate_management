@@ -8,6 +8,9 @@ class Maintenance {
 	String	code
 	Boolean isConfirmed
 	Date	confirmationDate
+	ShiroUser createdBy
+	ShiroUser updatedBy
+	ShiroUser confirmedBy
 	Boolean isDeleted
 	Date 	dateCreated // Predefined names by Grails will be filled automatically
 	Date 	lastUpdated // Predefined names by Grails will be filled automatically
@@ -15,5 +18,8 @@ class Maintenance {
 //	static hasMany = [maintenanceDetails : MaintenanceDetail]
     static constraints = {
 		confirmationDate(nullable : true)
+		createdBy(nullable : true)
+		updatedBy(nullable : true)
+		confirmedBy(nullable : true)
     }
 }

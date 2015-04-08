@@ -7,6 +7,7 @@ import grails.transaction.Transactional
 class ProjectVoteService {
 	ProjectVoteValidationService projectVoteValidationService
 	ProjectService projectService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -19,6 +20,7 @@ class ProjectVoteService {
 	}
 	def createObject(object){
 		object.isDeleted = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = projectVoteValidationService.createObjectValidation(object as ProjectVote)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -28,9 +30,10 @@ class ProjectVoteService {
 	}
 	def updateObject(def object){
 		def valObject = ProjectVote.read(object.id)
-		valObject.username = object.username
+		valObject.user = object.user
 		valObject.project = object.project
 		valObject.isAgree = object.isAgree
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = projectVoteValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -53,9 +56,7 @@ class ProjectVoteService {
 	}
 	
 	def agreeObject(def object){
-		object.username = ShiroUser.find{
-			username == object.username
-		}
+		object.user = userService.getObjectByUserName(object.username)
 		object.project = Project.find{
 			id == object.projectid
 		}
@@ -71,9 +72,7 @@ class ProjectVoteService {
 	}
 	
 	def disagreeObject(def object){
-		object.username = ShiroUser.find{
-			username == object.username
-		}
+		object.user = userService.getObjectByUserName(object.username)
 		object.project = Project.find{
 			id == object.projectid
 		}

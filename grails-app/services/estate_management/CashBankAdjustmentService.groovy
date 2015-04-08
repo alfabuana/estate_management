@@ -6,6 +6,7 @@ import grails.transaction.Transactional
 class CashBankAdjustmentService {
 	CashBankAdjustmentValidationService cashBankAdjustmentValidationService
 	CashMutationService	cashMutationService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -19,6 +20,7 @@ class CashBankAdjustmentService {
 	def createObject(object){
 		object.isDeleted = false
 		object.isConfirmed = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = cashBankAdjustmentValidationService.createObjectValidation(object as CashBankAdjustment)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -33,6 +35,7 @@ class CashBankAdjustmentService {
 		valObject.adjustmentDate = object.adjustmentDate
 		valObject.amount = Double.parseDouble(object.amount)
 		valObject.code = object.code
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = cashBankAdjustmentValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -52,6 +55,7 @@ class CashBankAdjustmentService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 	}
 	def confirmObject(def object){
 		def newObject = CashBankAdjustment.get(object.id)
@@ -60,6 +64,7 @@ class CashBankAdjustmentService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			CashBank cashBank = CashBank.find {id == newObject.cashBank.id	}
 			def status = "plus"
 			def sourceDocumentType = "cashBankAdjustment"
@@ -72,6 +77,7 @@ class CashBankAdjustmentService {
 					amount, mutationDate)
 			newObject.save()
 		}
+		return newObject
 	}
 	def unConfirmObject(def object){
 		def newObject = CashBankAdjustment.get(object.id)
@@ -91,8 +97,10 @@ class CashBankAdjustmentService {
 					amount, mutationDate)
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			newObject.save()
 		}
+		return newObject
 	}
 
 

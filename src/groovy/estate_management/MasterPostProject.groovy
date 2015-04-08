@@ -207,7 +207,8 @@ class MasterPostProject extends VerticalLayout{
 							def object = [id:textId.getValue(),
 								title:textTitle.getValue(),
 								description:textDescription.getValue(),
-								complaint:cmbComplaint.getValue()
+								complaint:cmbComplaint.getValue(),
+								username:getSession().getAttribute("user")
 							]
 
 							if (object.id == "")
@@ -252,7 +253,8 @@ class MasterPostProject extends VerticalLayout{
 						try{
 							def object = [id:textIdDetail.getValue(),
 								projectId:textId.getValue(),
-								attachmentUrl:textAttachmentUrlDetail.getValue()
+								attachmentUrl:textAttachmentUrlDetail.getValue(),
+								username:getSession().getAttribute("user")
 							]
 
 							if (object.id == "")
@@ -364,7 +366,8 @@ class MasterPostProject extends VerticalLayout{
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
-							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
 							object = Grails.get(ProjectService).confirmObject(object)
 							if (object.errors.hasErrors())
 							{
@@ -689,13 +692,19 @@ class MasterPostProject extends VerticalLayout{
 		//fillTableContainer(tableContainer);
 		itemlist = Grails.get(ProjectService).getList()
 		tableContainer.addAll(itemlist)
+		tableContainer.addNestedContainerProperty("createdBy.id")
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.id")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
+		tableContainer.addNestedContainerProperty("confirmedBy.id")
+		tableContainer.addNestedContainerProperty("confirmedBy.username")
 		tableContainer.addNestedContainerProperty("complaint.id")
 		tableContainer.addNestedContainerProperty("complaint.title")
 		//		tableContainer.addNestedContainerProperty("customer1.id")
 		table.setColumnHeader("amountAgree","Amount Agree")
 		table.setColumnHeader("amountDisagree","Amount Disagree")
 		table.setContainerDataSource(tableContainer);
-		table.visibleColumns = ["title","description","complaint.title","amountAgree","amountDisagree","isConfirmed","confirmationDate","isFinished","finishDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["title","description","complaint.title","amountAgree","amountDisagree","isConfirmed","confirmationDate","isFinished","finishDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
@@ -732,13 +741,17 @@ class MasterPostProject extends VerticalLayout{
 		def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
 		def itemListDetail = Grails.get(ProjectDetailService).getList(ind)
 		tableDetailContainer.addNestedContainerProperty("project.id")
+		tableDetailContainer.addNestedContainerProperty("createdBy.id")
+		tableDetailContainer.addNestedContainerProperty("createdBy.username")
+		tableDetailContainer.addNestedContainerProperty("updatedBy.id")
+		tableDetailContainer.addNestedContainerProperty("updatedBy.username")
 		//					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
 		//					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
 		//		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
 		tableDetailContainer.addAll(itemListDetail)
 		tableDetail.setColumnHeader("project.id","Project Id")
 		tableDetail.setContainerDataSource(tableDetailContainer);
-		tableDetail.visibleColumns = ["project.id","attachmentUrl","isDeleted","dateCreated","lastUpdated"]
+		tableDetail.visibleColumns = ["project.id","attachmentUrl","isDeleted","dateCreated","lastUpdated","createdBy.username","updatedBy.username"]
 		tableDetail.setSelectable(true)
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)

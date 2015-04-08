@@ -339,7 +339,8 @@ class MasterInvoiceClearance extends VerticalLayout{
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
-							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
 							object = Grails.get(InvoicePaidService).confirmObject(object)
 							if (object.errors.hasErrors())
 							{
@@ -630,20 +631,26 @@ class MasterInvoiceClearance extends VerticalLayout{
 			 //fillTableContainer(tableContainer);
 			 itemlist = Grails.get(InvoicePaidService).getList()
 			 tableContainer.addAll(itemlist)
+			 tableContainer.addNestedContainerProperty("createdBy.id")
+			 tableContainer.addNestedContainerProperty("createdBy.username")
+			 tableContainer.addNestedContainerProperty("updatedBy.id")
+			 tableContainer.addNestedContainerProperty("updatedBy.username")
+			 tableContainer.addNestedContainerProperty("confirmedBy.id")
+			 tableContainer.addNestedContainerProperty("confirmedBy.username")
 			 tableContainer.addNestedContainerProperty("invoice.id")
 			 tableContainer.addNestedContainerProperty("invoice.code")
-			 tableContainer.addNestedContainerProperty("username.id")
-			 tableContainer.addNestedContainerProperty("username.username")
+			 tableContainer.addNestedContainerProperty("user.id")
+			 tableContainer.addNestedContainerProperty("user.username")
 			 table.setContainerDataSource(tableContainer);
 			 table.setColumnHeader("invoiceDate","Invoice Date")
-			 table.setColumnHeader("username.username","Username")
+			 table.setColumnHeader("user.username","Username")
 			 table.setColumnHeader("totalAmount","Total Amount")
 			 table.setColumnHeader("invoice.code","Invoice Code")
 	 //		table.setColumnHeader("startTime","Start Time")
 	 //		table.setColumnHeader("durasi","Duration")
 	 //		table.setColumnHeader("dateStartUsing","Date Start Using")
 	 //		table.setColumnHeader("dateEndUsing","Date End Using")
-			 table.visibleColumns = ["invoice.code","username.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+			 table.visibleColumns = ["invoice.code","user.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 			 table.setSelectable(true)
 			 table.setImmediate(false)
 	 //		table.setPageLength(table.size())

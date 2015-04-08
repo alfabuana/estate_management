@@ -150,6 +150,7 @@ class MasterVendor extends VerticalLayout{
 								  telephone:textTelephone.getValue(),
 								  fax:textFax.getValue(),
 								  email:textEmail.getValue(),
+								  username:getSession().getAttribute("user")
 								  ]
 					
 					if (object.id == "")
@@ -341,6 +342,10 @@ class MasterVendor extends VerticalLayout{
 		//fillTableContainer(tableContainer);
 	    itemlist = Grails.get(VendorService).getList()
 		tableContainer.addAll(itemlist)
+		tableContainer.addNestedContainerProperty("createdBy.id")
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.id")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
 //		tableContainer.addNestedContainerProperty("facility1.id")
 //		tableContainer.addNestedContainerProperty("facility1.nama")
 //		tableContainer.addNestedContainerProperty("customer1.id")
@@ -348,7 +353,7 @@ class MasterVendor extends VerticalLayout{
 		table.setContainerDataSource(tableContainer);
 //		table.setColumnHeader("name","Name")
 //		table.setColumnHeader("address","Address")
-		table.visibleColumns = ["name","description","telephone","fax","email","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["name","description","telephone","fax","email","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

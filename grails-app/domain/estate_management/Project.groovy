@@ -10,6 +10,9 @@ class Project {
 	Boolean	isDeleted
 	Boolean isConfirmed
 	Date	confirmationDate
+	ShiroUser createdBy
+	ShiroUser updatedBy
+	ShiroUser confirmedBy
 	Boolean	isFinished
 	Date	finishDate
 	Complaint	complaint
@@ -22,5 +25,8 @@ class Project {
 		confirmationDate(nullable:true)
 		finishDate(nullable:true)
 		complaint(nullable:true)
+		createdBy(nullable : true)
+		updatedBy(nullable : true)
+		confirmedBy(nullable : true)
     }
 }

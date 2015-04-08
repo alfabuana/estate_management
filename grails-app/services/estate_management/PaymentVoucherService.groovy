@@ -7,6 +7,7 @@ import grails.transaction.Transactional
 class PaymentVoucherService {
 	PaymentVoucherValidationService paymentVoucherValidationService
 	CashMutationService	cashMutationService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -36,6 +37,7 @@ class PaymentVoucherService {
 		object.isConfirmed = false
 		object.isReconciled = false
 		object.totalAmount= 0
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = paymentVoucherValidationService.createObjectValidation(object as PaymentVoucher)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -45,11 +47,12 @@ class PaymentVoucherService {
 	}
 	def updateObject(def object){
 		def valObject = PaymentVoucher.read(object.id)
-		valObject.username = object.username
+		valObject.user = object.user
 		valObject.cashBank = object.cashBank
 		valObject.code = object.code
 		valObject.paymentDate = object.paymentDate
 		valObject.isGBCH = object.isGBCH
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		//		valObject.dueDate = object.dueDate
 		valObject = paymentVoucherValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
@@ -82,10 +85,12 @@ class PaymentVoucherService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			for (detail in newObject.paymentVoucherDetails.findAll{ it.isDeleted == false })
 			{
 				detail.isConfirmed = true
 				detail.confirmationDate = new Date()
+				detail.confirmedBy = userService.getObjectByUserName(object.username)
 				Payable payable = Payable.find{
 					id == detail.payable.id
 				}
@@ -121,6 +126,7 @@ class PaymentVoucherService {
 			{
 				detail.isConfirmed = false
 				detail.confirmationDate = null
+				detail.confirmedBy = null
 				Payable payable = Payable.find{
 					id == detail.payable.id
 				}
@@ -141,6 +147,7 @@ class PaymentVoucherService {
 					amount, mutationDate)
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			newObject.save()
 		}
 		return newObject

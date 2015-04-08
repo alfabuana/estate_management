@@ -30,9 +30,9 @@ class PaymentVoucherValidationService {
 		return object
 	}
 	def usernameNotNull(def object){
-		if (object.username == null || object.username == "")
+		if (object.user == null || object.user == "")
 		{
-			object.errors.rejectValue('username','null','Username tidak boleh kosong')
+			object.errors.rejectValue('user','null','Username tidak boleh kosong')
 		}
 		return object
 	}

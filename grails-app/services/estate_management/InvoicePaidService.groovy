@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class InvoicePaidService {
 	InvoicePaidValidationService invoicePaidValidationService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -16,11 +17,10 @@ class InvoicePaidService {
 		return InvoicePaid.getAll()
 	}
 	def createObject(object){
-		object.username = ShiroUser.find{
-			username == object.username
-		}
+		object.user = userService.getObjectByUserName(object.username)
 		object.isDeleted = false
 		object.isConfirmed = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = invoicePaidValidationService.createObjectValidation(object as InvoicePaid)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -34,6 +34,7 @@ class InvoicePaidService {
 //		valObject.username = object.username
 		valObject.description = object.description
 		valObject.paidDate = object.paidDate
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = invoicePaidValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -53,6 +54,7 @@ class InvoicePaidService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 
 	}
 	def confirmObject(def object){
@@ -62,8 +64,10 @@ class InvoicePaidService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
+		return newObject
 
 	}
 	def unConfirmObject(def object){
@@ -73,8 +77,9 @@ class InvoicePaidService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			newObject.save()
 		}
-
+		return newObject
 	}
 }

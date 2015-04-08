@@ -202,6 +202,7 @@ class MasterMaintenance extends VerticalLayout{
 								  description:textDescription.getValue(),
 								  amount:textAmount.getValue(),
 								  code:textCode.getValue(),
+								  username:getSession().getAttribute("user")
 								  ]
 					
 					if (object.id == "")
@@ -344,7 +345,8 @@ class MasterMaintenance extends VerticalLayout{
 			new ConfirmDialog.Listener() {
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
-						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+							,username:getSession().getAttribute("user")]
 						object = Grails.get(MaintenanceService).confirmObject(object)
 						if (object.errors.hasErrors())
 							{
@@ -415,7 +417,7 @@ class MasterMaintenance extends VerticalLayout{
 			textDescription.setImmediate(false)
 			layout.addComponent(textDescription)
 			textAmount = new TextField("Amount:");
-			textAmount.setPropertyDataSource(item.getItemProperty("amount"))
+			textAmount.setValue(item.getItemProperty("amount").toString())
 			textAmount.setBuffered(true)
 			textAmount.setImmediate(false)
 			layout.addComponent(textAmount)
@@ -585,10 +587,12 @@ class MasterMaintenance extends VerticalLayout{
 		//fillTableContainer(tableContainer);
 	    itemlist = Grails.get(MaintenanceService).getList()
 		tableContainer.addAll(itemlist)
-//		tableContainer.addNestedContainerProperty("username.id")
-//		tableContainer.addNestedContainerProperty("username.username")
-//		tableContainer.addNestedContainerProperty("home.id")
-//		tableContainer.addNestedContainerProperty("home.name")
+		tableContainer.addNestedContainerProperty("createdBy.id")
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.id")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
+		tableContainer.addNestedContainerProperty("confirmedBy.id")
+		tableContainer.addNestedContainerProperty("confirmedBy.username")
 		table.setContainerDataSource(tableContainer);
 //		table.setColumnHeader("username.username","Username")
 //		table.setColumnHeader("home.name","Home Name")
@@ -597,7 +601,7 @@ class MasterMaintenance extends VerticalLayout{
 //		table.setColumnHeader("durasi","Duration")
 //		table.setColumnHeader("dateStartUsing","Date Start Using")
 //		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["description","amount","code","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["description","amount","code","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())
@@ -639,7 +643,7 @@ table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 		 tableDetailContainer.addAll(itemListDetail)
 //		 tableDetail.setColumnHeader("complaint.id","Complaint Id")
 		 tableDetail.setContainerDataSource(tableDetailContainer);
-		 tableDetail.visibleColumns = ["maintenance","username","isDeleted","dateCreated","lastUpdated"]
+		 tableDetail.visibleColumns = ["maintenance","user","isDeleted","dateCreated","lastUpdated"]
 		 tableDetail.setSelectable(true)
 		 tableDetail.setImmediate(false)
 		 tableDetail.setVisible(true)

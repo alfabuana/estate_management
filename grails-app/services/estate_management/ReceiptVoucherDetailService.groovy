@@ -6,6 +6,7 @@ import grails.transaction.Transactional
 class ReceiptVoucherDetailService {
 	ReceiptVoucherDetailValidationService receiptVoucherDetailValidationService
 	ReceiptVoucherService receiptVoucherService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -25,6 +26,7 @@ class ReceiptVoucherDetailService {
 		object.isDeleted = false
 		object.isConfirmed = false
 		object.amount = object.receivable.amount
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = receiptVoucherDetailValidationService.createObjectValidation(object as ReceiptVoucherDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -41,6 +43,7 @@ class ReceiptVoucherDetailService {
 		valObject.code = object.code
 		valObject.amount = object.receivable.amount
 		valObject.description = object.description
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = receiptVoucherDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -71,6 +74,7 @@ class ReceiptVoucherDetailService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = newObject.confirmationDate
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
 	}
@@ -81,6 +85,7 @@ class ReceiptVoucherDetailService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			newObject.save()
 		}
 	}

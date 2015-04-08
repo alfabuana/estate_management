@@ -8,6 +8,20 @@ class MaintenanceValidationService {
     def serviceMethod() {
 
     }
+	def isConfirmed(def object){
+		if (object.isConfirmed == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah terconfirm')
+		}
+		return object
+	}
+	def isNotConfirmed(def object){
+		if (object.isConfirmed == false)
+		{
+			object.errors.rejectValue(null,'null','Belum terconfirm')
+		}
+		return object
+	}
 	def descriptionNotNull(def object){
 		if (object.description == null || object.description == "")
 		{
@@ -53,10 +67,14 @@ class MaintenanceValidationService {
 	}
 	def confirmObjectValidation(object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def unConfirmObjectValidation(object)
 	{
+		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 }

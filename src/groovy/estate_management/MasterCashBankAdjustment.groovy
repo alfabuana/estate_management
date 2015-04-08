@@ -157,7 +157,8 @@ class MasterCashBankAdjustment extends VerticalLayout{
 								cashBank:cmbCashBank.getValue(),
 								adjustmentDate:textAdjustmentDate.getValue(),
 								amount:textAmount.getValue(),
-								code:textCode.getValue()
+								code:textCode.getValue(),
+								username:getSession().getAttribute("user")
 							]
 
 							if (object.id == "")
@@ -241,7 +242,8 @@ class MasterCashBankAdjustment extends VerticalLayout{
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
-							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
 							object = Grails.get(CashBankAdjustmentService).confirmObject(object)
 							if (object.errors.hasErrors())
 							{
@@ -420,12 +422,17 @@ class MasterCashBankAdjustment extends VerticalLayout{
 		tableContainer.addAll(itemlist)
 		tableContainer.addNestedContainerProperty("cashBank.id")
 		tableContainer.addNestedContainerProperty("cashBank.name")
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
+		tableContainer.addNestedContainerProperty("confirmedBy.username")
 		//		tableContainer.addNestedContainerProperty("customer1.id")
 
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("cashBank.name","Cash Bank Name")
 		table.setColumnHeader("adjustmentDate","Adjustment Date")
-		table.visibleColumns = ["cashBank.name","adjustmentDate","amount","code","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["cashBank.name","adjustmentDate","amount","code","isConfirmed"
+			,"confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username"
+			,"updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())

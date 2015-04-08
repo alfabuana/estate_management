@@ -4,6 +4,8 @@ import grails.transaction.Transactional
 
 @Transactional
 class MaintenanceDetailService {
+	MaintenanceDetailValidationService maintenanceDetailValidationService
+	UserService userService
 
     def serviceMethod() {
 
@@ -21,6 +23,7 @@ class MaintenanceDetailService {
 	def createObject(object){
 		object.maintenance = Maintenance.get(object.maintenanceId)
 		object.isDeleted = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = maintenanceDetailValidationService.createObjectValidation(object as MaintenanceDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -32,7 +35,8 @@ class MaintenanceDetailService {
 		def valObject = MaintenanceDetail.read(object.id)
 //		valObject.complaint = object.complaint
 		valObject.maintenance = object.maintenance
-		valObject.username = object.username
+		valObject.user = object.user
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = maintenanceDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
