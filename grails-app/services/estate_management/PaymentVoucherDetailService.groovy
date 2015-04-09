@@ -1,11 +1,13 @@
 package estate_management
 
 import grails.transaction.Transactional
+import java.text.SimpleDateFormat
 
 @Transactional
 class PaymentVoucherDetailService {
 	PaymentVoucherDetailValidationService paymentVoucherDetailValidationService
-
+	PaymentVoucherService paymentVoucherService
+	UserService userService
 	def serviceMethod() {
 
 	}
@@ -19,15 +21,28 @@ class PaymentVoucherDetailService {
 		def a = object.toLong()
 		return PaymentVoucherDetail.findAll("from PaymentVoucherDetail as b where b.paymentVoucher.id=? and b.isDeleted =false",[a])
 	}
+	
+	def createCode(object)
+		{
+			Date curDate = new Date()
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+			String now = format.format(curDate)
+			String code = "PVD-"+now+"-"+object.id
+			return code
+		}
 	def createObject(object){
 		object.paymentVoucher = PaymentVoucher.get(object.paymentVoucherId)
 		object.isDeleted = false
 		object.isConfirmed = false
 		object.amount = object.payable.amount
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = paymentVoucherDetailValidationService.createObjectValidation(object as PaymentVoucherDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
-			object =object.save()
+			object = object.save()
+			paymentVoucherService.calculateTotal(object.paymentVoucher.id)
+			object.code = createCode(object)
+			object = object.save()
 		}
 		return object
 	}
@@ -38,10 +53,13 @@ class PaymentVoucherDetailService {
 		valObject.code = object.code
 		valObject.amount = object.payable.amount
 		valObject.description = object.description
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = paymentVoucherDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
 			valObject.save()
+			paymentVoucherService.calculateTotal(valObject.paymentVoucher.id)
+			
 		}
 		else
 		{
@@ -56,6 +74,7 @@ class PaymentVoucherDetailService {
 		{
 			newObject.isDeleted = true
 			newObject.save()
+			paymentVoucherService.calculateTotal(newObject.paymentVoucher.id)
 		}
 
 	}
@@ -66,6 +85,7 @@ class PaymentVoucherDetailService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = newObject.confirmationDate
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
 	}
@@ -76,6 +96,7 @@ class PaymentVoucherDetailService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			newObject.save()
 		}
 	}

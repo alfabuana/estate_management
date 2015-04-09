@@ -147,7 +147,8 @@ class MasterCashBank extends VerticalLayout{
 								  name:textName.getValue(),
 								  description:textDescription.getValue(),
 								  amount:textAmount.getValue(),
-								  isBank:chkBank.getValue()
+								  isBank:chkBank.getValue(),
+								  username:getSession().getAttribute("user")
 								  ]
 					
 					if (object.id == "")
@@ -199,8 +200,16 @@ class MasterCashBank extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(CashBankService).softDeletedObject(object)
-						initTable()
+						object = Grails.get(CashBankService).softDeletedObject(object)
+						if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 					} else {
 								
 					}
@@ -324,14 +333,14 @@ class MasterCashBank extends VerticalLayout{
 		//fillTableContainer(tableContainer);
 	    itemlist = Grails.get(CashBankService).getList()
 		tableContainer.addAll(itemlist)
-//		tableContainer.addNestedContainerProperty("facility1.id")
-//		tableContainer.addNestedContainerProperty("facility1.nama")
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
 //		tableContainer.addNestedContainerProperty("customer1.id")
 		
 		table.setContainerDataSource(tableContainer);
-//		table.setColumnHeader("name","Name")
-//		table.setColumnHeader("address","Address")
-		table.visibleColumns = ["name","description","amount","isBank","dateCreated","lastUpdated","isDeleted"]
+		table.setColumnHeader("createdBy.username","CreatedBy")
+		table.setColumnHeader("updatedBy.username","UpdatedBy")
+		table.visibleColumns = ["id","name","description","amount","isBank","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

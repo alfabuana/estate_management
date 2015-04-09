@@ -45,8 +45,8 @@ vaadin {
     // widgetset = 'com.mycompany.widgetset'
 
     compile {
-        //usePathJar = true //if you have problem with long classpath and vaadin-compile-widgetset on windows, uncomment this line
-        //classPathRegExp="(?ismx)([^;]*(vaadin|gwt-dev|ant|sac)[^;]*);" //Regex pattern including jar contains following words vaadin|gwt-dev|ant|sac, used by default for path jar
+        usePathJar = true //if you have problem with long classpath and vaadin-compile-widgetset on windows, uncomment this line
+        classPathRegExp="(?ismx)([^;]*(vaadin|gwt-dev|ant|sac)[^;]*);" //Regex pattern including jar contains following words vaadin|gwt-dev|ant|sac, used by default for path jar
 
         //memory settings
         //antMaxMemory='512m'

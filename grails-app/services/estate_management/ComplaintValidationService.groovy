@@ -8,10 +8,31 @@ class ComplaintValidationService {
     def serviceMethod() {
 
     }
-	def usernameNotNull(def object){
-		if (object.username == null || object.username == "")
+	def isConfirmed(def object){
+		if (object.isConfirmed == true)
 		{
-			object.errors.rejectValue('username','null','Username tidak boleh kosong')
+			object.errors.rejectValue(null,'null','Sudah terconfirm')
+		}
+		return object
+	}
+	def isNotConfirmed(def object){
+		if (object.isConfirmed == false)
+		{
+			object.errors.rejectValue(null,'null','Belum diconfirm tidak boleh diclear/unclear')
+		}
+		return object
+	}
+	def isCleared(def object){
+		if (object.isCleared == true)
+		{
+			object.errors.rejectValue(null,'null','Belum diunclear tidak boleh di unconfirm')
+		}
+		return object
+	}
+	def usernameNotNull(def object){
+		if (object.user == null || object.user == "")
+		{
+			object.errors.rejectValue('user','null','Username tidak boleh kosong')
 		}
 		return object
 	}
@@ -64,10 +85,27 @@ class ComplaintValidationService {
 	}
 	def confirmObjectValidation(object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def unConfirmObjectValidation(object)
 	{
+		object = isCleared(object)
+		if (object.errors.hasErrors()) return object
+		return object
+	}
+	
+	def clearObjectValidation(object)
+	{
+		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
+		return object
+	}
+	def unClearObjectValidation(object)
+	{
+		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 }

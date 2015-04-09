@@ -41,9 +41,9 @@ import com.vaadin.annotations.Theme;
 //@Theme("StockControl")
 public class MyUI extends UI{
 	Navigator navigator
-	
+
 	public String UserName = "";
-	
+
 	def generalFunction = new GeneralFunction()
 	def windowChgPass
 	def textId
@@ -51,84 +51,84 @@ public class MyUI extends UI{
 	def textOldPassword
 	def textNewPassword
 	def textConfirmPassword
-	
+
 	public class MainView extends VerticalLayout implements View {
 		Panel panel
 		MenuBar menuBar
 		MenuItem userMenu
-		
-		
-		
+
+
+
 		public MainView() {
 			setSizeFull()
-			
+
 			// Layout with menu on left and view area on right
 			HorizontalLayout hLayout = new HorizontalLayout();
 			hLayout.setSizeFull();
-			
+
 			// Menu on top of the screen
 			menuBar = new MenuBar()
 			menuBar.setWidth("100%")
 			userMenu =  menuBar.addItem(UserName, null)
 			userMenu.setStyleName("menuRight");
 			userMenu.addItem("Change Password", new MenuBar.Command(){
-				public void menuSelected(MenuItem selectedItem) {
-					windowChangePassword("Change Password");
-				}
-			});
+						public void menuSelected(MenuItem selectedItem) {
+							windowChangePassword("Change Password");
+						}
+					});
 			userMenu.addItem("Logout", new MenuBar.Command(){
-				public void menuSelected(MenuItem selectedItem) {
-					SignOut();
-				}
-			});
+						public void menuSelected(MenuItem selectedItem) {
+							SignOut();
+						}
+					});
 
 			// Have a menu on the left side of the screen
 			VerticalLayout menuContent = new VerticalLayout();
 			menuContent.setWidth(null);
 			menuContent.setMargin(true);
 			// Create TreeView For left Content
-			
-			
+
+
 
 			def tree = new TreeMenu()
-		
+
 			tree.addItemClickListener(new ItemClickListener() {
-				@Override
-				public void itemClick(ItemClickEvent event) {
-					navigator.navigateTo("MAINVIEW" + "/" + event.getItemId());
-				}
-			})
+						@Override
+						public void itemClick(ItemClickEvent event) {
+							navigator.navigateTo("MAINVIEW" + "/" + event.getItemId());
+						}
+					})
 			for(def item in tree.getItemIds()){
 				tree.expandItemsRecursively(item)
 			}
 			menuContent.addComponent(tree)
-			
+
 			def menu = new Panel("Menu");
 			menu.setHeight("100%");
 			menu.setWidth(null);
 			menu.setContent(menuContent);
-			
+
 			hLayout.addComponent(menu);
-			
-//			==========================
+
+			//			==========================
 			// JUDUL
-//			==========================
+			//			==========================
 			// A panel that contains a content area on right
 			panel = new Panel("Estate Management");
 			panel.setSizeFull();
-//			==========================
-			
+			//			==========================
+
 			hLayout.addComponent(panel);
 			hLayout.setExpandRatio(panel, 1.0f);
 			//hLayout.setWidth(null);
-			
+
 			addComponent(menuBar);//1
 			setComponentAlignment(menuBar, Alignment.MIDDLE_RIGHT );
 			addComponent(hLayout);//2
 			setExpandRatio(hLayout, 1.0f);
-			
+
 		}
-		
+
 		@Override
 		public void enter(ViewChangeEvent event) {
 			// TODO Auto-generated method stub
@@ -138,19 +138,19 @@ public class MyUI extends UI{
 			//print UserName + "/" + currentUser.getPrincipal()
 			userMenu.setText(UserName)
 			userMenu.setDescription("UserName")
-			
+
 			//print event.getParameters()
 			VerticalLayout panelContent = new VerticalLayout();
 			panelContent.setSizeFull();
-//			panelContent.setMargin(true);
-//			panelContent.setWidth(null);
-			panel.setContent(panelContent); 
+			//			panelContent.setMargin(true);
+			//			panelContent.setWidth(null);
+			panel.setContent(panelContent);
 
 			if (event.getParameters() == null
-				|| event.getParameters().isEmpty()) {
+			|| event.getParameters().isEmpty()) {
 				panelContent.addComponent(
-					new Label(" " +
-							  ""));
+						new Label(" " +
+						""));
 				return;
 			}
 			else{
@@ -207,11 +207,17 @@ public class MyUI extends UI{
 					case "Maintenance Fee":
 						panelContent.addComponent(new MasterMaintenance())
 						break
+					case "Cash Bank Mutation":
+						panelContent.addComponent(new MasterCashBankMutation())
+						break
+					case "Outstanding Invoice":
+						panelContent.addComponent(new MasterOutstandingInvoice())
+						break
 				}
-			}	
+			}
 		}
 	}
-	
+
 	public boolean SignOut()
 	{
 		// "Logout" the user
@@ -229,7 +235,7 @@ public class MyUI extends UI{
 		//getApplication().getWindow().executeJavaScript("window.location.reload();");
 		return true
 	}
-	
+
 	public void windowChangePassword(String caption) {
 		Subject currentUser = SecurityUtils.getSubject();
 		def user = ShiroUser.findByUsername(currentUser.getPrincipal())
@@ -259,103 +265,105 @@ public class MyUI extends UI{
 		layout.addComponent(createCancelButton())
 		getUI().addWindow(windowChgPass);
 	}
-	
+
 	private Button createCancelButton() {
 		def button = new Button("Cancel", new Button.ClickListener() {
-			void buttonClick(Button.ClickEvent event) {
-				windowChgPass.setCaption(textName.getValue())
-				textName.discard()
-				windowChgPass.close()
-			}
-		  })
-	}
-	
-	private Button createSaveButton() {
-		def button = new Button("Save", new Button.ClickListener() {
-			
-			void buttonClick(Button.ClickEvent event) {
-				try{
-					def object = [id:textId.getValue(),
-								  username:textName.getValue(),
-								  passwordHash:textNewPassword.getValue()]
-					
-					object =  Grails.get(UserService).updatePasswordObject(object, textOldPassword.getValue(), textConfirmPassword.getValue())
-					
-					
-					if (object.errors.hasErrors())
-					{
-						textName.setData("username")
-						textNewPassword.setData("newpasswordHash")
-						textOldPassword.setData("oldpasswordHash")
-						textConfirmPassword.setData("confirmpasswordHash")
-						Object[] tv = [textName,textNewPassword,textOldPassword,textConfirmPassword]
-						generalFunction.setErrorUI(tv,object)
-					}
-					else
-					{
+					void buttonClick(Button.ClickEvent event) {
+						windowChgPass.setCaption(textName.getValue())
+						textName.discard()
 						windowChgPass.close()
 					}
-					//initTable()
-				}catch (Exception e)// (MalformedURLException e)
-				{
-					Notification.show("Error\n",
-						e.getLocalizedMessage(),
-						Notification.Type.ERROR_MESSAGE);
-				}
-				 
-				
-			}
-		  })
+				})
+	}
+
+	private Button createSaveButton() {
+		def button = new Button("Save", new Button.ClickListener() {
+
+					void buttonClick(Button.ClickEvent event) {
+						try{
+							def object = [id:textId.getValue(),
+								username:textName.getValue(),
+								passwordHash:textNewPassword.getValue()]
+
+							object =  Grails.get(UserService).updatePasswordObject(object, textOldPassword.getValue(), textConfirmPassword.getValue())
+
+
+							if (object.errors.hasErrors())
+							{
+								textName.setData("username")
+								textNewPassword.setData("newpasswordHash")
+								textOldPassword.setData("oldpasswordHash")
+								textConfirmPassword.setData("confirmpasswordHash")
+								Object[] tv = [textName,textNewPassword,textOldPassword,textConfirmPassword]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								windowChgPass.close()
+							}
+							//initTable()
+						}catch (Exception e)// (MalformedURLException e)
+						{
+							Notification.show("Error\n",
+									e.getLocalizedMessage(),
+									Notification.Type.ERROR_MESSAGE);
+						}
+
+
+					}
+				})
 		//button.setClickShortcut(KeyCode.ENTER);
 		//button.addStyleName("primary"); //Reindeer.BUTTON_DEFAULT
 	}
-	
+
 	@Override
 	protected void init(VaadinRequest request) {
 		// TODO Auto-generated method stub
 		getPage().setTitle("ESTATE MANAGEMENT");
 		// Create a navigator to control the views
 		navigator = new Navigator(this, this);
-		 
+
 		// Create and register the views
 		navigator.addView("", new LoginForm());
-//		navigator.addView("", new MainView());
+
+		//		navigator.addView("", new MainView());
 		navigator.addView("MAINVIEW", new MainView());
-		
+
 		// We use a view change handler to ensure the user is always redirected
 		// to the login view if the user is not logged in.
 		//
 		navigator.addViewChangeListener(new ViewChangeListener() {
 
-			@Override
-			public boolean beforeViewChange(ViewChangeEvent event) {
 
-				// Check if a user has logged in
-				Subject currentUser = SecurityUtils.getSubject();
-				boolean isLoggedIn = currentUser.isAuthenticated();
-				boolean isLoginView = event.getNewView() instanceof LoginForm;
+					@Override
+					public boolean beforeViewChange(ViewChangeEvent event) {
 
-				if (!isLoggedIn && !isLoginView) {
-					// Redirect to login view always if a user has not yet
-					// logged in
-					navigator.navigateTo(""/*LoginForm.NAME*/);
-					return false;
+						// Check if a user has logged in
+						Subject currentUser = SecurityUtils.getSubject();
+						boolean isLoggedIn = currentUser.isAuthenticated();
+						boolean isLoginView = event.getNewView() instanceof LoginForm;
 
-				} else if (isLoggedIn && isLoginView) {
-					// If someone tries to access to login view while logged in,
-					// then cancel
-					navigator.navigateTo("MAINVIEW")
-					return false;
-				}
+						if (!isLoggedIn && !isLoginView) {
+							// Redirect to login view always if a user has not yet
+							// logged in
+							navigator.navigateTo(""/*LoginForm.NAME*/);
+							return false;
 
-				return true;
-			}
+						} else if (isLoggedIn && isLoginView) {
+							// If someone tries to access to login view while logged in,
+							// then cancel
+							navigator.navigateTo("MAINVIEW")
+							return false;
+						}
 
-			@Override
-			public void afterViewChange(ViewChangeEvent event) {
+						return true;
+					}
 
-			}
-		});
+					@Override
+					public void afterViewChange(ViewChangeEvent event) {
+
+					}
+				});
 	}
 
 }

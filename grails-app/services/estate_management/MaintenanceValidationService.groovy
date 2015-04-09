@@ -8,6 +8,20 @@ class MaintenanceValidationService {
     def serviceMethod() {
 
     }
+	def isConfirmed(def object){
+		if (object.isConfirmed == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah terconfirm')
+		}
+		return object
+	}
+	def isNotConfirmed(def object){
+		if (object.isConfirmed == false)
+		{
+			object.errors.rejectValue(null,'null','Belum terconfirm')
+		}
+		return object
+	}
 	def descriptionNotNull(def object){
 		if (object.description == null || object.description == "")
 		{
@@ -29,13 +43,22 @@ class MaintenanceValidationService {
 		}
 		return object
 	}
+	def maintenanceDateNotNull(def object){
+		if (object.maintenanceDate == null || object.maintenanceDate == "")
+		{
+			object.errors.rejectValue('maintenanceDate','null','maintenanceDate tidak boleh kosong')
+		}
+		return object
+	}
 	def createObjectValidation(def object)
 	{
 		object = descriptionNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
+		object = maintenanceDateNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -43,8 +66,10 @@ class MaintenanceValidationService {
 		object = descriptionNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
+		object = maintenanceDateNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)
@@ -53,10 +78,14 @@ class MaintenanceValidationService {
 	}
 	def confirmObjectValidation(object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def unConfirmObjectValidation(object)
 	{
+		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 }

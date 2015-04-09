@@ -1,10 +1,13 @@
 package estate_management
 
 import grails.transaction.Transactional
+import java.text.SimpleDateFormat
 
 @Transactional
 class PaymentRequestDetailService {
 	PaymentRequestDetailValidationService paymentRequestDetailValidationService
+	PaymentRequestService	paymentRequestService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -15,7 +18,14 @@ class PaymentRequestDetailService {
 	def getList(){
 		return PaymentRequestDetail.getAll()
 	}
-	
+	def createCode(object)
+	{
+		Date curDate = new Date()
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+		String now = format.format(curDate)
+		String code = "PRD-"+now+"-"+object.id
+		return code
+	}
 	def getList(object){
 		def a = object.toLong()
 		return PaymentRequestDetail.findAll("from PaymentRequestDetail as b where b.paymentRequest.id=? and b.isDeleted =false",[a])
@@ -24,10 +34,15 @@ class PaymentRequestDetailService {
 		object.paymentRequest = PaymentRequest.get(object.paymentRequestId)
 		object.isDeleted = false
 		object.isConfirmed = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = paymentRequestDetailValidationService.createObjectValidation(object as PaymentRequestDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			paymentRequestService.calculateTotal(object.paymentRequest.id)
+			object.code = createCode(object)
+			object = object.save()
+			
 		}
 
 		return object
@@ -38,10 +53,12 @@ class PaymentRequestDetailService {
 		valObject.code = object.code
 		valObject.amount = Double.parseDouble(object.amount)
 		valObject.description = object.description
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = paymentRequestDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
 			valObject.save()
+			paymentRequestService.calculateTotal(valObject.paymentRequest.id)
 		}
 		else
 		{
@@ -57,6 +74,7 @@ class PaymentRequestDetailService {
 		{
 			newObject.isDeleted = true
 			newObject.save()
+			paymentRequestService.calculateTotal(newObject.paymentRequest.id)
 		}
 	}
 	def confirmObject(def object){
@@ -66,6 +84,7 @@ class PaymentRequestDetailService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
 	}
@@ -76,6 +95,7 @@ class PaymentRequestDetailService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			newObject.save()
 		}
 	}

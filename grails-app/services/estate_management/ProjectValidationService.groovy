@@ -8,6 +8,20 @@ class ProjectValidationService {
     def serviceMethod() {
 
     }
+	def isConfirmed(def object){
+		if (object.isConfirmed == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah terconfirm')
+		}
+		return object
+	}
+	def isNotConfirmed(def object){
+		if (object.isConfirmed == false)
+		{
+			object.errors.rejectValue(null,'null','Belum terconfirm')
+		}
+		return object
+	}
 	def titleNotNull(def object){
 		if (object.title == null || object.title == "")
 		{
@@ -42,8 +56,6 @@ class ProjectValidationService {
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
 //		if (object.errors.hasErrors()) return object
-//		object = amountAgreeNotNull(object)
-//		if (object.errors.hasErrors()) return object
 //		object = amountDisagreeNotNull(object)
 		return object
 	}
@@ -52,8 +64,6 @@ class ProjectValidationService {
 		object = titleNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = amountAgreeNotNull(object)
 //		if (object.errors.hasErrors()) return object
 //		object = amountDisagreeNotNull(object)
 		return object
@@ -64,9 +74,22 @@ class ProjectValidationService {
 	}
 	def confirmObjectValidation(object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
+		
 		return object
 	}
 	def unConfirmObjectValidation(object)
+	{
+		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
+		return object
+	}
+	def finishObjectValidation(object)
+	{
+		return object
+	}
+	def unFinishObjectValidation(object)
 	{
 		return object
 	}

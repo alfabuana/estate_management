@@ -157,7 +157,8 @@ class MasterCashBankAdjustment extends VerticalLayout{
 								cashBank:cmbCashBank.getValue(),
 								adjustmentDate:textAdjustmentDate.getValue(),
 								amount:textAmount.getValue(),
-								code:textCode.getValue()
+								code:textCode.getValue(),
+								username:getSession().getAttribute("user")
 							]
 
 							if (object.id == "")
@@ -209,8 +210,16 @@ class MasterCashBankAdjustment extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(CashBankAdjustmentService).softDeletedObject(object)
-							initTable()
+							object = Grails.get(CashBankAdjustmentService).softDeletedObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 
 						}
@@ -233,9 +242,18 @@ class MasterCashBankAdjustment extends VerticalLayout{
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
-							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(CashBankAdjustmentService).confirmObject(object)
-							initTable()
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
+							object = Grails.get(CashBankAdjustmentService).confirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 
 						}
@@ -259,8 +277,16 @@ class MasterCashBankAdjustment extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(CashBankAdjustmentService).unConfirmObject(object)
-							initTable()
+							object = Grails.get(CashBankAdjustmentService).unConfirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 
 						}
@@ -287,9 +313,15 @@ class MasterCashBankAdjustment extends VerticalLayout{
 		textId.setPropertyDataSource(item.getItemProperty("id"))
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
+		textCode = new TextField("Code:");
+		textCode.setPropertyDataSource(item.getItemProperty("code"))
+		textCode.setBuffered(true)
+		textCode.setImmediate(false)
+		textCode.setReadOnly(true)
+		layout.addComponent(textCode)
 		cmbCashBank = new ComboBox("Cash Bank:");
 		def beanCashBank = new BeanItemContainer<CashBank>(CashBank.class)
-		def cashBankList = Grails.get(CashBankService).getList()
+		def cashBankList = Grails.get(CashBankService).getListDeleted()
 		beanCashBank.addAll(cashBankList)
 		cmbCashBank.setContainerDataSource(beanCashBank)
 		cmbCashBank.setItemCaptionPropertyId("name")
@@ -308,11 +340,7 @@ class MasterCashBankAdjustment extends VerticalLayout{
 		textAmount.setBuffered(true)
 		textAmount.setImmediate(false)
 		layout.addComponent(textAmount)
-		textCode = new TextField("Code:");
-		textCode.setPropertyDataSource(item.getItemProperty("code"))
-		textCode.setBuffered(true)
-		textCode.setImmediate(false)
-		layout.addComponent(textCode)
+		
 		layout.addComponent(createSaveButton())
 		layout.addComponent(createCancelButton())
 		getUI().addWindow(window);
@@ -338,9 +366,12 @@ class MasterCashBankAdjustment extends VerticalLayout{
 		textId = new TextField("Id:");
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
+		textCode = new TextField("Code:")
+		layout.addComponent(textCode)
+		textCode.setReadOnly(true)
 		cmbCashBank = new ComboBox("Cash Bank:")
 		def beanCashBank = new BeanItemContainer<CashBank>(CashBank.class)
-		def cashBankList = Grails.get(CashBankService).getList()
+		def cashBankList = Grails.get(CashBankService).getListDeleted()
 		beanCashBank.addAll(cashBankList)
 		cmbCashBank.setContainerDataSource(beanCashBank)
 		cmbCashBank.setItemCaptionPropertyId("name")
@@ -349,8 +380,7 @@ class MasterCashBankAdjustment extends VerticalLayout{
 		layout.addComponent(textAdjustmentDate)
 		textAmount = new TextField("Amount:")
 		layout.addComponent(textAmount)
-		textCode = new TextField("Code:")
-		layout.addComponent(textCode)
+		
 		//			def textArea = new TextArea("Text Area")
 		//			layout.addComponent(textArea)
 		//			def dateField = new DateField("Date Field")
@@ -396,12 +426,17 @@ class MasterCashBankAdjustment extends VerticalLayout{
 		tableContainer.addAll(itemlist)
 		tableContainer.addNestedContainerProperty("cashBank.id")
 		tableContainer.addNestedContainerProperty("cashBank.name")
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
+		tableContainer.addNestedContainerProperty("confirmedBy.username")
 		//		tableContainer.addNestedContainerProperty("customer1.id")
 
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("cashBank.name","Cash Bank Name")
 		table.setColumnHeader("adjustmentDate","Adjustment Date")
-		table.visibleColumns = ["cashBank.name","adjustmentDate","amount","code","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["id","cashBank.name","adjustmentDate","amount","code","isConfirmed"
+			,"confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username"
+			,"updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())

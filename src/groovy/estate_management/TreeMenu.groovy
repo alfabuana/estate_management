@@ -51,6 +51,10 @@ class TreeMenu extends Tree{
 		addItem("Cash Bank Adjustment")
 		setParent("Cash Bank Adjustment", "Finance")
 		setChildrenAllowed( "Cash Bank Adjustment", false)
+		
+		addItem("Cash Bank Mutation")
+		setParent("Cash Bank Mutation", "Finance")
+		setChildrenAllowed( "Cash Bank Mutation", false)
 
 		addItem("Payment Request")
 		setParent("Payment Request", "Finance")
@@ -79,10 +83,7 @@ class TreeMenu extends Tree{
 		setParent("Maintenance Fee", "Maintenance")
 		setChildrenAllowed( "Maintenance Fee", false)
 
-		addItem("Invoice Payment")
-		setParent("Invoice Payment", "Maintenance")
-		setChildrenAllowed( "Invoice Payment", false)
-
+		
 		
 		addItem( "Tenant" )
 		//Child
@@ -93,6 +94,14 @@ class TreeMenu extends Tree{
 		addItem("Home Assignment")
 		setParent("Home Assignment", "Tenant")
 		setChildrenAllowed( "Home Assignment", false)
+		
+		addItem("Invoice Payment")
+		setParent("Invoice Payment", "Tenant")
+		setChildrenAllowed( "Invoice Payment", false)
+
+		addItem("Outstanding Invoice")
+		setParent("Outstanding Invoice", "Tenant")
+		setChildrenAllowed( "Outstanding Invoice", false)
 		//	   if (currentUser.hasRole("Administrator"))
 		//	   {
 		//		   //Parent

@@ -48,6 +48,7 @@ import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
 
 import estate_management.ProjectService
+import grails.converters.JSON
 
 
 
@@ -195,7 +196,7 @@ class MasterInvoicePayment extends VerticalLayout{
 				try{
 					def object = [id:textId.getValue(),
 								invoice:cmbInvoice.getValue(),
-								  username:cmbUser.getValue(),
+								  username:String.valueOf(getSession().getAttribute("user")),
 								  description:textDescription.getValue(),
 								  paidDate:textPaidDate.getValue()
 								  ]
@@ -289,8 +290,16 @@ class MasterInvoicePayment extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(InvoicePaidService).softDeletedObject(object)
-						initTable()
+						object  = Grails.get(InvoicePaidService).softDeletedObject(object)
+						if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 					} else {
 								
 					}
@@ -314,8 +323,16 @@ class MasterInvoicePayment extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id").toString()]
-							Grails.get(InvoicePaidDetailService).softDeletedObject(object)
-							initTableDetail()
+							object = Grails.get(InvoicePaidDetailService).softDeletedObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTableDetail()
+							}
 						} else {
 
 						}
@@ -339,9 +356,18 @@ class MasterInvoicePayment extends VerticalLayout{
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
-							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(InvoicePaidService).confirmObject(object)
-							initTable()
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
+							object = Grails.get(InvoicePaidService).confirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 									
 						}
@@ -365,8 +391,16 @@ class MasterInvoicePayment extends VerticalLayout{
 						public void onClose(ConfirmDialog dialog) {
 							if (dialog.isConfirmed()) {
 								def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-								Grails.get(InvoicePaidService).unConfirmObject(object)
+								object = Grails.get(InvoicePaidService).unConfirmObject(object)
+								if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
 								initTable()
+							}
 							} else {
 										
 							}
@@ -395,7 +429,7 @@ class MasterInvoicePayment extends VerticalLayout{
 			layout.addComponent(textId)
 			cmbInvoice = new ComboBox("Invoice:");
 			def beanInvoice = new BeanItemContainer<Invoice>(Invoice.class)
-			def invoiceList = Grails.get(InvoiceService).getList()
+			def invoiceList = Grails.get(InvoiceService).getListDeleted()
 			beanInvoice.addAll(invoiceList)
 			cmbInvoice.setContainerDataSource(beanInvoice)
 			cmbInvoice.setItemCaptionPropertyId("code")
@@ -405,13 +439,14 @@ class MasterInvoicePayment extends VerticalLayout{
 			layout.addComponent(cmbInvoice)
 			cmbUser = new ComboBox("User:");
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-			def userList = Grails.get(UserService).getList()
+			def userList = Grails.get(UserService).getListDeleted()
 			beanUser.addAll(userList)
 			cmbUser.setContainerDataSource(beanUser)
 			cmbUser.setItemCaptionPropertyId("username")
-			cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("username.id").value})
+			cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("user.id").value})
 			cmbUser.setBuffered(true)
 			cmbUser.setImmediate(false)
+			cmbUser.setReadOnly(true)
 			layout.addComponent(cmbUser)
 			textDescription = new TextField("Description:");
 			textDescription.setPropertyDataSource(item.getItemProperty("description"))
@@ -450,17 +485,18 @@ class MasterInvoicePayment extends VerticalLayout{
 			layout.addComponent(textId)
 			cmbInvoice = new ComboBox("Invoice:")
 			def beanInvoice = new BeanItemContainer<Invoice>(Invoice.class)
-			def invoiceList = Grails.get(InvoiceService).getList()
+			def invoiceList = Grails.get(InvoiceService).getListDeleted()
 			beanInvoice.addAll(invoiceList)
 			cmbInvoice.setContainerDataSource(beanInvoice)
 			cmbInvoice.setItemCaptionPropertyId("code")
 			layout.addComponent(cmbInvoice)
 			cmbUser = new ComboBox("User:")
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-			def userList = Grails.get(UserService).getList()
+			def userList = Grails.get(UserService).getListDeleted()
 			beanUser.addAll(userList)
 			cmbUser.setContainerDataSource(beanUser)
 			cmbUser.setItemCaptionPropertyId("username")
+			cmbUser.setReadOnly(true)
 			layout.addComponent(cmbUser)
 			textDescription = new TextField("Description:")
 			layout.addComponent(textDescription)
@@ -614,20 +650,26 @@ class MasterInvoicePayment extends VerticalLayout{
 			 //fillTableContainer(tableContainer);
 			 itemlist = Grails.get(InvoicePaidService).getList()
 			 tableContainer.addAll(itemlist)
+			 tableContainer.addNestedContainerProperty("createdBy.id")
+			 tableContainer.addNestedContainerProperty("createdBy.username")
+			 tableContainer.addNestedContainerProperty("updatedBy.id")
+			 tableContainer.addNestedContainerProperty("updatedBy.username")
+			 tableContainer.addNestedContainerProperty("confirmedBy.id")
+			 tableContainer.addNestedContainerProperty("confirmedBy.username")
 			 tableContainer.addNestedContainerProperty("invoice.id")
 			 tableContainer.addNestedContainerProperty("invoice.code")
-			 tableContainer.addNestedContainerProperty("username.id")
-			 tableContainer.addNestedContainerProperty("username.username")
+			 tableContainer.addNestedContainerProperty("user.id")
+			 tableContainer.addNestedContainerProperty("user.username")
 			 table.setContainerDataSource(tableContainer);
 			 table.setColumnHeader("invoiceDate","Invoice Date")
-			 table.setColumnHeader("username.username","Username")
+			 table.setColumnHeader("user.username","Username")
 			 table.setColumnHeader("totalAmount","Total Amount")
 			 table.setColumnHeader("invoice.code","Invoice Code")
 	 //		table.setColumnHeader("startTime","Start Time")
 	 //		table.setColumnHeader("durasi","Duration")
 	 //		table.setColumnHeader("dateStartUsing","Date Start Using")
 	 //		table.setColumnHeader("dateEndUsing","Date End Using")
-			 table.visibleColumns = ["invoice.code","username.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+			 table.visibleColumns = ["id","invoice.code","user.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 			 table.setSelectable(true)
 			 table.setImmediate(false)
 	 //		table.setPageLength(table.size())
@@ -669,7 +711,7 @@ class MasterInvoicePayment extends VerticalLayout{
 		tableDetailContainer.addAll(itemListDetail)
 		tableDetail.setColumnHeader("invoicePaid.id","Invoice Paid Id")
 		tableDetail.setContainerDataSource(tableDetailContainer);
-		tableDetail.visibleColumns = ["invoicePaid.id","attachmentUrl","isDeleted","dateCreated","lastUpdated"]
+		tableDetail.visibleColumns = ["id","invoicePaid.id","attachmentUrl","isDeleted","dateCreated","lastUpdated"]
 		tableDetail.setSelectable(true)
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)

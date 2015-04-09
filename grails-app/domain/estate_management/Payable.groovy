@@ -3,7 +3,7 @@ package estate_management
 import java.util.Date;
 
 class Payable {
-	ShiroUser 	username
+	ShiroUser 	user
 	String		payableSource
 	String 		payableSourceId
 	Integer	 	payableSourceDetailId
@@ -21,5 +21,6 @@ class Payable {
     static constraints = {
 		completionDate (nullable : true)
 		dueDate (nullable : true)
+		user (nullable : true)
     }
 }

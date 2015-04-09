@@ -49,8 +49,8 @@ class PaymentVoucherDetailValidationService {
 		if (object.errors.hasErrors()) return object
 		object = payableNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
@@ -62,8 +62,8 @@ class PaymentVoucherDetailValidationService {
 		if (object.errors.hasErrors()) return object
 		object = payableNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)

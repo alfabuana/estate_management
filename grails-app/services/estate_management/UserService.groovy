@@ -7,7 +7,9 @@ import estate_management.ShiroUser;
 import org.apache.shiro.crypto.hash.Sha256Hash
 import org.apache.shiro.subject.Subject
 import org.apache.shiro.SecurityUtils
-
+import org.apache.shiro.subject.PrincipalCollection
+import org.apache.shiro.subject.SimplePrincipalCollection
+import org.apache.shiro.subject.Subject
 @Transactional
 class UserService {
 	UserValidatorService userValidatorService = new UserValidatorService()
@@ -20,10 +22,16 @@ class UserService {
 		return ShiroUser.get(object)
 	}
 	
+	def getObjectByUserName(def object){
+		return ShiroUser.find{ username == String.valueOf(object).toUpperCase()}
+	}
+	
 	def getList(){
 		return ShiroUser.getAll()
 	}
-	
+	def getListDeleted(){
+		return ShiroUser.findAll{isDeleted == false}
+	}
 	def createObject(object){
 		ShiroUser newObject = new ShiroUser()
 		newObject.username = String.valueOf(object.username).toUpperCase()

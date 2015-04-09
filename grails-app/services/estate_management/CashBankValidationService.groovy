@@ -8,6 +8,7 @@ class CashBankValidationService {
     def serviceMethod() {
 
     }
+	
 	def nameNotNull(def object){
 		if (object.name == null || object.name == "")
 		{

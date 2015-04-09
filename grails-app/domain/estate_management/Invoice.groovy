@@ -3,7 +3,8 @@ package estate_management
 import java.util.Date;
 
 class Invoice {
-	ShiroUser	username
+	Home		home
+	ShiroUser	user
 	String		code
 	Date		invoiceDate
 	String		description
@@ -11,6 +12,9 @@ class Invoice {
 	Double		totalAmount
 	Boolean		isConfirmed
 	Date		confirmationDate
+	ShiroUser createdBy
+	ShiroUser updatedBy
+	ShiroUser confirmedBy
 	Boolean		isCleared
 	Boolean 	isDeleted
 	Date 		dateCreated // Predefined names by Grails will be filled automatically
@@ -19,7 +23,13 @@ class Invoice {
 	static hasMany = [invoiceDetails : InvoiceDetail]
 	static belongsTo = Invoice
     static constraints = {
+		user(nullable:true)
+		home(nullable:true)
 		dueDate(nullable:true)
 		confirmationDate(nullable : true)
+		createdBy(nullable : true)
+		updatedBy(nullable : true)
+		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

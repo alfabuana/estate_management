@@ -8,8 +8,21 @@ class ProjectVoteValidationService {
     def serviceMethod() {
 
     }
+	def alreadyVote(def object){
+		def projectVote = ProjectVote.find {
+			user == object.user &&
+					project == object.project
+		}
+		if (projectVote != null)
+		{
+			object.errors.rejectValue(null,'null','Already Vote')
+			return object
+		}
+		return object
+	}
+	
 	def usernameNotNull(def object){
-		if (object.username == null || object.username == "")
+		if (object.user == null || object.user == "")
 		{
 			object.errors.rejectValue('username','null','Username tidak boleh kosong')
 		}
@@ -36,6 +49,8 @@ class ProjectVoteValidationService {
 		object = projectNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = isAgreeNotNull(object)
+		if (object.errors.hasErrors()) return object
+		object = alreadyVote(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -51,4 +66,5 @@ class ProjectVoteValidationService {
 	{
 		return object
 	}
+	
 }

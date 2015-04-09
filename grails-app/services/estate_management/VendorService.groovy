@@ -6,6 +6,7 @@ import grails.transaction.Transactional
 @Transactional
 class VendorService {
 	VendorValidationService vendorValidationService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -16,9 +17,13 @@ class VendorService {
 	def getList(){
 		return Vendor.getAll()
 	}
+	def getListDeleted(){
+		return Vendor.findAll{isDeleted == false}
+	}
 	
 	def createObject(object){
 		object.isDeleted = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = vendorValidationService.createObjectValidation(object as Vendor)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -34,6 +39,7 @@ class VendorService {
 		valObject.telephone = object.telephone
 		valObject.fax = object.fax
 		valObject.email = object.email
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = vendorValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{

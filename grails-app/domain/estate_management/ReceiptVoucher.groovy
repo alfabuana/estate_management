@@ -3,7 +3,7 @@ package estate_management
 import java.util.Date;
 
 class ReceiptVoucher {
-	ShiroUser	username
+	ShiroUser	user
 	CashBank	cashBank
 	String		code
 	Date		receiptDate
@@ -14,6 +14,9 @@ class ReceiptVoucher {
 	Double		totalAmount
 	Boolean		isConfirmed
 	Date		confirmationDate
+	ShiroUser createdBy
+	ShiroUser updatedBy
+	ShiroUser confirmedBy
 	Boolean 	isDeleted
 	Date 		dateCreated // Predefined names by Grails will be filled automatically
 	Date 		lastUpdated // Predefined names by Grails will be filled automatically
@@ -24,5 +27,9 @@ class ReceiptVoucher {
 		dueDate(nullable:true)
 		confirmationDate(nullable : true)
 		reconciliationDate(nullable : true)
+		createdBy(nullable : true)
+		updatedBy(nullable : true)
+		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

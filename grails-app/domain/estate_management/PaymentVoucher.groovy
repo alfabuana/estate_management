@@ -3,7 +3,7 @@ package estate_management
 import java.util.Date;
 
 class PaymentVoucher {
-	ShiroUser	username
+	ShiroUser	user
 	CashBank	cashBank
 	String		code
 	Date		paymentDate
@@ -12,6 +12,9 @@ class PaymentVoucher {
 	Boolean		isReconciled
 	Date		reconciliationDate
 	Double		totalAmount
+	ShiroUser createdBy
+	ShiroUser updatedBy
+	ShiroUser confirmedBy
 	Boolean		isConfirmed
 	Date		confirmationDate
 	Boolean 	isDeleted
@@ -24,5 +27,9 @@ class PaymentVoucher {
 		dueDate(nullable:true)
 		confirmationDate (nullable : true)
 		reconciliationDate (nullable : true)
+		createdBy(nullable : true)
+		updatedBy(nullable : true)
+		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

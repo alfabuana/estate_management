@@ -1,7 +1,7 @@
 package estate_management
 
 class Receivable {
-	ShiroUser	username
+	ShiroUser	user
 	String 		receivableSource
 	Integer 	receivableSourceId
 	Integer 	receivableSourceDetailId
@@ -19,5 +19,6 @@ class Receivable {
 	static constraints = {
 		completionDate (nullable : true)
 		dueDate(nullable : true)
+		user (nullable : true)
 	}
 }

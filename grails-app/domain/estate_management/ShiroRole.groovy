@@ -1,9 +1,9 @@
 package estate_management
 
-import java.util.Date;
-
 class ShiroRole {
     String name
+//	ShiroUser createdBy
+//	ShiroUser updatedBy
 
 	Boolean 	isDeleted
 	Date 		dateCreated // Predefined names by Grails will be filled automatically
@@ -14,5 +14,7 @@ class ShiroRole {
 
     static constraints = {
         name(nullable: false, blank: false, unique: true)
+//		createdBy(nullable : true)
+//		updatedBy(nullable : true)
     }
 }

@@ -8,10 +8,50 @@ class InvoiceValidationService {
     def serviceMethod() {
 
     }
-	def usernameNotNull(def object){
-		if (object.username == null || object.username == "")
+	def isConfirmed(def object){
+		if (object.isConfirmed == true)
 		{
-			object.errors.rejectValue('username','null','Username tidak boleh kosong')
+			object.errors.rejectValue(null,'null','Sudah terconfirm')
+		}
+		return object
+	}
+	def isNotConfirmed(def object){
+		if (object.isConfirmed == false)
+		{
+			object.errors.rejectValue(null,'null','Belum terconfirm')
+		}
+		return object
+	}
+	def hasDetail(def object){
+		if(object.invoiceDetails.size() == 0)
+		{
+			object.errors.rejectValue(null,'null','Harus memiliki detail')
+		}
+		return object
+	}
+	def recevableNotAssociateWithReceiptVoucher(def object)
+	{
+		for (detail in object.invoiceDetails.findAll{ it.isDeleted == false })
+		{
+			def invoiceDetail = ReceiptVoucherDetail.find {
+				receivable.receivableSource == "invoice" &&
+						receivable.receivableSourceId == object.id &&
+						receivable.receivableSourceDetailId == detail.id &&
+						isDeleted == false
+			}
+			if (invoiceDetail != null)
+			{
+				object.errors.rejectValue(null,'null','Invoice sudah di buat ReceiptVoucher')
+				return object
+			}
+		}
+		return object
+	}
+
+	def usernameNotNull(def object){
+		if (object.user == null || object.user == "")
+		{
+			object.errors.rejectValue('user','null','Username tidak boleh kosong')
 		}
 		return object
 	}
@@ -52,10 +92,10 @@ class InvoiceValidationService {
 	}
 	def createObjectValidation(def object)
 	{
-		object = usernameNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = usernameNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = invoiceDateNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
@@ -67,10 +107,10 @@ class InvoiceValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
-		object = usernameNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = usernameNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = invoiceDateNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
@@ -86,10 +126,16 @@ class InvoiceValidationService {
 	}
 	def confirmObjectValidation(object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
+		object = hasDetail(object)
 		return object
 	}
 	def unConfirmObjectValidation(object)
 	{
+		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
+		object = recevableNotAssociateWithReceiptVoucher(object)
 		return object
 	}
 }

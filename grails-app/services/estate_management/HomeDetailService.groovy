@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class HomeDetailService {
 	HomeDetailValidationService homeDetailValidationService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -14,6 +15,16 @@ class HomeDetailService {
 	}
 	def getList(){
 		return HomeDetail.getAll()
+	}
+	def getListForMasterHome(def object){
+		return HomeDetail.findAll{
+			home.id == object && isDeleted == false
+		}
+	}
+	def getListForMasterUser(def object){
+		return HomeDetail.findAll{
+			user.id == object && isDeleted == false
+		}
 	}
 	def createObject(object){
 		object.isDeleted = false
@@ -28,7 +39,7 @@ class HomeDetailService {
 	def updateObject(def object){
 		def valObject = HomeDetail.read(object.id)
 		valObject.home = object.home
-		valObject.username = object.username
+		valObject.user = object.user
 		valObject = homeDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{

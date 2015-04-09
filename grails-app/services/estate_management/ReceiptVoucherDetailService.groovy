@@ -1,10 +1,13 @@
 package estate_management
 
 import grails.transaction.Transactional
+import java.text.SimpleDateFormat
 
 @Transactional
 class ReceiptVoucherDetailService {
 	ReceiptVoucherDetailValidationService receiptVoucherDetailValidationService
+	ReceiptVoucherService receiptVoucherService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -19,15 +22,27 @@ class ReceiptVoucherDetailService {
 		def a = object.toLong()
 		return ReceiptVoucherDetail.findAll("from ReceiptVoucherDetail as b where b.receiptVoucher.id=? and b.isDeleted =false",[a])
 	}
+	def createCode(object)
+	{
+		Date curDate = new Date()
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+		String now = format.format(curDate)
+		String code = "RVD-"+now+"-"+object.id
+		return code
+	}
 	def createObject(object){
 		object.receiptVoucher = ReceiptVoucher.get(object.receiptVoucherId)
 		object.isDeleted = false
 		object.isConfirmed = false
 		object.amount = object.receivable.amount
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = receiptVoucherDetailValidationService.createObjectValidation(object as ReceiptVoucherDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			receiptVoucherService.calculateTotal(object.receiptVoucher.id)
+			object.code = createCode(object)
+			object = object.save()
 		}
 		return object
 	}
@@ -39,10 +54,12 @@ class ReceiptVoucherDetailService {
 		valObject.code = object.code
 		valObject.amount = object.receivable.amount
 		valObject.description = object.description
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = receiptVoucherDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
 			valObject.save()
+			receiptVoucherService.calculateTotal(valObject.receiptVoucher.id)
 		}
 		else
 		{
@@ -57,6 +74,7 @@ class ReceiptVoucherDetailService {
 		{
 			newObject.isDeleted = true
 			newObject.save()
+			receiptVoucherService.calculateTotal(newObject.receiptVoucher.id)
 		}
 
 	}
@@ -67,6 +85,7 @@ class ReceiptVoucherDetailService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = newObject.confirmationDate
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
 	}
@@ -77,6 +96,7 @@ class ReceiptVoucherDetailService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			newObject.save()
 		}
 	}

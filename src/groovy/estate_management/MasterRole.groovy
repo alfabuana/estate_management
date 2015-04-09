@@ -189,8 +189,16 @@ class MasterRole extends VerticalLayout{
 				public void onClose(ConfirmDialog dialog) {
 					if (dialog.isConfirmed()) {
 						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-						Grails.get(RoleService).softDeleteObject(object)
-						initTable()
+						object = Grails.get(RoleService).softDeleteObject(object)
+						if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 					} else {
 								
 					}
@@ -298,7 +306,7 @@ class MasterRole extends VerticalLayout{
 //		tableContainer.addNestedContainerProperty("customer1.nama")
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("name","Name")
-		table.visibleColumns = ["name","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["id","name","dateCreated","lastUpdated","isDeleted"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

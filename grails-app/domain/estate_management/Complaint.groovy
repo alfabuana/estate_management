@@ -3,12 +3,18 @@ package estate_management
 import java.util.Date;
 
 class Complaint {
-	ShiroUser	username
+	ShiroUser	user
 	Home		home
 	String		description
 	String		title
+	String 		code
 	Boolean		isConfirmed
 	Date		confirmationDate
+	Boolean		isCleared
+	Date		clearDate
+	ShiroUser createdBy
+	ShiroUser updatedBy
+	ShiroUser confirmedBy
 	Boolean 	isDeleted
 	Date 		dateCreated // Predefined names by Grails will be filled automatically
 	Date 		lastUpdated // Predefined names by Grails will be filled automatically
@@ -17,5 +23,10 @@ class Complaint {
 
     static constraints = {
 		confirmationDate(nullable:true)
+		clearDate(nullable : true)
+		createdBy(nullable : true)
+		updatedBy(nullable : true)
+		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

@@ -5,6 +5,7 @@ import grails.transaction.Transactional
 @Transactional
 class ComplaintDetailService {
 	ComplaintDetailValidationService complaintDetailValidationService
+	UserService userService
 
 	def serviceMethod() {
 
@@ -17,11 +18,15 @@ class ComplaintDetailService {
 	}
 	def getList(object){
 		def a = object.toLong()
-		return ComplaintDetail.findAll("from ComplaintDetail as b where b.complaint.id=? and b.isDeleted =false",[a])
+//		return ComplaintDetail.findAll("from ComplaintDetail as b where b.complaint.id=? and b.isDeleted =false",[a])
+		return ComplaintDetail.findAll{ 
+			complaint.id == object
+		}
 	}
 	def createObject(object){
 		object.complaint = Complaint.get(object.complaintId)
 		object.isDeleted = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = complaintDetailValidationService.createObjectValidation(object as ComplaintDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -33,6 +38,7 @@ class ComplaintDetailService {
 		def valObject = ComplaintDetail.read(object.id)
 //		valObject.complaint = object.complaint
 		valObject.attachmentUrl = object.attachmentUrl
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = complaintDetailValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{

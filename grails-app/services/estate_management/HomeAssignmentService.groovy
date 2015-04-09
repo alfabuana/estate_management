@@ -1,11 +1,13 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 @Transactional
 class HomeAssignmentService {
 	HomeAssignmentValidationService homeAssignmentValidationService
-
+	HomeDetailService homeDetailService
+	UserService userService
 	def serviceMethod() {
 
 	}
@@ -18,6 +20,7 @@ class HomeAssignmentService {
 	def createObject(object){
 		object.isDeleted = false
 		object.isConfirmed = false
+		object.createdBy = userService.getObjectByUserName(object.username)
 		object = homeAssignmentValidationService.createObjectValidation(object as HomeAssignment)
 		if (object.errors.getErrorCount() == 0)
 		{
@@ -29,8 +32,9 @@ class HomeAssignmentService {
 	def updateObject(def object){
 		def valObject = HomeAssignment.read(object.id)
 		valObject.home = object.home
-		valObject.username = object.username
+		valObject.user = userService.getObjectByUserName(object.username)
 		valObject.assignDate = object.assignDate
+		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = homeAssignmentValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
 		{
@@ -51,6 +55,7 @@ class HomeAssignmentService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 	}
 	def confirmObject(def object){
 		def newObject = HomeAssignment.get(object.id)
@@ -59,8 +64,29 @@ class HomeAssignmentService {
 		{
 			newObject.isConfirmed = true
 			newObject.confirmationDate = new Date()
+			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
+
+			HomeDetail homeDetail = HomeDetail.find{
+				home == newObject.home && user == newObject.user
+			}
+			if (homeDetail == null)
+			{
+				homeDetail = new HomeDetail()
+				homeDetail.home = newObject.home
+				homeDetail.lastAssignDate = newObject.assignDate
+				homeDetail.user = newObject.user
+				homeDetailService.createObject(homeDetail)
+			}
+			else
+			{
+				homeDetail.isDeleted = false
+				homeDetail.lastAssignDate = newObject.assignDate
+				homeDetail.user  = newObject.user
+				homeDetailService.updateObject(homeDetail)
+			}
 		}
+		return newObject
 	}
 	def unConfirmObject(def object){
 		def newObject = HomeAssignment.get(object.id)
@@ -69,8 +95,15 @@ class HomeAssignmentService {
 		{
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
+			newObject.confirmedBy = null
 			newObject.save()
+			HomeDetail homeDetail = HomeDetail.find{
+				home == newObject.home && user == newObject.user
+			}
+			homeDetail.isDeleted = true
+			homeDetail.save()
 		}
+		return newObject
 	}
 
 

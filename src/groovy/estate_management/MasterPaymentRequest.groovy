@@ -66,7 +66,8 @@ class MasterPaymentRequest extends VerticalLayout{
 	//	private TextField textDescription
 
 	//==============================
-	private ComboBox cmbUser
+	private ComboBox cmbVendor
+	private ComboBox cmbProject
 	private TextField textDescription
 	private TextField textCode
 	private TextField textAmount
@@ -138,8 +139,8 @@ class MasterPaymentRequest extends VerticalLayout{
 							case "EditDetail":
 								if (tableDetail.getValue() != null)
 									windowEditDetail(tableContainer.getItem(table.getValue()),
-										tableDetailContainer.getItem(tableDetail.getValue())
-										,"EditDetail");
+											tableDetailContainer.getItem(tableDetail.getValue())
+											,"EditDetail");
 								break;
 							case "DeleteDetail":
 								if (tableDetail.getValue() != null)
@@ -199,7 +200,9 @@ class MasterPaymentRequest extends VerticalLayout{
 						try{
 							def object = [id:textId.getValue(),
 								//								paymentRequestId : textId.getValue(),
-								username:cmbUser.getValue(),
+								vendor:cmbVendor.getValue(),
+								project:cmbProject.getValue(),
+								username:String.valueOf(getSession().getAttribute("user")),
 								description:textDescription.getValue(),
 								code:textCode.getValue(),
 								amount:textAmount.getValue().toString(),
@@ -218,12 +221,13 @@ class MasterPaymentRequest extends VerticalLayout{
 
 							if (object.errors.hasErrors())
 							{
-								cmbUser.setData("username")
+								cmbVendor.setData("vendor")
+								cmbProject.setData("project")
 								textDescription.setData("description")
 								textCode.setData("code")
 								textAmount.setData("amount")
 								textRequestDate.setData("requestDate")
-								Object[] tv = [cmbUser,textDescription,textCode,textAmount,textRequestDate]
+								Object[] tv = [cmbVendor,cmbProject,textDescription,textCode,textAmount,textRequestDate]
 								generalFunction.setErrorUI(tv,object)
 							}
 							else
@@ -251,7 +255,8 @@ class MasterPaymentRequest extends VerticalLayout{
 								paymentRequestId : textId.getValue(),
 								code:textCodeDetail.getValue(),
 								amount:textAmountDetail.getValue().toString(),
-								description:textDescriptionDetail.getValue()
+								description:textDescriptionDetail.getValue(),
+								username:getSession().getAttribute("user")
 							]
 
 							if (object.id == "")
@@ -262,7 +267,7 @@ class MasterPaymentRequest extends VerticalLayout{
 							{
 								object =  Grails.get(PaymentRequestDetailService).updateObject(object)
 							}
-							
+
 							if (object.errors.hasErrors())
 							{
 								textCodeDetail.setData("code")
@@ -276,6 +281,7 @@ class MasterPaymentRequest extends VerticalLayout{
 								window.close()
 							}
 							initTableDetail()
+							initTable()
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -300,8 +306,16 @@ class MasterPaymentRequest extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentRequestService).softDeletedObject(object)
-							initTable()
+							object = Grails.get(PaymentRequestService).softDeletedObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 
 						}
@@ -325,8 +339,17 @@ class MasterPaymentRequest extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentRequestDetailService).softDeletedObject(object)
-							initTableDetail()
+							object = Grails.get(PaymentRequestDetailService).softDeletedObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTableDetail()
+								initTable()
+							}
 						} else {
 
 						}
@@ -349,9 +372,18 @@ class MasterPaymentRequest extends VerticalLayout{
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
-							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentRequestService).confirmObject(object)
-							initTable()
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
+							object = Grails.get(PaymentRequestService).confirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 
 						}
@@ -375,8 +407,16 @@ class MasterPaymentRequest extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							Grails.get(PaymentRequestService).unConfirmObject(object)
-							initTable()
+							object = Grails.get(PaymentRequestService).unConfirmObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
 						} else {
 
 						}
@@ -403,29 +443,42 @@ class MasterPaymentRequest extends VerticalLayout{
 		textId.setPropertyDataSource(item.getItemProperty("id"))
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
-		cmbUser = new ComboBox("User:");
-		def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-		def userList = Grails.get(UserService).getList()
-		beanUser.addAll(userList)
-		cmbUser.setContainerDataSource(beanUser)
-		cmbUser.setItemCaptionPropertyId("username")
-		cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("username.id").value})
-		cmbUser.setBuffered(true)
-		cmbUser.setImmediate(false)
-		layout.addComponent(cmbUser)
+		textCode = new TextField("Code:");
+		textCode.setPropertyDataSource(item.getItemProperty("code"))
+		textCode.setBuffered(true)
+		textCode.setImmediate(false)
+		textCode.setReadOnly(true)
+		layout.addComponent(textCode)
+		cmbVendor = new ComboBox("Vendor:");
+		def beanVendor = new BeanItemContainer<Vendor>(Vendor.class)
+		def vendorList = Grails.get(VendorService).getListDeleted()
+		beanVendor.addAll(vendorList)
+		cmbVendor.setContainerDataSource(beanVendor)
+		cmbVendor.setItemCaptionPropertyId("name")
+		cmbVendor.select(cmbVendor.getItemIds().find{ it.id == item.getItemProperty("vendor.id").value})
+		cmbVendor.setBuffered(true)
+		cmbVendor.setImmediate(false)
+		layout.addComponent(cmbVendor)
+		cmbProject = new ComboBox("Project:");
+		def beanProject = new BeanItemContainer<Project>(Project.class)
+		def projectList = Grails.get(ProjectService).getListUnFinish()
+		beanVendor.addAll(projectList)
+		cmbProject.setContainerDataSource(beanProject)
+		cmbProject.setItemCaptionPropertyId("title")
+		cmbProject.select(cmbProject.getItemIds().find{ it.id == item.getItemProperty("project.id").value})
+		cmbProject.setBuffered(true)
+		cmbProject.setImmediate(false)
+		layout.addComponent(cmbProject)
 		textDescription = new TextField("Description:");
 		textDescription.setPropertyDataSource(item.getItemProperty("description"))
 		textDescription.setBuffered(true)
 		textDescription.setImmediate(false)
 		layout.addComponent(textDescription)
-		textCode = new TextField("Code:");
-		textCode.setPropertyDataSource(item.getItemProperty("code"))
-		textCode.setBuffered(true)
-		textCode.setImmediate(false)
-		layout.addComponent(textCode)
+		
 		textAmount = new TextField("Amount:");
 		//			textAmount.setPropertyDataSource(item.getItemProperty("amount"))
 		textAmount.setValue(item.getItemProperty("amount").toString())
+		textAmount.setReadOnly(true)
 		textAmount.setBuffered(true)
 		textAmount.setImmediate(false)
 		layout.addComponent(textAmount)
@@ -459,18 +512,28 @@ class MasterPaymentRequest extends VerticalLayout{
 		textId = new TextField("Id:");
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
-		cmbUser = new ComboBox("User:")
-		def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-		def userList = Grails.get(UserService).getList()
-		beanUser.addAll(userList)
-		cmbUser.setContainerDataSource(beanUser)
-		cmbUser.setItemCaptionPropertyId("username")
-		layout.addComponent(cmbUser)
+		textCode = new TextField("Code:")
+		textCode.setReadOnly(true)
+		layout.addComponent(textCode)
+		cmbVendor = new ComboBox("Vendor:")
+		def beanVendor = new BeanItemContainer<Vendor>(Vendor.class)
+		def vendorList = Grails.get(VendorService).getListDeleted()
+		beanVendor.addAll(vendorList)
+		cmbVendor.setContainerDataSource(beanVendor)
+		cmbVendor.setItemCaptionPropertyId("name")
+		layout.addComponent(cmbVendor)
+		cmbProject = new ComboBox("Project:")
+		def beanProject = new BeanItemContainer<Project>(Project.class)
+		def projectList = Grails.get(ProjectService).getListUnFinish()
+		beanProject.addAll(projectList)
+		cmbProject.setContainerDataSource(beanProject)
+		cmbProject.setItemCaptionPropertyId("title")
+		layout.addComponent(cmbProject)
 		textDescription = new TextField("Description:")
 		layout.addComponent(textDescription)
-		textCode = new TextField("Code:")
-		layout.addComponent(textCode)
+		
 		textAmount = new TextField("Amount:")
+		textAmount.setReadOnly(true)
 		layout.addComponent(textAmount)
 		textRequestDate = new DateField("Request Date:")
 		layout.addComponent(textRequestDate)
@@ -519,7 +582,9 @@ class MasterPaymentRequest extends VerticalLayout{
 		textIdDetail = new TextField("Detail Id:")
 		textIdDetail.setReadOnly(true)
 		layout3.addComponent(textIdDetail)
+		
 		textCodeDetail = new TextField("Code:");
+		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
 		textAmountDetail = new TextField("Amount:");
 		layout3.addComponent(textAmountDetail)
@@ -569,6 +634,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		textCodeDetail.setPropertyDataSource(itemDetail.getItemProperty("code"))
 		textCodeDetail.setBuffered(true)
 		textCodeDetail.setImmediate(false)
+		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
 		//		comb = new ComboBox("Item:")
 
@@ -584,7 +650,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		//
 		//		layout3.addComponent(comb)
 		textAmountDetail = new TextField("Amount:")
-//		textAmountDetail.setPropertyDataSource(itemDetail.getItemProperty("amount"))
+		//		textAmountDetail.setPropertyDataSource(itemDetail.getItemProperty("amount"))
 		textAmountDetail.setValue(itemDetail.getItemProperty("amount").toString())
 		textAmountDetail.setBuffered(true)
 		layout3.addComponent(textAmountDetail)
@@ -618,17 +684,26 @@ class MasterPaymentRequest extends VerticalLayout{
 		//fillTableContainer(tableContainer);
 		itemlist = Grails.get(PaymentRequestService).getList()
 		tableContainer.addAll(itemlist)
-		tableContainer.addNestedContainerProperty("username.id")
-		tableContainer.addNestedContainerProperty("username.username")
+		tableContainer.addNestedContainerProperty("createdBy.id")
+		tableContainer.addNestedContainerProperty("createdBy.username")
+		tableContainer.addNestedContainerProperty("updatedBy.id")
+		tableContainer.addNestedContainerProperty("updatedBy.username")
+		tableContainer.addNestedContainerProperty("confirmedBy.id")
+		tableContainer.addNestedContainerProperty("confirmedBy.username")
+		tableContainer.addNestedContainerProperty("vendor.id")
+		tableContainer.addNestedContainerProperty("vendor.name")
+		tableContainer.addNestedContainerProperty("project.id")
+		tableContainer.addNestedContainerProperty("project.title")
 		table.setContainerDataSource(tableContainer);
-		table.setColumnHeader("username.username","Username")
+		table.setColumnHeader("vendor.name","Vendor name")
 		table.setColumnHeader("requestDate","Request Date")
 		//		table.setColumnHeader("startDate","Start Date")
 		//		table.setColumnHeader("startTime","Start Time")
 		//		table.setColumnHeader("durasi","Duration")
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["username.username","description","code","amount","requestDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["id","vendor.name","project.title","description","code","amount","requestDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"
+]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
@@ -665,13 +740,19 @@ class MasterPaymentRequest extends VerticalLayout{
 		def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
 		def itemListDetail = Grails.get(PaymentRequestDetailService).getList(ind)
 		tableDetailContainer.addNestedContainerProperty("paymentRequest.id")
+		tableDetailContainer.addNestedContainerProperty("createdBy.id")
+		tableDetailContainer.addNestedContainerProperty("createdBy.username")
+		tableDetailContainer.addNestedContainerProperty("updatedBy.id")
+		tableDetailContainer.addNestedContainerProperty("updatedBy.username")
+		tableDetailContainer.addNestedContainerProperty("confirmedBy.id")
+		tableDetailContainer.addNestedContainerProperty("confirmedBy.username")
 		//					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
 		//					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
 		//		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
 		tableDetailContainer.addAll(itemListDetail)
 		tableDetail.setColumnHeader("paymentRequest.id","Payment Request Id")
 		tableDetail.setContainerDataSource(tableDetailContainer);
-		tableDetail.visibleColumns = ["paymentRequest.id","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
+		tableDetail.visibleColumns = ["id","paymentRequest.id","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated","createdBy.username","updatedBy.username","confirmedBy.username"]
 		tableDetail.setSelectable(true)
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)
