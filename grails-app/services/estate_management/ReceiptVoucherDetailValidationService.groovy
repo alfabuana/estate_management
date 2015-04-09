@@ -49,8 +49,8 @@ class ReceiptVoucherDetailValidationService {
 		if (object.errors.hasErrors()) return object
 		object = receivableNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
@@ -62,8 +62,8 @@ class ReceiptVoucherDetailValidationService {
 		if (object.errors.hasErrors()) return object
 		object = receivableNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)

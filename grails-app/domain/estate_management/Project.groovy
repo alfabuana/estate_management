@@ -5,6 +5,7 @@ import java.util.Date;
 class Project {
 	String	title
 	String	description
+	String code
 	Double	amountAgree
 	Double	amountDisagree
 	Boolean	isDeleted
@@ -28,5 +29,6 @@ class Project {
 		createdBy(nullable : true)
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

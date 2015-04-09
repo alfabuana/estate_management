@@ -1,5 +1,6 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 @Transactional
@@ -74,15 +75,16 @@ class HomeAssignmentService {
 				homeDetail = new HomeDetail()
 				homeDetail.home = newObject.home
 				homeDetail.lastAssignDate = newObject.assignDate
+				homeDetail.user = newObject.user
 				homeDetailService.createObject(homeDetail)
 			}
 			else
 			{
 				homeDetail.isDeleted = false
 				homeDetail.lastAssignDate = newObject.assignDate
+				homeDetail.user  = newObject.user
 				homeDetailService.updateObject(homeDetail)
 			}
-
 		}
 		return newObject
 	}

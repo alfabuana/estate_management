@@ -353,7 +353,7 @@ class MasterVendor extends VerticalLayout{
 		table.setContainerDataSource(tableContainer);
 //		table.setColumnHeader("name","Name")
 //		table.setColumnHeader("address","Address")
-		table.visibleColumns = ["name","description","telephone","fax","email","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username"]
+		table.visibleColumns = ["id","name","description","telephone","fax","email","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

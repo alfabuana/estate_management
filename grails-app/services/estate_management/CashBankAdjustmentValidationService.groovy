@@ -57,8 +57,8 @@ class CashBankAdjustmentValidationService {
 		object = adjustmentDateNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object  = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object  = codeNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -68,8 +68,8 @@ class CashBankAdjustmentValidationService {
 		object = adjustmentDateNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object  = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object  = codeNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)

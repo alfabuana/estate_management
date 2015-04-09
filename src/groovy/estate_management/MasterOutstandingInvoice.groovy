@@ -1,19 +1,9 @@
 package estate_management
-
+import org.apache.shiro.SecurityUtils
+import org.apache.shiro.subject.Subject
 import java.awt.event.ItemEvent;
-
 import estate_management.widget.GeneralFunction
-
-
-
-
-
-
 import org.vaadin.dialogs.ConfirmDialog
-
-
-
-
 import com.vaadin.data.Property
 import com.vaadin.data.Property.ValueChangeEvent
 import com.vaadin.data.fieldgroup.BeanFieldGroup
@@ -33,7 +23,6 @@ import com.vaadin.ui.Button
 import com.vaadin.ui.ComboBox
 import com.vaadin.ui.Component
 import com.vaadin.shared.ui.datefield.Resolution
-import com.vaadin.ui.CheckBox
 import com.vaadin.ui.DateField
 import com.vaadin.ui.Field
 import com.vaadin.ui.FormLayout
@@ -47,19 +36,11 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
-
-import estate_management.ReceiptVoucherService
+import estate_management.InvoiceService
 import grails.converters.JSON
-
-
-
-
-
-
-
 import com.vaadin.grails.Grails
 
-class MasterReceiptVoucher extends VerticalLayout{
+class MasterOutstandingInvoice extends VerticalLayout{
 	def selectedRow
 	def itemlist
 	GeneralFunction generalFunction = new GeneralFunction()
@@ -71,16 +52,14 @@ class MasterReceiptVoucher extends VerticalLayout{
 	//	private TextField textDescription
 
 	//==============================
-	private ComboBox cmbUser
-	private ComboBox cmbCashBank
+	private ComboBox cmbHome
 	private TextField textCode
-	private DateField textReceiptDate
-	private CheckBox chkIsGBCH
+	private DateField textInvoiceDate
+	private TextField textDescription
 	//	private DateField textDueDate
 	private TextField textTotalAmount
 
 	private TextField textIdDetail
-	private ComboBox cmbReceivableDetail
 	private TextField textCodeDetail
 	private TextField textAmountDetail
 	private TextField textDescriptionDetail
@@ -89,21 +68,19 @@ class MasterReceiptVoucher extends VerticalLayout{
 
 	private Table table = new Table();
 	private Table tableDetail = new Table()
-	private BeanItemContainer<ReceiptVoucher> tableContainer;
+	private BeanItemContainer<Invoice> tableContainer;
 	private BeanItemContainer tableDetailContainer
 	private FieldGroup fieldGroup;
 	private FormLayout layout
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "Receipt Voucher"
+	String Title = "Outstanding Invoice"
 	//						Constant.MenuName.Item + ":";
-
-	public MasterReceiptVoucher() {
-		//		currentUser = SecurityUtils.getSubject();
-
+	Subject currentUser = SecurityUtils.getSubject();
+	public MasterOutstandingInvoice() {
 		initTable();
-
+		
 		HorizontalLayout menu = new HorizontalLayout()
 		menu.setWidth("100%")
 		//		menu.addComponent(createAddButton())
@@ -120,7 +97,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 						switch(selectedItem.getText())
 						{
 							case "Add":
-								def item = new BeanItem<ReceiptVoucher>(tableContainer);
+								def item = new BeanItem<PaymentRequest>(tableContainer);
 								windowAdd("Add");
 								break
 							case "Edit":
@@ -163,7 +140,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 		MenuItem updateMenu = menuBar.addItem("Edit", mycommand)
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
-		MenuItem uncofirmMenu = menuBar.addItem("Unconfirm", mycommand)
+		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")
 		//	END BUTTON MENU
@@ -176,15 +153,17 @@ class MasterReceiptVoucher extends VerticalLayout{
 		MenuItem saveDetailMenu =  menuBarDetail.addItem("AddDetail",mycommand)
 		MenuItem editDetailMenu = menuBarDetail.addItem("EditDetail", mycommand)
 		MenuItem deleteDetailMenu = menuBarDetail.addItem("DeleteDetail",mycommand)
-		menuBarDetail.setWidth("100%")
-		menuBarDetail.setVisible(false)
-		addComponent(menuBarDetail)
+//		menuBarDetail.setWidth("100%")
+//		menuBarDetail.setVisible(false)
+//		addComponent(menuBarDetail)
 		addComponent(tableDetail)
 
 		//		==========================
 		//		ENd View Detail
 		//		==========================
 		//		table.setPageLength(table.size())
+		
+	
 	}
 
 
@@ -204,35 +183,34 @@ class MasterReceiptVoucher extends VerticalLayout{
 					void buttonClick(Button.ClickEvent event) {
 						try{
 							def object = [id:textId.getValue(),
-								user:cmbUser.getValue(),
+								home:cmbHome.getValue(),
 								username:String.valueOf(getSession().getAttribute("user")),
-								cashBank:cmbCashBank.getValue(),
 								code:textCode.getValue(),
-								receiptDate:textReceiptDate.getValue(),
-								isGBCH:chkIsGBCH.getValue(),
-								//								  dueDate:textDueDate.getValue().toString(),
+								invoiceDate:textInvoiceDate.getValue(),
+								description:textDescription.getValue(),
+								//								  dueDate:textDueDate.getValue(),
 								totalAmount:textTotalAmount.getValue()
 							]
 
 							if (object.id == "")
 							{
-								object =  Grails.get(ReceiptVoucherService).createObject(object)
+								object =  Grails.get(InvoiceService).createObject(object)
 							}
 							else
 							{
-								object =  Grails.get(ReceiptVoucherService).updateObject(object)
+								object =  Grails.get(InvoiceService).updateObject(object)
 							}
+
 
 							if (object.errors.hasErrors())
 							{
-								cmbUser.setData("username")
-								cmbCashBank.setData("cashBank")
+								cmbHome.setData("home")
 								textCode.setData("code")
-								textReceiptDate.setData("receiptDate")
-								chkIsGBCH.setData("isGBCH")
+								textInvoiceDate.setData("invoiceDate")
+								textDescription.setData("description")
 								//						textDueDate.setData("dueDate")
 								textTotalAmount.setData("totalAmount")
-								Object[] tv = [cmbUser,cmbCashBank,textCode,textReceiptDate,chkIsGBCH,textTotalAmount]
+								Object[] tv = [cmbHome,textCode,textInvoiceDate,textDescription,textTotalAmount]
 								generalFunction.setErrorUI(tv,object)
 							}
 							else
@@ -257,29 +235,26 @@ class MasterReceiptVoucher extends VerticalLayout{
 					void buttonClick(Button.ClickEvent event) {
 						try{
 							def object = [id:textIdDetail.getValue(),
-								receiptVoucherId : textId.getValue(),
-								receivable:cmbReceivableDetail.getValue(),
+								invoiceId : textId.getValue(),
 								code:textCodeDetail.getValue(),
 								amount:textAmountDetail.getValue().toString(),
-								description:textDescriptionDetail.getValue(),
-								username:getSession().getAttribute("user")
+								description:textDescriptionDetail.getValue()
 							]
 
 							if (object.id == "")
 							{
-								object =  Grails.get(ReceiptVoucherDetailService).createObject(object)
+								object =  Grails.get(InvoiceDetailService).createObject(object)
 							}
 							else
 							{
-								object =  Grails.get(ReceiptVoucherDetailService).updateObject(object)
+								object =  Grails.get(InvoiceDetailService).updateObject(object)
 							}
 							if (object.errors.hasErrors())
 							{
-								cmbReceivableDetail.setData("receivable")
 								textCodeDetail.setData("code")
 								textAmountDetail.setData("amount")
-								textDescriptionDetail.setData("description")
-								Object[] tv = [cmbReceivableDetail,textCodeDetail,textAmountDetail,textDescriptionDetail]
+								textDescriptionDetail.setDate("description")
+								Object[] tv = [textCodeDetail,textAmountDetail,textDescriptionDetail]
 								generalFunction.setErrorUI(tv,object)
 							}
 							else
@@ -312,7 +287,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							object = Grails.get(ReceiptVoucherService).softDeletedObject(object)
+							object = Grails.get(InvoiceService).softDeletedObject(object)
 							if (object.errors.hasErrors())
 							{
 								Object[] tv = [textId]
@@ -323,7 +298,8 @@ class MasterReceiptVoucher extends VerticalLayout{
 								initTable()
 							}
 						} else {
-
+						
+						
 						}
 					}
 				})
@@ -345,7 +321,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id").toString()]
-							object = Grails.get(ReceiptVoucherDetailService).softDeletedObject(object)
+							object  = Grails.get(InvoiceDetailService).softDeletedObject(object)
 							if (object.errors.hasErrors())
 							{
 								Object[] tv = [textId]
@@ -357,7 +333,6 @@ class MasterReceiptVoucher extends VerticalLayout{
 								initTable()
 							}
 						} else {
-
 						}
 					}
 				})
@@ -367,7 +342,6 @@ class MasterReceiptVoucher extends VerticalLayout{
 		//				Notification.Type.ERROR_MESSAGE);
 		//		}
 	}
-
 	//	===========================================
 	//	WINDOW CONFIRM
 	//	===========================================
@@ -381,7 +355,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
 								,username:getSession().getAttribute("user")]
-							object = Grails.get(ReceiptVoucherService).confirmObject(object)
+							object = Grails.get(InvoiceService).confirmObject(object)
 							if (object.errors.hasErrors())
 							{
 								Object[] tv = [textId]
@@ -414,7 +388,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 					public void onClose(ConfirmDialog dialog) {
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							object = Grails.get(ReceiptVoucherService).unConfirmObject(object)
+							object = Grails.get(InvoiceService).unConfirmObject(object)
 							if (object.errors.hasErrors())
 							{
 								Object[] tv = [textId]
@@ -456,37 +430,27 @@ class MasterReceiptVoucher extends VerticalLayout{
 		textCode.setImmediate(false)
 		textCode.setReadOnly(true)
 		layout.addComponent(textCode)
-		cmbUser = new ComboBox("User:");
-		def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-		def userList = Grails.get(UserService).getListDeleted()
-		beanUser.addAll(userList)
-		cmbUser.setContainerDataSource(beanUser)
-		cmbUser.setItemCaptionPropertyId("username")
-		cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("user.id").value})
-		cmbUser.setBuffered(true)
-		cmbUser.setImmediate(false)
-		layout.addComponent(cmbUser)
-		cmbCashBank = new ComboBox("Cash Bank:");
-		def beanCashBank = new BeanItemContainer<CashBank>(CashBank.class)
-		def cashBankList = Grails.get(CashBankService).getListDeleted()
-		beanCashBank.addAll(cashBankList)
-		cmbCashBank.setContainerDataSource(beanCashBank)
-		cmbCashBank.setItemCaptionPropertyId("name")
-		cmbCashBank.select(cmbCashBank.getItemIds().find{ it.id == item.getItemProperty("cashBank.id").value})
-		cmbCashBank.setBuffered(true)
-		cmbCashBank.setImmediate(false)
-		layout.addComponent(cmbCashBank)
+		cmbHome = new ComboBox("Home:");
+		def beanHome = new BeanItemContainer<Home>(Home.class)
+		def homeList = Grails.get(HomeService).getListDeleted()
+		beanHome.addAll(userList)
+		cmbHome.setContainerDataSource(beanHome)
+		cmbHome.setItemCaptionPropertyId("name")
+		cmbHome.select(cmbHome.getItemIds().find{ it.id == item.getItemProperty("home.id").value})
+		cmbHome.setBuffered(true)
+		cmbHome.setImmediate(false)
+		layout.addComponent(cmbHome)
 		
-		textReceiptDate = new DateField("Receipt Date:");
-		textReceiptDate.setPropertyDataSource(item.getItemProperty("receiptDate"))
-		textReceiptDate.setBuffered(true)
-		textReceiptDate.setImmediate(false)
-		layout.addComponent(textReceiptDate)
-		chkIsGBCH = new CheckBox("is GBCH");
-		chkIsGBCH.setPropertyDataSource(item.getItemProperty("isGBCH"))
-		chkIsGBCH.setBuffered(true)
-		chkIsGBCH.setImmediate(false)
-		layout.addComponent(chkIsGBCH)
+		textInvoiceDate = new DateField("Invoice Date:");
+		textInvoiceDate.setPropertyDataSource(item.getItemProperty("invoiceDate"))
+		textInvoiceDate.setBuffered(true)
+		textInvoiceDate.setImmediate(false)
+		layout.addComponent(textInvoiceDate)
+		textDescription = new TextField("Description:");
+		textDescription.setPropertyDataSource(item.getItemProperty("description"))
+		textDescription.setBuffered(true)
+		textDescription.setImmediate(false)
+		layout.addComponent(textDescription)
 		//			textDueDate = new DateField("Due Date:");
 		//			textDueDate.setPropertyDataSource(item.getItemProperty("dueDate"))
 		//			textDueDate.setBuffered(true)
@@ -516,6 +480,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 	//@RequiresPermissions("Master:Item:Add")
 	private void windowAdd(String caption) {
 		//		if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
+		println getSession()
 		window = new Window(caption);
 		window.setModal(true);
 		def layout = new FormLayout();
@@ -527,30 +492,24 @@ class MasterReceiptVoucher extends VerticalLayout{
 		textCode = new TextField("Code:")
 		textCode.setReadOnly(true)
 		layout.addComponent(textCode)
-		cmbUser = new ComboBox("User:")
-		def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-		def userList = Grails.get(UserService).getListDeleted()
-		beanUser.addAll(userList)
-		cmbUser.setContainerDataSource(beanUser)
-		cmbUser.setItemCaptionPropertyId("username")
-		layout.addComponent(cmbUser)
-		cmbCashBank = new ComboBox("Cash Bank:")
-		def beanCashBank = new BeanItemContainer<CashBank>(CashBank.class)
-		def cashBankList = Grails.get(CashBankService).getListDeleted()
-		beanCashBank.addAll(cashBankList)
-		cmbCashBank.setContainerDataSource(beanCashBank)
-		cmbCashBank.setItemCaptionPropertyId("name")
-		layout.addComponent(cmbCashBank)
+		cmbHome = new ComboBox("Home:")
+		def beanHome = new BeanItemContainer<Home>(Home.class)
+		def homeList = Grails.get(HomeService).getListDeleted()
+		beanHome.addAll(homeList)
+		cmbHome.setContainerDataSource(beanHome)
+		cmbHome.setItemCaptionPropertyId("name")
+		layout.addComponent(cmbHome)
 		
-		textReceiptDate = new DateField("Receipt Date:")
-		layout.addComponent(textReceiptDate)
-		chkIsGBCH = new CheckBox("Is GBCH")
-		layout.addComponent(chkIsGBCH)
+		textInvoiceDate = new DateField("Invoice Date:")
+		layout.addComponent(textInvoiceDate)
+		textDescription = new TextField("Description:")
+		layout.addComponent(textDescription)
 		//			textDueDate = new DateField("Due Date:")
 		//			layout.addComponent(textDueDate)
 		textTotalAmount = new TextField("Total Amount:")
 		layout.addComponent(textTotalAmount)
 		textTotalAmount.setReadOnly(true)
+
 		//			def textArea = new TextArea("Text Area")
 		//			layout.addComponent(textArea)
 		//			def dateField = new DateField("Date Field")
@@ -599,18 +558,11 @@ class MasterReceiptVoucher extends VerticalLayout{
 		textCodeDetail = new TextField("Code:");
 		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
-		cmbReceivableDetail = new ComboBox("Receivable:")
-		def beanReceivable = new BeanItemContainer<Receivable>(Receivable.class)
-		def receivableList = Grails.get(ReceivableService).getList()
-		beanReceivable.addAll(receivableList)
-		cmbReceivableDetail.setContainerDataSource(beanReceivable)
-		cmbReceivableDetail.setItemCaptionPropertyId("code")
-		layout3.addComponent(cmbReceivableDetail)
-		textAmountDetail = new TextField("Amount:");
-		textAmountDetail.setReadOnly(true)
-		layout3.addComponent(textAmountDetail)
 		textDescriptionDetail = new TextField("Description:");
 		layout3.addComponent(textDescriptionDetail)
+		textAmountDetail = new TextField("Amount:");
+		layout3.addComponent(textAmountDetail)
+		
 		//		comb = new ComboBox("Sales Order Detail Item:")
 		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
 		//			itemlist = Grails.get(SalesOrderDetailService).getListForCombo(item.getItemProperty("salesOrder.id").toString())
@@ -657,16 +609,11 @@ class MasterReceiptVoucher extends VerticalLayout{
 		textCodeDetail.setImmediate(false)
 		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
-		cmbReceivableDetail = new ComboBox("Receivable:");
-		def beanReceivable = new BeanItemContainer<Receivable>(Receivable.class)
-		def receivableList = Grails.get(ReceivableService).getList()
-		beanReceivable.addAll(receivableList)
-		cmbReceivableDetail.setContainerDataSource(beanReceivable)
-		cmbReceivableDetail.setItemCaptionPropertyId("code")
-		cmbReceivableDetail.select(cmbReceivableDetail.getItemIds().find{ it.id == itemDetail.getItemProperty("receivable.id").value})
-		cmbReceivableDetail.setBuffered(true)
-		cmbReceivableDetail.setImmediate(false)
-		layout3.addComponent(cmbReceivableDetail)
+		textDescriptionDetail = new TextField("Description:");
+		textDescriptionDetail.setPropertyDataSource(itemDetail.getItemProperty("description"))
+		textDescriptionDetail.setBuffered(true)
+		textDescriptionDetail.setImmediate(false)
+		layout3.addComponent(textDescriptionDetail)
 		//		comb = new ComboBox("Item:")
 
 		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
@@ -684,12 +631,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 		//		textAmountDetail.setPropertyDataSource(itemDetail.getItemProperty("amount"))
 		textAmountDetail.setValue(itemDetail.getItemProperty("amount").toString())
 		textAmountDetail.setBuffered(true)
-		textAmountDetail.setReadOnly(true)
 		layout3.addComponent(textAmountDetail)
-		textDescriptionDetail = new TextField("Description:")
-		textDescriptionDetail.setPropertyDataSource(itemDetail.getItemProperty("description"))
-		textDescriptionDetail.setBuffered(true)
-		layout3.addComponent(textDescriptionDetail)
 		layout3.addComponent(createSaveDetailButton())
 		layout3.addComponent(createCancelButton())
 
@@ -711,9 +653,11 @@ class MasterReceiptVoucher extends VerticalLayout{
 	}
 
 	void initTable() {
-		tableContainer = new BeanItemContainer<ReceiptVoucher>(ReceiptVoucher.class);
+		tableContainer = new BeanItemContainer<Invoice>(Invoice.class);
 		//fillTableContainer(tableContainer);
-		itemlist = Grails.get(ReceiptVoucherService).getList()
+//		getSession().getAttribute("user")
+		
+		itemlist = Grails.get(InvoiceService).getListOutstanding(currentUser.getPrincipal())
 		tableContainer.addAll(itemlist)
 		tableContainer.addNestedContainerProperty("createdBy.id")
 		tableContainer.addNestedContainerProperty("createdBy.username")
@@ -721,23 +665,22 @@ class MasterReceiptVoucher extends VerticalLayout{
 		tableContainer.addNestedContainerProperty("updatedBy.username")
 		tableContainer.addNestedContainerProperty("confirmedBy.id")
 		tableContainer.addNestedContainerProperty("confirmedBy.username")
-		tableContainer.addNestedContainerProperty("user.id")
-		tableContainer.addNestedContainerProperty("user.username")
-		tableContainer.addNestedContainerProperty("cashBank.id")
-		tableContainer.addNestedContainerProperty("cashBank.name")
+		tableContainer.addNestedContainerProperty("home.id")
+		tableContainer.addNestedContainerProperty("home.name")
 		table.setContainerDataSource(tableContainer);
-		table.setColumnHeader("user.username","Username")
-		table.setColumnHeader("cashBank.name","Cash Bank Name")
-		table.setColumnHeader("receiptDate","Receipt Date")
+		table.setColumnHeader("invoiceDate","Invoice Date")
+		table.setColumnHeader("home.name","Home Name")
 		table.setColumnHeader("totalAmount","Total Amount")
+		//		table.setColumnHeader("startTime","Start Time")
 		//		table.setColumnHeader("durasi","Duration")
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["id","user.username","cashBank.name","code","receiptDate","isGBCH","dueDate","isReconciled","reconciliationDate","totalAmount","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","home.name","code","invoiceDate","description","dueDate","totalAmount","isConfirmed","confirmationDate","isCleared","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
 		table.setSizeFull()
+
 		table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 					@Override
 					public void itemClick(ItemClickEvent itemClickEvent) {
@@ -757,45 +700,32 @@ class MasterReceiptVoucher extends VerticalLayout{
 						else
 						{
 							tableDetail.setVisible(false)
-							menuBarDetail.setVisible(false)
+//							menuBarDetail.setVisible(false)
 						}
 					}
 				})
 
-		//		table.addValueChangeListener(new Property.ValueChangeListener() {
-		//			public void valueChange(ValueChangeEvent event) {
-		//				selectedRow = table.getValue()
-		//			}
-		//		});
-
 	}
-
 	void initTableDetail() {
-		tableDetailContainer = new BeanItemContainer<ReceiptVoucherDetail>(ReceiptVoucherDetail.class);
+		tableDetailContainer = new BeanItemContainer<InvoiceDetail>(InvoiceDetail.class);
 		def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
-		def itemListDetail = Grails.get(ReceiptVoucherDetailService).getList(ind)
-		tableDetailContainer.addNestedContainerProperty("createdBy.id")
-		tableDetailContainer.addNestedContainerProperty("createdBy.username")
-		tableDetailContainer.addNestedContainerProperty("updatedBy.id")
-		tableDetailContainer.addNestedContainerProperty("updatedBy.username")
-		tableDetailContainer.addNestedContainerProperty("confirmedBy.id")
-		tableDetailContainer.addNestedContainerProperty("confirmedBy.username")
-		tableDetailContainer.addNestedContainerProperty("receiptVoucher.id")
-		tableDetailContainer.addNestedContainerProperty("receivable.id");
-		tableDetailContainer.addNestedContainerProperty("receivable.code");
+		def itemListDetail = Grails.get(InvoiceDetailService).getList(ind)
+		tableDetailContainer.addNestedContainerProperty("invoice.id")
 		//					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
 		//					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
 		//		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
 		tableDetailContainer.addAll(itemListDetail)
-		tableDetail.setColumnHeader("receiptVoucher.id","Receipt Voucher Id")
+		tableDetail.setColumnHeader("invoice.id","Invoice Id")
 		tableDetail.setContainerDataSource(tableDetailContainer);
-		tableDetail.visibleColumns = ["id","receiptVoucher.id","receivable.code","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated","createdBy.username","updatedBy.username","confirmedBy.username"]
+		tableDetail.visibleColumns = ["id","invoice.id","code","description","amount","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
 		tableDetail.setSelectable(true)
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)
 		tableDetail.setSizeFull()
-		menuBarDetail.setVisible(true)
+//		menuBarDetail.setVisible(true)
 	}
+
+
 
 
 }

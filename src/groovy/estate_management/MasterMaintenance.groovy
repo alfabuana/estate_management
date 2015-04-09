@@ -76,6 +76,8 @@ class MasterMaintenance extends VerticalLayout{
 	private TextField textDescription
 	private TextField textAmount
 	private TextField textCode
+	private DateField textMaintenanceDate
+	private DateField textDueDate
 	
 //	private TextField textIdDetail
 //	private TextField textAttachmentUrlDetail
@@ -202,7 +204,9 @@ class MasterMaintenance extends VerticalLayout{
 								  description:textDescription.getValue(),
 								  amount:textAmount.getValue(),
 								  code:textCode.getValue(),
-								  username:getSession().getAttribute("user")
+								  username:getSession().getAttribute("user"),
+								  maintenanceDate:textMaintenanceDate.getValue(),
+								  dueDate:textDueDate.getValue()
 								  ]
 					
 					if (object.id == "")
@@ -220,7 +224,9 @@ class MasterMaintenance extends VerticalLayout{
 						textDescription.setData("description")
 						textAmount.setData("amount")
 						textCode.setData("code")
-						Object[] tv = [textDescription,textAmount,textCode]
+						textMaintenanceDate.setData("maintenanceDate")
+						textDueDate.setData("dueDate")
+						Object[] tv = [textDescription,textAmount,textCode,textMaintenanceDate,textDueDate]
 						generalFunction.setErrorUI(tv,object)
 					}
 					else
@@ -411,6 +417,12 @@ class MasterMaintenance extends VerticalLayout{
 			textId.setPropertyDataSource(item.getItemProperty("id"))
 			textId.setReadOnly(true)
 			layout.addComponent(textId)
+			textCode = new TextField("Code:");
+			textCode.setPropertyDataSource(item.getItemProperty("code"))
+			textCode.setBuffered(true)
+			textCode.setImmediate(false)
+			textCode.setReadOnly(true)
+			layout.addComponent(textCode)
 			textDescription = new TextField("Description:");
 			textDescription.setPropertyDataSource(item.getItemProperty("description"))
 			textDescription.setBuffered(true)
@@ -421,11 +433,17 @@ class MasterMaintenance extends VerticalLayout{
 			textAmount.setBuffered(true)
 			textAmount.setImmediate(false)
 			layout.addComponent(textAmount)
-			textCode = new TextField("Code:");
-			textCode.setPropertyDataSource(item.getItemProperty("code"))
-			textCode.setBuffered(true)
-			textCode.setImmediate(false)
-			layout.addComponent(textCode)
+			
+			textMaintenanceDate = new DateField("Maintenance Date:");
+			textMaintenanceDate.setPropertyDataSource(item.getItemProperty("maintenanceDate"))
+			textMaintenanceDate.setBuffered(true)
+			textMaintenanceDate.setImmediate(false)
+			layout.addComponent(textMaintenanceDate)
+			textDueDate = new DateField("Due Date:");
+			textDueDate.setPropertyDataSource(item.getItemProperty("dueDate"))
+			textDueDate.setBuffered(true)
+			textDueDate.setImmediate(false)
+			layout.addComponent(textDueDate)
 			layout.addComponent(createSaveButton())
 			layout.addComponent(createCancelButton())
 			getUI().addWindow(window);
@@ -451,12 +469,18 @@ class MasterMaintenance extends VerticalLayout{
 			textId = new TextField("Id:");
 			textId.setReadOnly(true)
 			layout.addComponent(textId)
+			textCode = new TextField("Code:")
+			textCode.setReadOnly(true)
+			layout.addComponent(textCode)
 			textDescription = new TextField("Description:")
 			layout.addComponent(textDescription)
 			textAmount = new TextField("Amount:")
 			layout.addComponent(textAmount)
-			textCode = new TextField("Code:")
-			layout.addComponent(textCode)
+			
+			textMaintenanceDate = new DateField("Maintenance Date:")
+			layout.addComponent(textMaintenanceDate)
+			textDueDate = new DateField("Due Date:")
+			layout.addComponent(textDueDate)
 //			def textArea = new TextArea("Text Area")
 //			layout.addComponent(textArea)
 //			def dateField = new DateField("Date Field")
@@ -601,7 +625,7 @@ class MasterMaintenance extends VerticalLayout{
 //		table.setColumnHeader("durasi","Duration")
 //		table.setColumnHeader("dateStartUsing","Date Start Using")
 //		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["description","amount","code","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","description","amount","code","maintenanceDate","dueDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())
@@ -643,7 +667,7 @@ table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 		 tableDetailContainer.addAll(itemListDetail)
 //		 tableDetail.setColumnHeader("complaint.id","Complaint Id")
 		 tableDetail.setContainerDataSource(tableDetailContainer);
-		 tableDetail.visibleColumns = ["maintenance","user","isDeleted","dateCreated","lastUpdated"]
+		 tableDetail.visibleColumns = ["id","maintenance","user","isDeleted","dateCreated","lastUpdated"]
 		 tableDetail.setSelectable(true)
 		 tableDetail.setImmediate(false)
 		 tableDetail.setVisible(true)

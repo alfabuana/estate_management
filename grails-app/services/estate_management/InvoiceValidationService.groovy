@@ -92,10 +92,10 @@ class InvoiceValidationService {
 	}
 	def createObjectValidation(def object)
 	{
-		object = usernameNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = usernameNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = invoiceDateNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
@@ -107,10 +107,10 @@ class InvoiceValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
-		object = usernameNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = usernameNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = invoiceDateNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)

@@ -650,7 +650,7 @@ class MasterInvoiceClearance extends VerticalLayout{
 	 //		table.setColumnHeader("durasi","Duration")
 	 //		table.setColumnHeader("dateStartUsing","Date Start Using")
 	 //		table.setColumnHeader("dateEndUsing","Date End Using")
-			 table.visibleColumns = ["invoice.code","user.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+			 table.visibleColumns = ["id","invoice.code","user.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 			 table.setSelectable(true)
 			 table.setImmediate(false)
 	 //		table.setPageLength(table.size())

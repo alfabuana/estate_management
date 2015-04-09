@@ -669,7 +669,7 @@ class MasterInvoicePayment extends VerticalLayout{
 	 //		table.setColumnHeader("durasi","Duration")
 	 //		table.setColumnHeader("dateStartUsing","Date Start Using")
 	 //		table.setColumnHeader("dateEndUsing","Date End Using")
-			 table.visibleColumns = ["invoice.code","user.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+			 table.visibleColumns = ["id","invoice.code","user.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 			 table.setSelectable(true)
 			 table.setImmediate(false)
 	 //		table.setPageLength(table.size())
@@ -711,7 +711,7 @@ class MasterInvoicePayment extends VerticalLayout{
 		tableDetailContainer.addAll(itemListDetail)
 		tableDetail.setColumnHeader("invoicePaid.id","Invoice Paid Id")
 		tableDetail.setContainerDataSource(tableDetailContainer);
-		tableDetail.visibleColumns = ["invoicePaid.id","attachmentUrl","isDeleted","dateCreated","lastUpdated"]
+		tableDetail.visibleColumns = ["id","invoicePaid.id","attachmentUrl","isDeleted","dateCreated","lastUpdated"]
 		tableDetail.setSelectable(true)
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)

@@ -14,8 +14,6 @@ class Payable {
 	Double 		pendingClearanceAmount
 	Boolean 	isCompleted
 	Date 		completionDate
-	ShiroUser createdBy
-	ShiroUser updatedBy
 	Boolean 	isDeleted
 	Date 		dateCreated // Predefined names by Grails will be filled automatically
 	Date 		lastUpdated // Predefined names by Grails will be filled automatically
@@ -23,7 +21,6 @@ class Payable {
     static constraints = {
 		completionDate (nullable : true)
 		dueDate (nullable : true)
-		createdBy(nullable : true)
-		updatedBy(nullable : true)
+		user (nullable : true)
     }
 }

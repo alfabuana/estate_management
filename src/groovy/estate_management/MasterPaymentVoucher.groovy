@@ -457,6 +457,12 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textId.setPropertyDataSource(item.getItemProperty("id"))
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
+		textCode = new TextField("Code:");
+		textCode.setPropertyDataSource(item.getItemProperty("code"))
+		textCode.setBuffered(true)
+		textCode.setImmediate(false)
+		textCode.setReadOnly(true)
+		layout.addComponent(textCode)
 		cmbUser = new ComboBox("User:");
 		def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
 		def userList = Grails.get(UserService).getListDeleted()
@@ -477,11 +483,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		cmbCashBank.setBuffered(true)
 		cmbCashBank.setImmediate(false)
 		layout.addComponent(cmbCashBank)
-		textCode = new TextField("Code:");
-		textCode.setPropertyDataSource(item.getItemProperty("code"))
-		textCode.setBuffered(true)
-		textCode.setImmediate(false)
-		layout.addComponent(textCode)
+		
 		textPaymentDate = new DateField("Payment Date:");
 		textPaymentDate.setPropertyDataSource(item.getItemProperty("paymentDate"))
 		textPaymentDate.setBuffered(true)
@@ -529,6 +531,9 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textId = new TextField("Id:");
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
+		textCode = new TextField("Code:")
+		textCode.setReadOnly(true)
+		layout.addComponent(textCode)
 		cmbUser = new ComboBox("User:")
 		def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
 		def userList = Grails.get(UserService).getListDeleted()
@@ -543,8 +548,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		cmbCashBank.setContainerDataSource(beanCashBank)
 		cmbCashBank.setItemCaptionPropertyId("name")
 		layout.addComponent(cmbCashBank)
-		textCode = new TextField("Code:")
-		layout.addComponent(textCode)
+		
 		textPaymentDate = new DateField("Payment Date:")
 		layout.addComponent(textPaymentDate)
 		chkIsGBCH = new CheckBox("Is GBCH")
@@ -600,6 +604,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textIdDetail.setReadOnly(true)
 		layout3.addComponent(textIdDetail)
 		textCodeDetail = new TextField("Code:");
+		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
 		cmbPayableDetail = new ComboBox("Payable:")
 		def beanPayable = new BeanItemContainer<Payable>(Payable.class)
@@ -657,6 +662,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textCodeDetail.setPropertyDataSource(itemDetail.getItemProperty("code"))
 		textCodeDetail.setBuffered(true)
 		textCodeDetail.setImmediate(false)
+		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
 		cmbPayableDetail = new ComboBox("Payable:");
 		def beanPayable = new BeanItemContainer<Payable>(Payable.class)
@@ -734,7 +740,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		//		table.setColumnHeader("durasi","Duration")
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["user.username","cashBank.name","code","paymentDate","isGBCH","dueDate","isReconciled","reconciliationDate","totalAmount","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","user.username","cashBank.name","code","paymentDate","isGBCH","dueDate","isReconciled","reconciliationDate","totalAmount","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
@@ -776,7 +782,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		tableDetailContainer.addAll(itemListDetail)
 		tableDetail.setColumnHeader("paymentVoucher.id","Payment Voucher Id")
 		tableDetail.setContainerDataSource(tableDetailContainer);
-		tableDetail.visibleColumns = ["paymentVoucher.id","payable.code","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
+		tableDetail.visibleColumns = ["id","paymentVoucher.id","payable.code","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
 		tableDetail.setSelectable(true)
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)

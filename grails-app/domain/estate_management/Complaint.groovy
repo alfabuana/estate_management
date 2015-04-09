@@ -7,6 +7,7 @@ class Complaint {
 	Home		home
 	String		description
 	String		title
+	String 		code
 	Boolean		isConfirmed
 	Date		confirmationDate
 	Boolean		isCleared
@@ -26,5 +27,6 @@ class Complaint {
 		createdBy(nullable : true)
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

@@ -314,6 +314,12 @@ class MasterCashBankMutation extends VerticalLayout{
 		textId.setPropertyDataSource(item.getItemProperty("id"))
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
+		textCode = new TextField("Code:");
+		textCode.setPropertyDataSource(item.getItemProperty("code"))
+		textCode.setBuffered(true)
+		textCode.setImmediate(false)
+		textCode.setReadOnly(true)
+		layout.addComponent(textCode)
 		cmbSourceCashBank = new ComboBox("Source Cash Bank:");
 		def beanCashBank = new BeanItemContainer<CashBank>(CashBank.class)
 		def cashBankList = Grails.get(CashBankService).getListDeleted()
@@ -340,11 +346,7 @@ class MasterCashBankMutation extends VerticalLayout{
 		textAmount.setBuffered(true)
 		textAmount.setImmediate(false)
 		layout.addComponent(textAmount)
-		textCode = new TextField("Code:");
-		textCode.setPropertyDataSource(item.getItemProperty("code"))
-		textCode.setBuffered(true)
-		textCode.setImmediate(false)
-		layout.addComponent(textCode)
+		
 		layout.addComponent(createSaveButton())
 		layout.addComponent(createCancelButton())
 		getUI().addWindow(window);
@@ -370,6 +372,10 @@ class MasterCashBankMutation extends VerticalLayout{
 		textId = new TextField("Id:");
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
+		textCode = new TextField("Code:")
+		textCode.setReadOnly(true)
+		layout.addComponent(textCode)
+		
 		cmbSourceCashBank = new ComboBox("Source Cash Bank:")
 		def beanCashBank = new BeanItemContainer<CashBank>(CashBank.class)
 		def cashBankList = Grails.get(CashBankService).getListDeleted()
@@ -386,8 +392,7 @@ class MasterCashBankMutation extends VerticalLayout{
 		layout.addComponent(cmbTargetCashBank)
 		textAmount = new TextField("Amount:")
 		layout.addComponent(textAmount)
-		textCode = new TextField("Code:")
-		layout.addComponent(textCode)
+		
 		//			def textArea = new TextArea("Text Area")
 		//			layout.addComponent(textArea)
 		//			def dateField = new DateField("Date Field")
@@ -446,7 +451,7 @@ class MasterCashBankMutation extends VerticalLayout{
 		table.setContainerDataSource(tableContainer);
 //		table.setColumnHeader("cashBank.name","Cash Bank Name")
 //		table.setColumnHeader("adjustmentDate","Adjustment Date")
-		table.visibleColumns = ["sourceCashBank.name","targetCashBank.name","amount","code","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","sourceCashBank.name","targetCashBank.name","amount","code","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())

@@ -17,6 +17,9 @@ class VendorService {
 	def getList(){
 		return Vendor.getAll()
 	}
+	def getListDeleted(){
+		return Vendor.findAll{isDeleted == false}
+	}
 	
 	def createObject(object){
 		object.isDeleted = false

@@ -3,6 +3,7 @@ package estate_management
 import java.util.Date;
 
 class Invoice {
+	Home		home
 	ShiroUser	user
 	String		code
 	Date		invoiceDate
@@ -22,10 +23,13 @@ class Invoice {
 	static hasMany = [invoiceDetails : InvoiceDetail]
 	static belongsTo = Invoice
     static constraints = {
+		user(nullable:true)
+		home(nullable:true)
 		dueDate(nullable:true)
 		confirmationDate(nullable : true)
 		createdBy(nullable : true)
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

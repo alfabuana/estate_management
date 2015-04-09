@@ -340,7 +340,7 @@ class MasterCashBank extends VerticalLayout{
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("createdBy.username","CreatedBy")
 		table.setColumnHeader("updatedBy.username","UpdatedBy")
-		table.visibleColumns = ["name","description","amount","isBank","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username"]
+		table.visibleColumns = ["id","name","description","amount","isBank","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

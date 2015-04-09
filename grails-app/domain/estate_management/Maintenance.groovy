@@ -8,6 +8,8 @@ class Maintenance {
 	String	code
 	Boolean isConfirmed
 	Date	confirmationDate
+	Date	maintenanceDate
+	Date	dueDate
 	ShiroUser createdBy
 	ShiroUser updatedBy
 	ShiroUser confirmedBy
@@ -17,9 +19,11 @@ class Maintenance {
 
 //	static hasMany = [maintenanceDetails : MaintenanceDetail]
     static constraints = {
+		dueDate(nullable:true)
 		confirmationDate(nullable : true)
 		createdBy(nullable : true)
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

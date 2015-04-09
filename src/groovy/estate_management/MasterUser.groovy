@@ -332,7 +332,7 @@ class MasterUser extends VerticalLayout{
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("username","User Name")
 		table.setColumnHeader("passwordHash","Password")
-		table.visibleColumns = ["username","passwordHash","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["id","username","passwordHash","dateCreated","lastUpdated","isDeleted"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())
@@ -373,7 +373,7 @@ void initTableDetail() {
  tableDetailContainer.addAll(itemListDetail)
 // tableDetail.setColumnHeader("invoice.id","Invoice Id")
  tableDetail.setContainerDataSource(tableDetailContainer);
- tableDetail.visibleColumns = ["home.name","isDeleted","dateCreated","lastUpdated"]
+ tableDetail.visibleColumns = ["id","home.name","isDeleted","dateCreated","lastUpdated"]
  tableDetail.setSelectable(true)
  tableDetail.setImmediate(false)
  tableDetail.setVisible(true)

@@ -90,12 +90,12 @@ class PaymentRequestValidationService {
 	}
 	def createObjectValidation(def object)
 	{
-		object = usernameNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = usernameNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object  = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object  = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object  = requestDateNotNull(object)
@@ -103,12 +103,12 @@ class PaymentRequestValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
-		object = usernameNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = usernameNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object  = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object  = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object  = requestDateNotNull(object)

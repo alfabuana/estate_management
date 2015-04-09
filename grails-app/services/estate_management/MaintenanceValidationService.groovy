@@ -43,13 +43,22 @@ class MaintenanceValidationService {
 		}
 		return object
 	}
+	def maintenanceDateNotNull(def object){
+		if (object.maintenanceDate == null || object.maintenanceDate == "")
+		{
+			object.errors.rejectValue('maintenanceDate','null','maintenanceDate tidak boleh kosong')
+		}
+		return object
+	}
 	def createObjectValidation(def object)
 	{
 		object = descriptionNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
+		object = maintenanceDateNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -57,8 +66,10 @@ class MaintenanceValidationService {
 		object = descriptionNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
+		object = maintenanceDateNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)

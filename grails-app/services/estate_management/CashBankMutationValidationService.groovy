@@ -9,6 +9,13 @@ class CashBankMutationValidationService {
     def serviceMethod() {
 
     }
+	def sourceAndTargetCannotSame(def object){
+		if (object.sourceCashBank == object.targetCashBank)
+		{
+			object.errors.rejectValue('targetCashBank','null','Source & Target tidak boleh sama')
+		}
+		return object
+	}
 	def isConfirmed(def object){
 		if (object.isConfirmed == true)
 		{
@@ -58,8 +65,10 @@ class CashBankMutationValidationService {
 		object = targetCashBankNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object  = codeNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object  = codeNotNull(object)
+		object = sourceAndTargetCannotSame(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -69,8 +78,10 @@ class CashBankMutationValidationService {
 		object = targetCashBankNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object  = codeNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object  = codeNotNull(object)
+		object = sourceAndTargetCannotSame(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)
@@ -80,7 +91,6 @@ class CashBankMutationValidationService {
 	def confirmObjectValidation(object)
 	{
 		object = isConfirmed(object)
-		println object as JSON
 		if (object.errors.hasErrors()) return object
 		return object
 	}

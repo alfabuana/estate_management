@@ -72,6 +72,7 @@ class MasterPostProject extends VerticalLayout{
 	private TextField textTitle
 	private TextField textDescription
 	private ComboBox cmbComplaint
+	private TextField textCode
 
 	private TextField textIdDetail
 	private TextField textAttachmentUrlDetail
@@ -208,7 +209,8 @@ class MasterPostProject extends VerticalLayout{
 								title:textTitle.getValue(),
 								description:textDescription.getValue(),
 								complaint:cmbComplaint.getValue(),
-								username:getSession().getAttribute("user")
+								username:getSession().getAttribute("user"),
+								code:textCode.getValue()
 							]
 
 							if (object.id == "")
@@ -226,7 +228,8 @@ class MasterPostProject extends VerticalLayout{
 								textTitle.setData("title")
 								textDescription.setData("description")
 								cmbComplaint.setData("complaint")
-								Object[] tv = [textTitle,textDescription,cmbComplaint]
+								textCode.setData("code")
+								Object[] tv = [textTitle,textDescription,cmbComplaint,textCode]
 								generalFunction.setErrorUI(tv,object)
 							}
 							else
@@ -505,6 +508,12 @@ class MasterPostProject extends VerticalLayout{
 		textId.setPropertyDataSource(item.getItemProperty("id"))
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
+		textCode = new TextField("Code:");
+		textCode.setPropertyDataSource(item.getItemProperty("code"))
+		textCode.setBuffered(true)
+		textCode.setImmediate(false)
+		textCode.setReadOnly(true)
+		layout.addComponent(textCode)
 		textTitle = new TextField("Title:");
 		textTitle.setPropertyDataSource(item.getItemProperty("title"))
 		textTitle.setBuffered(true)
@@ -550,6 +559,9 @@ class MasterPostProject extends VerticalLayout{
 		textId = new TextField("Id:");
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
+		textCode = new TextField("Code:")
+		textCode.setReadOnly(true)
+		layout.addComponent(textCode)
 		textTitle = new TextField("Title:")
 		layout.addComponent(textTitle)
 		textDescription = new TextField("Description:")
@@ -704,7 +716,7 @@ class MasterPostProject extends VerticalLayout{
 		table.setColumnHeader("amountAgree","Amount Agree")
 		table.setColumnHeader("amountDisagree","Amount Disagree")
 		table.setContainerDataSource(tableContainer);
-		table.visibleColumns = ["title","description","complaint.title","amountAgree","amountDisagree","isConfirmed","confirmationDate","isFinished","finishDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","title","description","code","complaint.title","amountAgree","amountDisagree","isConfirmed","confirmationDate","isFinished","finishDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
@@ -751,7 +763,7 @@ class MasterPostProject extends VerticalLayout{
 		tableDetailContainer.addAll(itemListDetail)
 		tableDetail.setColumnHeader("project.id","Project Id")
 		tableDetail.setContainerDataSource(tableDetailContainer);
-		tableDetail.visibleColumns = ["project.id","attachmentUrl","isDeleted","dateCreated","lastUpdated","createdBy.username","updatedBy.username"]
+		tableDetail.visibleColumns = ["id","project.id","attachmentUrl","isDeleted","dateCreated","lastUpdated","createdBy.username","updatedBy.username"]
 		tableDetail.setSelectable(true)
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)

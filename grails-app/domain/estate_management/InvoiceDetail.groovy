@@ -8,6 +8,7 @@ class InvoiceDetail {
 	Double	amount
 	Boolean	isConfirmed
 	Date	confirmationDate
+	String	description
 	ShiroUser createdBy
 	ShiroUser updatedBy
 	ShiroUser confirmedBy
@@ -20,5 +21,6 @@ class InvoiceDetail {
 		createdBy(nullable : true)
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

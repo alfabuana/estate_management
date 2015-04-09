@@ -73,7 +73,7 @@ class MasterInvoice extends VerticalLayout{
 	//	private TextField textDescription
 
 	//==============================
-	private ComboBox cmbUser
+	private ComboBox cmbHome
 	private TextField textCode
 	private DateField textInvoiceDate
 	private TextField textDescription
@@ -83,6 +83,7 @@ class MasterInvoice extends VerticalLayout{
 	private TextField textIdDetail
 	private TextField textCodeDetail
 	private TextField textAmountDetail
+	private TextField textDescriptionDetail
 
 	//==============================
 
@@ -203,7 +204,7 @@ class MasterInvoice extends VerticalLayout{
 					void buttonClick(Button.ClickEvent event) {
 						try{
 							def object = [id:textId.getValue(),
-								user:cmbUser.getValue(),
+								home:cmbHome.getValue(),
 								username:String.valueOf(getSession().getAttribute("user")),
 								code:textCode.getValue(),
 								invoiceDate:textInvoiceDate.getValue(),
@@ -224,13 +225,13 @@ class MasterInvoice extends VerticalLayout{
 
 							if (object.errors.hasErrors())
 							{
-								cmbUser.setData("user")
+								cmbHome.setData("home")
 								textCode.setData("code")
 								textInvoiceDate.setData("invoiceDate")
 								textDescription.setData("description")
 								//						textDueDate.setData("dueDate")
 								textTotalAmount.setData("totalAmount")
-								Object[] tv = [cmbUser,textCode,textInvoiceDate,textDescription,textTotalAmount]
+								Object[] tv = [cmbHome,textCode,textInvoiceDate,textDescription,textTotalAmount]
 								generalFunction.setErrorUI(tv,object)
 							}
 							else
@@ -257,7 +258,8 @@ class MasterInvoice extends VerticalLayout{
 							def object = [id:textIdDetail.getValue(),
 								invoiceId : textId.getValue(),
 								code:textCodeDetail.getValue(),
-								amount:textAmountDetail.getValue().toString()
+								amount:textAmountDetail.getValue().toString(),
+								description:textDescriptionDetail.getValue()
 							]
 
 							if (object.id == "")
@@ -268,12 +270,12 @@ class MasterInvoice extends VerticalLayout{
 							{
 								object =  Grails.get(InvoiceDetailService).updateObject(object)
 							}
-							println object as JSON
 							if (object.errors.hasErrors())
 							{
 								textCodeDetail.setData("code")
 								textAmountDetail.setData("amount")
-								Object[] tv = [textCodeDetail,textAmountDetail]
+								textDescriptionDetail.setDate("description")
+								Object[] tv = [textCodeDetail,textAmountDetail,textDescriptionDetail]
 								generalFunction.setErrorUI(tv,object)
 							}
 							else
@@ -317,7 +319,6 @@ class MasterInvoice extends VerticalLayout{
 								initTable()
 							}
 						} else {
-
 						}
 					}
 				})
@@ -351,7 +352,7 @@ class MasterInvoice extends VerticalLayout{
 								initTable()
 							}
 						} else {
-
+							
 						}
 					}
 				})
@@ -443,21 +444,23 @@ class MasterInvoice extends VerticalLayout{
 		textId.setPropertyDataSource(item.getItemProperty("id"))
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
-		cmbUser = new ComboBox("User:");
-		def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-		def userList = Grails.get(UserService).getListDeleted()
-		beanUser.addAll(userList)
-		cmbUser.setContainerDataSource(beanUser)
-		cmbUser.setItemCaptionPropertyId("username")
-		cmbUser.select(cmbUser.getItemIds().find{ it.id == item.getItemProperty("user.id").value})
-		cmbUser.setBuffered(true)
-		cmbUser.setImmediate(false)
-		layout.addComponent(cmbUser)
 		textCode = new TextField("Code:");
 		textCode.setPropertyDataSource(item.getItemProperty("code"))
 		textCode.setBuffered(true)
 		textCode.setImmediate(false)
+		textCode.setReadOnly(true)
 		layout.addComponent(textCode)
+		cmbHome = new ComboBox("Home:");
+		def beanHome = new BeanItemContainer<Home>(Home.class)
+		def homeList = Grails.get(HomeService).getListDeleted()
+		beanHome.addAll(userList)
+		cmbHome.setContainerDataSource(beanHome)
+		cmbHome.setItemCaptionPropertyId("name")
+		cmbHome.select(cmbHome.getItemIds().find{ it.id == item.getItemProperty("home.id").value})
+		cmbHome.setBuffered(true)
+		cmbHome.setImmediate(false)
+		layout.addComponent(cmbHome)
+		
 		textInvoiceDate = new DateField("Invoice Date:");
 		textInvoiceDate.setPropertyDataSource(item.getItemProperty("invoiceDate"))
 		textInvoiceDate.setBuffered(true)
@@ -505,15 +508,17 @@ class MasterInvoice extends VerticalLayout{
 		textId = new TextField("Id:");
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
-		cmbUser = new ComboBox("User:")
-		def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
-		def userList = Grails.get(UserService).getListDeleted()
-		beanUser.addAll(userList)
-		cmbUser.setContainerDataSource(beanUser)
-		cmbUser.setItemCaptionPropertyId("username")
-		layout.addComponent(cmbUser)
 		textCode = new TextField("Code:")
+		textCode.setReadOnly(true)
 		layout.addComponent(textCode)
+		cmbHome = new ComboBox("Home:")
+		def beanHome = new BeanItemContainer<Home>(Home.class)
+		def homeList = Grails.get(HomeService).getListDeleted()
+		beanHome.addAll(homeList)
+		cmbHome.setContainerDataSource(beanHome)
+		cmbHome.setItemCaptionPropertyId("name")
+		layout.addComponent(cmbHome)
+		
 		textInvoiceDate = new DateField("Invoice Date:")
 		layout.addComponent(textInvoiceDate)
 		textDescription = new TextField("Description:")
@@ -570,9 +575,13 @@ class MasterInvoice extends VerticalLayout{
 		textIdDetail.setReadOnly(true)
 		layout3.addComponent(textIdDetail)
 		textCodeDetail = new TextField("Code:");
+		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
+		textDescriptionDetail = new TextField("Description:");
+		layout3.addComponent(textDescriptionDetail)
 		textAmountDetail = new TextField("Amount:");
 		layout3.addComponent(textAmountDetail)
+		
 		//		comb = new ComboBox("Sales Order Detail Item:")
 		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
 		//			itemlist = Grails.get(SalesOrderDetailService).getListForCombo(item.getItemProperty("salesOrder.id").toString())
@@ -617,7 +626,13 @@ class MasterInvoice extends VerticalLayout{
 		textCodeDetail.setPropertyDataSource(itemDetail.getItemProperty("code"))
 		textCodeDetail.setBuffered(true)
 		textCodeDetail.setImmediate(false)
+		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
+		textDescriptionDetail = new TextField("Description:");
+		textDescriptionDetail.setPropertyDataSource(itemDetail.getItemProperty("description"))
+		textDescriptionDetail.setBuffered(true)
+		textDescriptionDetail.setImmediate(false)
+		layout3.addComponent(textDescriptionDetail)
 		//		comb = new ComboBox("Item:")
 
 		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
@@ -667,17 +682,17 @@ class MasterInvoice extends VerticalLayout{
 		tableContainer.addNestedContainerProperty("updatedBy.username")
 		tableContainer.addNestedContainerProperty("confirmedBy.id")
 		tableContainer.addNestedContainerProperty("confirmedBy.username")
-		tableContainer.addNestedContainerProperty("user.id")
-		tableContainer.addNestedContainerProperty("user.username")
+		tableContainer.addNestedContainerProperty("home.id")
+		tableContainer.addNestedContainerProperty("home.name")
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("invoiceDate","Invoice Date")
-		table.setColumnHeader("user.username","Username")
+		table.setColumnHeader("home.name","Home Name")
 		table.setColumnHeader("totalAmount","Total Amount")
 		//		table.setColumnHeader("startTime","Start Time")
 		//		table.setColumnHeader("durasi","Duration")
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["user.username","code","invoiceDate","description","dueDate","totalAmount","isConfirmed","confirmationDate","isCleared","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","home.name","code","invoiceDate","description","dueDate","totalAmount","isConfirmed","confirmationDate","isCleared","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
@@ -719,7 +734,7 @@ class MasterInvoice extends VerticalLayout{
 		tableDetailContainer.addAll(itemListDetail)
 		tableDetail.setColumnHeader("invoice.id","Invoice Id")
 		tableDetail.setContainerDataSource(tableDetailContainer);
-		tableDetail.visibleColumns = ["invoice.id","code","amount","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
+		tableDetail.visibleColumns = ["id","invoice.id","code","description","amount","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
 		tableDetail.setSelectable(true)
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)

@@ -1,6 +1,8 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
+import java.text.SimpleDateFormat
 
 @Transactional
 class CashBankAdjustmentService {
@@ -17,6 +19,15 @@ class CashBankAdjustmentService {
 	def getList(){
 		return CashBankAdjustment.getAll()
 	}
+	
+	def createCode(object)
+	{
+		Date curDate = new Date()
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+		String now = format.format(curDate)
+		String code = "CA-"+now+"-"+object.id  
+		return code
+	}
 	def createObject(object){
 		object.isDeleted = false
 		object.isConfirmed = false
@@ -25,8 +36,9 @@ class CashBankAdjustmentService {
 		if (object.errors.getErrorCount() == 0)
 		{
 			object = object.save()
+			object.code = createCode(object)
+			object = object.save()
 		}
-
 		return object
 	}
 	def updateObject(def object){

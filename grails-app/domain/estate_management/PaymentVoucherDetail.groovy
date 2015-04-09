@@ -22,5 +22,6 @@ class PaymentVoucherDetail {
 		createdBy(nullable : true)
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

@@ -1,7 +1,9 @@
 package estate_management
 
 import java.awt.event.ItemEvent;
+import java.text.SimpleDateFormat
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 
 @Transactional
@@ -20,6 +22,27 @@ class InvoiceService {
 	}
 	def getListDeleted(){
 		return Invoice.findAll{isDeleted == false}
+	}
+	
+	def getListOutstanding(object)
+	{
+		object = userService.getObjectByUserName(object)
+		return Invoice.findAll{
+			isDeleted == false &&
+			isConfirmed == true 
+			&&
+			home.homeDetails.find{ it.user == object
+				} != null 
+			}
+	}
+	
+	def createCode(object)
+	{
+		Date curDate = new Date()
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+		String now = format.format(curDate)
+		String code = "IV-"+now+"-"+object.id
+		return code
 	}
 	def calculateTotal(def objectId){
 		def valObject = Invoice.read(objectId)
@@ -42,12 +65,14 @@ class InvoiceService {
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			object.code = createCode(object)
+			object = object.save()
 		}
 		return object
 	}
 	def updateObject(def object){
 		def valObject = Invoice.read(object.id)
-		valObject.user = object.user
+		valObject.home = object.home
 		valObject.code = object.code
 		valObject.invoiceDate = object.invoiceDate
 		valObject.description = object.description

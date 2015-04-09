@@ -589,7 +589,7 @@ class MasterProjectVote extends VerticalLayout{
 		table.setColumnHeader("amountAgree","Amount Agree")
 		table.setColumnHeader("amountDisagree","Amount Disagree")
 		table.setContainerDataSource(tableContainer);
-		table.visibleColumns = ["title","description","amountAgree","amountDisagree","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","title","description","amountAgree","amountDisagree","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

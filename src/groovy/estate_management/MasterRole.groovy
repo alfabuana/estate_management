@@ -306,7 +306,7 @@ class MasterRole extends VerticalLayout{
 //		tableContainer.addNestedContainerProperty("customer1.nama")
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("name","Name")
-		table.visibleColumns = ["name","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["id","name","dateCreated","lastUpdated","isDeleted"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

@@ -1,6 +1,8 @@
 package estate_management
 
 class PaymentRequest {
+	Vendor	vendor
+	Project	project
 	ShiroUser user
 	String description
 	String code
@@ -19,10 +21,12 @@ class PaymentRequest {
 	static hasMany = [ paymentRequestDetails: PaymentRequestDetail ]
 
     static constraints = {
+		user(nullable:true)
 		dueDate(nullable : true)
 		confirmationDate (nullable : true)
 		createdBy(nullable : true)
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

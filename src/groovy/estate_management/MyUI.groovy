@@ -210,6 +210,9 @@ public class MyUI extends UI{
 					case "Cash Bank Mutation":
 						panelContent.addComponent(new MasterCashBankMutation())
 						break
+					case "Outstanding Invoice":
+						panelContent.addComponent(new MasterOutstandingInvoice())
+						break
 				}
 			}
 		}

@@ -2,6 +2,7 @@ package estate_management
 
 import grails.converters.JSON
 import grails.transaction.Transactional
+import java.text.SimpleDateFormat
 
 @Transactional
 class PaymentVoucherService {
@@ -18,7 +19,14 @@ class PaymentVoucherService {
 	def getList(){
 		return PaymentVoucher.getAll()
 	}
-	
+	def createCode(object)
+	{
+		Date curDate = new Date()
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+		String now = format.format(curDate)
+		String code = "PV-"+now+"-"+object.id
+		return code
+	}
 	
 	def calculateTotal(def objectId){
 		def valObject = PaymentVoucher.read(objectId)
@@ -42,6 +50,8 @@ class PaymentVoucherService {
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			object.code = createCode(object)
+			object = object.save()
 		}
 		return object
 	}

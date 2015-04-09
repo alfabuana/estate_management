@@ -1,6 +1,7 @@
 package estate_management
 
 import grails.transaction.Transactional
+import java.text.SimpleDateFormat
 
 @Transactional
 class PaymentRequestDetailService {
@@ -17,7 +18,14 @@ class PaymentRequestDetailService {
 	def getList(){
 		return PaymentRequestDetail.getAll()
 	}
-	
+	def createCode(object)
+	{
+		Date curDate = new Date()
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+		String now = format.format(curDate)
+		String code = "PRD-"+now+"-"+object.id
+		return code
+	}
 	def getList(object){
 		def a = object.toLong()
 		return PaymentRequestDetail.findAll("from PaymentRequestDetail as b where b.paymentRequest.id=? and b.isDeleted =false",[a])
@@ -32,6 +40,8 @@ class PaymentRequestDetailService {
 		{
 			object =object.save()
 			paymentRequestService.calculateTotal(object.paymentRequest.id)
+			object.code = createCode(object)
+			object = object.save()
 			
 		}
 

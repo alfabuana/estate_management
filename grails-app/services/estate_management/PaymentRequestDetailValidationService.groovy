@@ -33,8 +33,8 @@ class PaymentRequestDetailValidationService {
 	{
 		object = paymentRequestNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object  = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object  = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
 		return object
 	}
@@ -42,8 +42,8 @@ class PaymentRequestDetailValidationService {
 	{
 		object = paymentRequestNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object  = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object  = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
 		return object
 	}

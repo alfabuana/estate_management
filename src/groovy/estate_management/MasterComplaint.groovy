@@ -57,6 +57,7 @@ class MasterComplaint extends VerticalLayout{
 	private ComboBox cmbHome
 	private TextField textTitle
 	private TextField textDescription
+	private TextField textCode
 	
 	private TextField textIdDetail
 	private TextField textAttachmentUrlDetail
@@ -195,7 +196,8 @@ class MasterComplaint extends VerticalLayout{
 								  username:String.valueOf(getSession().getAttribute("user")),
 								  home:cmbHome.getValue(),
 								  title:textTitle.getValue(),
-								  description:textDescription.getValue()
+								  description:textDescription.getValue(),
+								  code:textCode.getValue()
 								  ]
 					
 					if (object.id == "")
@@ -213,7 +215,8 @@ class MasterComplaint extends VerticalLayout{
 						cmbHome.setData("home")
 						textTitle.setData("title")
 						textDescription.setData("description")
-						Object[] tv = [cmbUser,cmbHome,textTitle,textDescription]
+						textCode.setData("code")
+						Object[] tv = [cmbUser,cmbHome,textTitle,textDescription,textCode]
 						generalFunction.setErrorUI(tv,object)
 					}
 					
@@ -485,6 +488,12 @@ class MasterComplaint extends VerticalLayout{
 			textId.setPropertyDataSource(item.getItemProperty("id"))
 			textId.setReadOnly(true)
 			layout.addComponent(textId)
+			textCode = new TextField("Code:");
+			textCode.setPropertyDataSource(item.getItemProperty("code"))
+			textCode.setBuffered(true)
+			textCode.setImmediate(false)
+			textCode.setReadOnly(true)
+			layout.addComponent(textCode)
 			cmbUser = new ComboBox("User:");
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
 			def userList = Grails.get(UserService).getListDeleted()
@@ -541,6 +550,9 @@ class MasterComplaint extends VerticalLayout{
 			textId = new TextField("Id:");
 			textId.setReadOnly(true)
 			layout.addComponent(textId)
+			textCode = new TextField("Code:")
+			textCode.setReadOnly(true)
+			layout.addComponent(textCode)
 			cmbUser = new ComboBox("User:")
 			def beanUser = new BeanItemContainer<ShiroUser>(ShiroUser.class)
 			def userList = Grails.get(UserService).getListDeleted()
@@ -705,7 +717,7 @@ class MasterComplaint extends VerticalLayout{
 //		table.setColumnHeader("durasi","Duration")
 //		table.setColumnHeader("dateStartUsing","Date Start Using")
 //		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["user.username","home.name","title","description","isConfirmed","confirmationDate","isCleared","clearDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","user.username","home.name","title","description","code","isConfirmed","confirmationDate","isCleared","clearDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())
@@ -751,7 +763,7 @@ table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 		 tableDetailContainer.addAll(itemListDetail)
 		 tableDetail.setColumnHeader("complaint.id","Complaint Id")
 		 tableDetail.setContainerDataSource(tableDetailContainer);
-		 tableDetail.visibleColumns = ["complaint.id","attachmentUrl","isDeleted","dateCreated","lastUpdated","createdBy.username","updatedBy.username"]
+		 tableDetail.visibleColumns = ["id","complaint.id","attachmentUrl","isDeleted","dateCreated","lastUpdated","createdBy.username","updatedBy.username"]
 		 tableDetail.setSelectable(true)
 		 tableDetail.setImmediate(false)
 		 tableDetail.setVisible(true)

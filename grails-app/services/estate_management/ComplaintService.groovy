@@ -2,6 +2,7 @@ package estate_management
 
 import grails.converters.JSON
 import grails.transaction.Transactional
+import java.text.SimpleDateFormat
 
 @Transactional
 class ComplaintService {
@@ -20,6 +21,14 @@ class ComplaintService {
 	def getListDeleted(){
 		return Complaint.findAll{isDeleted == false}
 	}
+	def createCode(object)
+	{
+		Date curDate = new Date()
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+		String now = format.format(curDate)
+		String code = "CT-"+now+"-"+object.id
+		return code
+	}
 	def createObject(object){
 		object.user = userService.getObjectByUserName(object.username)
 		object.isDeleted = false
@@ -30,6 +39,8 @@ class ComplaintService {
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			object.code = createCode(object)
+			object = object.save()
 		}
 		return object
 	}
@@ -43,6 +54,7 @@ class ComplaintService {
 		valObject.description = object.description
 		valObject.title = object.title
 		valObject.home = object.home
+		valObject.code = object.code
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = complaintValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)

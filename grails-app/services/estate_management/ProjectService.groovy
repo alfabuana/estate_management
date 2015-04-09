@@ -1,6 +1,7 @@
 package estate_management
 
 import grails.transaction.Transactional
+import java.text.SimpleDateFormat
 
 @Transactional
 class ProjectService {
@@ -17,10 +18,20 @@ class ProjectService {
 		return Project.getAll()
 	}
 	
+	def getListUnFinish(){
+		return Project.findAll{isFinished == false && isDeleted == false}
+	}
 	def getListConfirm(){
 		return Project.findAll{isConfirmed == true && isDeleted == false}
 	}
-	
+	def createCode(object)
+	{
+		Date curDate = new Date()
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+		String now = format.format(curDate)
+		String code = "PJ-"+now+"-"+object.id
+		return code
+	}
 	def calculateTotal(def objectId){
 		def valObject = Project.read(objectId)
 		Double totalAgree = 0
@@ -52,6 +63,8 @@ class ProjectService {
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			object.code = createCode(object)
+			object = object.save()
 		}
 		return object
 	}
@@ -60,6 +73,7 @@ class ProjectService {
 		valObject.title = object.title
 		valObject.description = object.description
 		valObject.complaint = object.complaint
+		valObject.code = object.code
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = projectValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)

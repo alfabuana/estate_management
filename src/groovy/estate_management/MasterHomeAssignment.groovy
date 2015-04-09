@@ -246,7 +246,7 @@ class MasterHomeAssignment extends VerticalLayout{
 							Grails.get(HomeAssignmentService).confirmObject(object)
 							initTable()
 						} else {
-									
+						
 						}
 					}
 				})
@@ -414,7 +414,7 @@ class MasterHomeAssignment extends VerticalLayout{
 //		table.setColumnHeader("durasi","Duration")
 //		table.setColumnHeader("dateStartUsing","Date Start Using")
 //		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["home.name","user.username","assignDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","home.name","user.username","assignDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

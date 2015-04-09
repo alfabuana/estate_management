@@ -1,6 +1,7 @@
 package estate_management
 
 import grails.transaction.Transactional
+import java.text.SimpleDateFormat
 
 @Transactional
 class PaymentVoucherDetailService {
@@ -20,6 +21,15 @@ class PaymentVoucherDetailService {
 		def a = object.toLong()
 		return PaymentVoucherDetail.findAll("from PaymentVoucherDetail as b where b.paymentVoucher.id=? and b.isDeleted =false",[a])
 	}
+	
+	def createCode(object)
+		{
+			Date curDate = new Date()
+			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
+			String now = format.format(curDate)
+			String code = "PVD-"+now+"-"+object.id
+			return code
+		}
 	def createObject(object){
 		object.paymentVoucher = PaymentVoucher.get(object.paymentVoucherId)
 		object.isDeleted = false
@@ -31,6 +41,8 @@ class PaymentVoucherDetailService {
 		{
 			object = object.save()
 			paymentVoucherService.calculateTotal(object.paymentVoucher.id)
+			object.code = createCode(object)
+			object = object.save()
 		}
 		return object
 	}

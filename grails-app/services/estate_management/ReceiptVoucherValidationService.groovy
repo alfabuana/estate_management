@@ -84,8 +84,8 @@ class ReceiptVoucherValidationService {
 		if (object.errors.hasErrors()) return object
 		object = cashBankNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = receiptDateNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = isGBCHNotNull(object)
@@ -101,8 +101,8 @@ class ReceiptVoucherValidationService {
 		if (object.errors.hasErrors()) return object
 		object = cashBankNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = codeNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = receiptDateNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = isGBCHNotNull(object)
