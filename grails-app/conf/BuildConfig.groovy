@@ -69,6 +69,7 @@ grails.project.dependency.resolution = {
         compile ":asset-pipeline:1.9.9"
 		compile ":vaadin:7.3.6"
 		compile ":shiro:1.2.1"
+		compile ":jasper:1.11.0"
 //		shiro-quick-start --prefix=latihan.Shiro
 		
         // plugins needed at runtime but not for compilation

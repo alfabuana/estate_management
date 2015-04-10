@@ -1,7 +1,10 @@
 package estate_management
 
 import java.awt.event.ItemEvent;
+import java.util.ArrayList;
+import java.util.Date;
 
+import estate_management.reportModel.InvoiceReportModel
 import estate_management.widget.GeneralFunction
 
 
@@ -10,7 +13,13 @@ import estate_management.widget.GeneralFunction
 
 
 
+import net.sf.jasperreports.engine.JasperRunManager
+import net.sf.jasperreports.engine.JRException
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource
+
 import org.vaadin.dialogs.ConfirmDialog
+
+
 
 
 
@@ -30,12 +39,15 @@ import com.vaadin.event.ItemClickEvent.ItemClickListener
 import com.vaadin.event.MouseEvents.ClickEvent
 import com.vaadin.event.MouseEvents.ClickListener
 import com.vaadin.server.DefaultErrorHandler
+import com.vaadin.server.StreamResource
 import com.vaadin.server.UserError
 import com.vaadin.ui.Button
 import com.vaadin.ui.ComboBox
 import com.vaadin.ui.Component
 import com.vaadin.shared.ui.datefield.Resolution
+import com.vaadin.ui.BrowserFrame
 import com.vaadin.ui.DateField
+import com.vaadin.ui.Embedded
 import com.vaadin.ui.Field
 import com.vaadin.ui.FormLayout
 import com.vaadin.ui.HorizontalLayout
@@ -48,9 +60,12 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
+import com.vaadin.shared.ui.window.WindowMode
 
 import estate_management.InvoiceService
 import grails.converters.JSON
+
+
 
 
 
@@ -139,6 +154,10 @@ class MasterInvoice extends VerticalLayout{
 								if (table.getValue() != null)
 									windowUnConfirm("Unconfirm");
 								break;
+								case "Print":
+								if (table.getValue() != null)
+									windowPrint();
+								break;
 							case "AddDetail":
 								if (table.getValue() != null)
 									windowAddDetail(tableContainer.getItem(table.getValue()),"AddDetail");
@@ -164,6 +183,7 @@ class MasterInvoice extends VerticalLayout{
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
 		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
+		MenuItem printMenu = menuBar.addItem("Print", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")
 		//	END BUTTON MENU
@@ -741,6 +761,98 @@ class MasterInvoice extends VerticalLayout{
 		tableDetail.setVisible(true)
 		tableDetail.setSizeFull()
 		menuBarDetail.setVisible(true)
+	}
+	private void windowPrint(){
+		final Map map = new HashMap();
+
+		StreamResource.StreamSource source = new StreamResource.StreamSource() {
+
+					public InputStream getStream() {
+						byte[] b = null;
+						try {
+							DataBeanMaker dataBeanMaker = new DataBeanMaker();
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							ArrayList dataBeanList = dataBeanMaker.getDataBeanList(object.id);
+							JRBeanCollectionDataSource beanColDataSource = new
+									JRBeanCollectionDataSource(dataBeanList);
+							Map parameters = new HashMap();
+
+							b = JasperRunManager.runReportToPdf(getClass().
+									getClassLoader().getResourceAsStream("reports/Invoice.jasper"),
+									map,beanColDataSource);
+						} catch (JRException ex) {
+							ex.printStackTrace();
+						}
+
+						return new ByteArrayInputStream(b);
+					}
+				};
+
+		StreamResource resource = new StreamResource(source, "Invoice.pdf");
+		resource.setMIMEType("application/pdf");
+
+
+		BrowserFrame browser = new BrowserFrame("Browser");
+		browser.setWidth("600px");
+		browser.setHeight("400px");
+
+		VerticalLayout v = new VerticalLayout();
+		Embedded e = new Embedded("", resource);
+		e.setSizeFull();
+		e.setHeight("600px")
+		e.setType(Embedded.TYPE_BROWSER)
+		v.addComponent(e);
+
+		Window w = new Window()
+		w.setContent(v);
+		w.setWindowMode(WindowMode.MAXIMIZED)
+		UI.getCurrent().addWindow(w);
+	}
+
+
+	private class DataBeanMaker {
+		public ArrayList getDataBeanList(def Object) {
+			ArrayList<InvoiceReportModel> dataBeanList = new ArrayList<InvoiceReportModel>();
+//			Invoice data = Grails.get(InvoiceService).getObjectById(Object)
+			for(data in Grails.get(InvoiceDetailService).getList(Object))
+			{
+				dataBeanList.add(produce(data.invoice.code,data.invoice.invoiceDate, 
+				data.invoice.description, data.invoice.dueDate, data.id.toInteger(), 
+				data.description, 
+				data.amount, data.invoice.totalAmount));
+			
+			}
+//			dataBeanList.add(produce(data.code,data.invoiceDate, 
+//				data.description, data.dueDate, data.invoiceDetails.id, 
+//				data.invoiceDetails.description, 
+//				data.invoiceDetails.amount, data.totalAmount));
+			return dataBeanList;
+		}
+
+		private InvoiceReportModel produce(
+				String code,
+				Date invoiceDate,
+				String description,
+				Date dueDate,
+				Integer idDetail,
+				String descriptionDetail,
+				Double amount,
+				Double totalAmount
+		) {
+
+			InvoiceReportModel dataBean = new InvoiceReportModel();
+
+			dataBean.setCode(code);
+			dataBean.setInvoiceDate(invoiceDate)
+			dataBean.setDescription(description)
+			dataBean.setDueDate(dueDate)
+			dataBean.setIdDetail(idDetail)
+			dataBean.setDescriptionDetail(descriptionDetail)
+			dataBean.setAmount(amount)
+			dataBean.setTotalAmount(totalAmount)
+
+			return dataBean;
+		}
 	}
 
 
