@@ -16,7 +16,7 @@ class ReceiptVoucherService {
 		return ReceiptVoucher.get(object)
 	}
 	def getList(){
-		return ReceiptVoucher.getAll()
+		return ReceiptVoucher.findAll([sort: "id", order: "desc"]){}
 	}
 	def createCode(object)
 	{

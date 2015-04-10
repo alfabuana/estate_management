@@ -8,6 +8,14 @@ class MaintenanceValidationService {
     def serviceMethod() {
 
     }
+	def isDeleted(def object){
+		if (object.isDeleted == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah dihapus')
+		}
+		return object
+	}
+
 	def isConfirmed(def object){
 		if (object.isConfirmed == true)
 		{
@@ -74,6 +82,8 @@ class MaintenanceValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def confirmObjectValidation(object)

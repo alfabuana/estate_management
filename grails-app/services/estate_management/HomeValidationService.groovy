@@ -8,6 +8,13 @@ class HomeValidationService {
     def serviceMethod() {
 
     }
+	def isDeleted(def object){
+		if (object.isDeleted == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah dihapus')
+		}
+		return object
+	}
 	def nameNotNull(def object){
 		if (object.name == null || object.name == "")
 		{
@@ -38,6 +45,8 @@ class HomeValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	

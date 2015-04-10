@@ -8,6 +8,13 @@ class ReceivableValidationService {
     def serviceMethod() {
 
     }
+	def isDeleted(def object){
+		if (object.isDeleted == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah dihapus')
+		}
+		return object
+	}
 	def usernameNotNull(def object){
 		if (object.user == null || object.user == "")
 		{
@@ -115,6 +122,8 @@ class ReceivableValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 

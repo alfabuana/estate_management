@@ -8,6 +8,7 @@ class ProjectVoteValidationService {
     def serviceMethod() {
 
     }
+	
 	def alreadyVote(def object){
 		def projectVote = ProjectVote.find {
 			user == object.user &&

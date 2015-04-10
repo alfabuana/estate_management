@@ -15,14 +15,14 @@ class ProjectService {
 		return Project.get(object)
 	}
 	def getList(){
-		return Project.getAll()
+		return Project.findAll([sort: "id", order: "desc"]){}
 	}
 	
 	def getListUnFinish(){
-		return Project.findAll{isFinished == false && isDeleted == false}
+		return Project.findAll([sort: "id", order: "desc"]){isFinished == false && isDeleted == false}
 	}
 	def getListConfirm(){
-		return Project.findAll{isConfirmed == true && isDeleted == false}
+		return Project.findAll([sort: "id", order: "desc"]){isConfirmed == true && isDeleted == false}
 	}
 	def createCode(object)
 	{

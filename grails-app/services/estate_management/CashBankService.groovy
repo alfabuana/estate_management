@@ -13,13 +13,10 @@ class CashBankService {
 		return CashBank.get(object)
 	}
 	def getList(){
-		def b = "isDeleted"
-		def c = false
-		return CashBank.findAll("from CashBank as b where b.${b} = ${c} ")
-//		return CashBank.getAll()
+		return CashBank.findAll([sort: "id", order: "desc"]){}
 	}
 	def getListDeleted(){
-		return CashBank.findAll{isDeleted == false}
+		return CashBank.findAll([sort: "id", order: "desc"]){isDeleted == false}
 	}
 	
 	def createObject(object){
@@ -59,6 +56,7 @@ class CashBankService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 	}
 	
 }

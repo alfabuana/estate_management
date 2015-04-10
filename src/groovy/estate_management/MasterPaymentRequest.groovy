@@ -72,6 +72,7 @@ class MasterPaymentRequest extends VerticalLayout{
 	private TextField textCode
 	private TextField textAmount
 	private DateField textRequestDate
+	private DateField textDueDate
 
 	private TextField textIdDetail
 	private TextField textCodeDetail
@@ -207,6 +208,7 @@ class MasterPaymentRequest extends VerticalLayout{
 								code:textCode.getValue(),
 								amount:textAmount.getValue().toString(),
 								requestDate:textRequestDate.getValue(),
+								dueDate:textDueDate.getValue()
 							]
 
 							if (object.id == "")
@@ -227,7 +229,8 @@ class MasterPaymentRequest extends VerticalLayout{
 								textCode.setData("code")
 								textAmount.setData("amount")
 								textRequestDate.setData("requestDate")
-								Object[] tv = [cmbVendor,cmbProject,textDescription,textCode,textAmount,textRequestDate]
+								textDueDate.setData("dueDate")
+								Object[] tv = [cmbVendor,cmbProject,textDescription,textCode,textAmount,textRequestDate,textDueDate]
 								generalFunction.setErrorUI(tv,object)
 							}
 							else
@@ -462,7 +465,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		cmbProject = new ComboBox("Project:");
 		def beanProject = new BeanItemContainer<Project>(Project.class)
 		def projectList = Grails.get(ProjectService).getListUnFinish()
-		beanVendor.addAll(projectList)
+		beanProject.addAll(projectList)
 		cmbProject.setContainerDataSource(beanProject)
 		cmbProject.setItemCaptionPropertyId("title")
 		cmbProject.select(cmbProject.getItemIds().find{ it.id == item.getItemProperty("project.id").value})
@@ -487,6 +490,11 @@ class MasterPaymentRequest extends VerticalLayout{
 		textRequestDate.setBuffered(true)
 		textRequestDate.setImmediate(false)
 		layout.addComponent(textRequestDate)
+		textDueDate = new DateField("Due Date:");
+		textDueDate.setPropertyDataSource(item.getItemProperty("dueDate"))
+		textDueDate.setBuffered(true)
+		textDueDate.setImmediate(false)
+		layout.addComponent(textDueDate)
 		layout.addComponent(createSaveButton())
 		layout.addComponent(createCancelButton())
 		getUI().addWindow(window);
@@ -537,6 +545,8 @@ class MasterPaymentRequest extends VerticalLayout{
 		layout.addComponent(textAmount)
 		textRequestDate = new DateField("Request Date:")
 		layout.addComponent(textRequestDate)
+		textDueDate = new DateField("Due Date:")
+		layout.addComponent(textDueDate)
 		//			def textArea = new TextArea("Text Area")
 		//			layout.addComponent(textArea)
 		//			def dateField = new DateField("Date Field")
@@ -702,7 +712,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		//		table.setColumnHeader("durasi","Duration")
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["id","vendor.name","project.title","description","code","amount","requestDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"
+		table.visibleColumns = ["id","vendor.name","project.title","description","code","amount","requestDate","dueDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"
 ]
 		table.setSelectable(true)
 		table.setImmediate(false)

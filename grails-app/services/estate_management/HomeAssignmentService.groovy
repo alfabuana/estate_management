@@ -15,7 +15,7 @@ class HomeAssignmentService {
 		return HomeAssignment.get(object)
 	}
 	def getList(){
-		return HomeAssignment.getAll()
+		return HomeAssignment.findAll([sort: "id", order: "desc"]){}
 	}
 	def createObject(object){
 		object.isDeleted = false

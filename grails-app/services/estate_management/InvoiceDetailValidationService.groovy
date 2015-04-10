@@ -8,6 +8,13 @@ class InvoiceDetailValidationService {
     def serviceMethod() {
 
     }
+	def isDeleted(def object){
+		if (object.isDeleted == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah dihapus')
+		}
+		return object
+	}
 	def invoiceNotNull(def object){
 		if (object.invoice == null || object.invoice == "")
 		{
@@ -60,6 +67,8 @@ class InvoiceDetailValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def confirmObjectValidation(object)

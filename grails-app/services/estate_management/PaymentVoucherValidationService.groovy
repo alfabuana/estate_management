@@ -8,6 +8,20 @@ class PaymentVoucherValidationService {
     def serviceMethod() {
 
     }
+	def isDeleted(def object){
+		if (object.isDeleted == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah dihapus')
+		}
+		return object
+	}
+	def cashBankAmountLowerThanTotalAmount(def object){
+		if (object.cashBank.amount < object.totalAmount)
+		{
+			object.errors.rejectValue(null,'null','Cash Bank Amount tidak mencukupi')
+		}
+		return object
+	}
 	def isConfirmed(def object){
 		if (object.isConfirmed == true)
 		{
@@ -114,11 +128,15 @@ class PaymentVoucherValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def confirmObjectValidation(object)
 	{
 		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
+		object = cashBankAmountLowerThanTotalAmount(object)
 		if (object.errors.hasErrors()) return object
 		object = hasDetail(object)
 		return object

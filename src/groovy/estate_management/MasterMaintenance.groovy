@@ -85,9 +85,9 @@ class MasterMaintenance extends VerticalLayout{
 	//==============================
 	
 	private Table table = new Table();
-	private Table tableDetail = new Table()
+//	private Table tableDetail = new Table()
 	private BeanItemContainer<Maintenance> tableContainer;
-	private BeanItemContainer tableDetailContainer
+//	private BeanItemContainer tableDetailContainer
 	private FieldGroup fieldGroup;
 	private FormLayout layout
 	private Action actionDelete = new Action("Delete");
@@ -176,7 +176,7 @@ class MasterMaintenance extends VerticalLayout{
 //		menuBarDetail.setWidth("100%")
 //		menuBarDetail.setVisible(false)
 //		addComponent(menuBarDetail)
-		addComponent(tableDetail)
+//		addComponent(tableDetail)
 
 		//		==========================
 		//		ENd View Detail
@@ -640,41 +640,41 @@ table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 						//				print selectedRow
 					}
 				});
-		table.addValueChangeListener(new Property.ValueChangeListener() {
-					public void valueChange(ValueChangeEvent event) {
-						selectedRow = table.getValue()
-						if (selectedRow != null) {
-							initTableDetail()
-
-						}
-						else
-						{
-							tableDetail.setVisible(false)
+//		table.addValueChangeListener(new Property.ValueChangeListener() {
+//					public void valueChange(ValueChangeEvent event) {
+//						selectedRow = table.getValue()
+//						if (selectedRow != null) {
+//							initTableDetail()
+//
+//						}
+//						else
+//						{
+//							tableDetail.setVisible(false)
 //							menuBarDetail.setVisible(false)
-						}
-					}
-				})
+//						}
+//					}
+//				})
 
 	}
-	 void initTableDetail() {
-		 tableDetailContainer = new BeanItemContainer<MaintenanceDetail>(MaintenanceDetail.class);
-		 def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
-		 def itemListDetail = Grails.get(MaintenanceDetailService).getList(ind)
-//		 tableDetailContainer.addNestedContainerProperty("complaint.id")
-		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
-		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
-		 //		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
-		 tableDetailContainer.addAll(itemListDetail)
-//		 tableDetail.setColumnHeader("complaint.id","Complaint Id")
-		 tableDetail.setContainerDataSource(tableDetailContainer);
-		 tableDetail.visibleColumns = ["id","maintenance","user","isDeleted","dateCreated","lastUpdated"]
-		 tableDetail.setSelectable(true)
-		 tableDetail.setImmediate(false)
-		 tableDetail.setVisible(true)
-		 tableDetail.setSizeFull()
-//		 menuBarDetail.setVisible(true)
-	 }
-	 
+//	 void initTableDetail() {
+//		 tableDetailContainer = new BeanItemContainer<MaintenanceDetail>(MaintenanceDetail.class);
+//		 def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+//		 def itemListDetail = Grails.get(MaintenanceDetailService).getList(ind)
+////		 tableDetailContainer.addNestedContainerProperty("complaint.id")
+//		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
+//		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
+//		 //		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
+//		 tableDetailContainer.addAll(itemListDetail)
+////		 tableDetail.setColumnHeader("complaint.id","Complaint Id")
+//		 tableDetail.setContainerDataSource(tableDetailContainer);
+//		 tableDetail.visibleColumns = ["id","maintenance","user","isDeleted","dateCreated","lastUpdated"]
+//		 tableDetail.setSelectable(true)
+//		 tableDetail.setImmediate(false)
+//		 tableDetail.setVisible(true)
+//		 tableDetail.setSizeFull()
+////		 menuBarDetail.setVisible(true)
+//	 }
+//	 
 }
 	
 

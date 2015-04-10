@@ -8,6 +8,13 @@ class ProjectDetailValidationService {
     def serviceMethod() {
 
     }
+	def isDeleted(def object){
+		if (object.isDeleted == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah dihapus')
+		}
+		return object
+	}
 	def projectNotNull(def object){
 		if (object.project == null || object.project == "")
 		{
@@ -38,6 +45,8 @@ class ProjectDetailValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 }

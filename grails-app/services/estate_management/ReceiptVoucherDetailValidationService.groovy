@@ -8,6 +8,13 @@ class ReceiptVoucherDetailValidationService {
     def serviceMethod() {
 
     }
+	def isDeleted(def object){
+		if (object.isDeleted == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah dihapus')
+		}
+		return object
+	}
 	def receiptVoucherNotNull(def object){
 		if (object.receiptVoucher == null || object.receiptVoucher == "")
 		{
@@ -71,6 +78,8 @@ class ReceiptVoucherDetailValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def confirmObjectValidation(object)

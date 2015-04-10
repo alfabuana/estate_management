@@ -17,7 +17,7 @@ class CashBankMutationService {
 		return CashBankMutation.get(object)
 	}
 	def getList(){
-		return CashBankMutation.getAll()
+		return CashBankMutation.findAll([sort: "id", order: "desc"]){}
 	}
 	def createCode(object)
 	{

@@ -121,13 +121,13 @@ class MasterInvoiceClearance extends VerticalLayout{
 //								if (table.getValue() != null)
 //									windowDelete("Delete");
 //								break;
-							case "Confirm":
+							case "Clear":
 								if (table.getValue() != null)
-									windowConfirm("Confirm");
+									windowClear("Clear");
 								break;
-							case "Unconfirm":
+							case "Unclear":
 								if (table.getValue() != null)
-									windowUnConfirm("Unconfirm");
+									windowUnClear("Unclear");
 								break;
 //							case "AddDetail":
 //								if (table.getValue() != null)
@@ -152,8 +152,8 @@ class MasterInvoiceClearance extends VerticalLayout{
 //		MenuItem saveMenu =  menuBar.addItem("Add",mycommand)
 //		MenuItem updateMenu = menuBar.addItem("Edit", mycommand)
 //		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
-		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
-		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
+		MenuItem clearMenu = menuBar.addItem("Clear", mycommand)
+		MenuItem unclearMenu = menuBar.addItem("Unclear", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")	
 		//	END BUTTON MENU
@@ -329,11 +329,11 @@ class MasterInvoiceClearance extends VerticalLayout{
 //	}
 //
 	//	===========================================
-	//	WINDOW CONFIRM
+	//	WINDOW CLEAR
 	//	===========================================
 		
 		//@RequiresPermissions("Master:Item:Delete")
-		private void windowConfirm(String caption) {
+		private void windowClear(String caption) {
 	//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 				ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
@@ -341,7 +341,7 @@ class MasterInvoiceClearance extends VerticalLayout{
 						if (dialog.isConfirmed()) {
 							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
 								,username:getSession().getAttribute("user")]
-							object = Grails.get(InvoicePaidService).confirmObject(object)
+							object = Grails.get(InvoicePaidService).clearObject(object)
 							if (object.errors.hasErrors())
 							{
 								Object[] tv = [textId]
@@ -363,18 +363,18 @@ class MasterInvoiceClearance extends VerticalLayout{
 	//		}
 		}
 		//	===========================================
-		//	WINDOW UNCONFIRM
+		//	WINDOW UNCLEAR
 		//	===========================================
 			
 			//@RequiresPermissions("Master:Item:Delete")
-			private void windowUnConfirm(String caption) {
+			private void windowUnClear(String caption) {
 		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 					ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 					new ConfirmDialog.Listener() {
 						public void onClose(ConfirmDialog dialog) {
 							if (dialog.isConfirmed()) {
 								def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-								object = Grails.get(InvoicePaidService).unConfirmObject(object)
+								object = Grails.get(InvoicePaidService).unClearObject(object)
 								if (object.errors.hasErrors())
 							{
 								Object[] tv = [textId]
@@ -629,7 +629,7 @@ class MasterInvoiceClearance extends VerticalLayout{
 		 void initTable() {
 			 tableContainer = new BeanItemContainer<InvoicePaid>(InvoicePaid.class);
 			 //fillTableContainer(tableContainer);
-			 itemlist = Grails.get(InvoicePaidService).getList()
+			 itemlist = Grails.get(InvoicePaidService).getListForClearance()
 			 tableContainer.addAll(itemlist)
 			 tableContainer.addNestedContainerProperty("createdBy.id")
 			 tableContainer.addNestedContainerProperty("createdBy.username")
@@ -637,6 +637,8 @@ class MasterInvoiceClearance extends VerticalLayout{
 			 tableContainer.addNestedContainerProperty("updatedBy.username")
 			 tableContainer.addNestedContainerProperty("confirmedBy.id")
 			 tableContainer.addNestedContainerProperty("confirmedBy.username")
+			 tableContainer.addNestedContainerProperty("invoice.isCleared")
+			 tableContainer.addNestedContainerProperty("invoice.clearDate")
 			 tableContainer.addNestedContainerProperty("invoice.id")
 			 tableContainer.addNestedContainerProperty("invoice.code")
 			 tableContainer.addNestedContainerProperty("user.id")
@@ -650,7 +652,7 @@ class MasterInvoiceClearance extends VerticalLayout{
 	 //		table.setColumnHeader("durasi","Duration")
 	 //		table.setColumnHeader("dateStartUsing","Date Start Using")
 	 //		table.setColumnHeader("dateEndUsing","Date End Using")
-			 table.visibleColumns = ["id","invoice.code","user.username","description","paidDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+			 table.visibleColumns = ["id","invoice.code","user.username","description","paidDate","invoice.isCleared","invoice.clearDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 			 table.setSelectable(true)
 			 table.setImmediate(false)
 	 //		table.setPageLength(table.size())

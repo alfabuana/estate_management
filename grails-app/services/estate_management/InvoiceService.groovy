@@ -18,21 +18,21 @@ class InvoiceService {
 		return Invoice.get(object)
 	}
 	def getList(){
-		return Invoice.getAll()
+		return Invoice.findAll([sort: "id", order: "desc"]){}
 	}
 	def getListDeleted(){
-		return Invoice.findAll{isDeleted == false}
+		return Invoice.findAll([sort: "id", order: "desc"]){isDeleted == false}
 	}
 	
 	def getListOutstanding(object)
 	{
 		object = userService.getObjectByUserName(object)
 		def b =[0.toLong()]
-		for (a in HomeDetail.findAll{ user == object})
+		for (a in HomeDetail.findAll([sort: "id", order: "desc"]){ user == object})
 		{
 			b.add(a.home.id)
 		}
-		return Invoice.findAll{
+		return Invoice.findAll([sort: "id", order: "desc"]){
 			isDeleted == false &&
 			isConfirmed == true &&
 			home.id in b
@@ -101,6 +101,7 @@ class InvoiceService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 
 	}
 	def confirmObject(def object){

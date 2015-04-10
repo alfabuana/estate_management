@@ -17,7 +17,7 @@ class PaymentVoucherService {
 		return PaymentVoucher.get(object)
 	}
 	def getList(){
-		return PaymentVoucher.getAll()
+		return PaymentVoucher.findAll([sort: "id", order: "desc"]){}
 	}
 	def createCode(object)
 	{

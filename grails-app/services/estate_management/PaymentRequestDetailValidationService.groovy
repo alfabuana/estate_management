@@ -8,6 +8,13 @@ class PaymentRequestDetailValidationService {
     def serviceMethod() {
 
     }
+	def isDeleted(def object){
+		if (object.isDeleted == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah dihapus')
+		}
+		return object
+	}
 	def paymentRequestNotNull(def object){
 		if (object.paymentRequest == null || object.paymentRequest == "")
 		{
@@ -49,6 +56,8 @@ class PaymentRequestDetailValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def confirmObjectValidation(object)

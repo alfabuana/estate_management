@@ -16,10 +16,10 @@ class ComplaintService {
 		return Complaint.get(object)
 	}
 	def getList(){
-		return Complaint.getAll()
+		return Complaint.findAll([sort: "id", order: "desc"]){}
 	}
 	def getListDeleted(){
-		return Complaint.findAll{isDeleted == false}
+		return Complaint.findAll([sort: "id", order: "desc"]){isDeleted == false}
 	}
 	def createCode(object)
 	{

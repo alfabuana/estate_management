@@ -15,7 +15,7 @@ class PaymentVoucherDetailService {
 		return PaymentVoucherDetail.get(object)
 	}
 	def getList(){
-		return PaymentVoucherDetail.getAll()
+		return PaymentVoucherDetail.findAll([sort: "id", order: "desc"]){}
 	}
 	def getList(object){
 		def a = object.toLong()

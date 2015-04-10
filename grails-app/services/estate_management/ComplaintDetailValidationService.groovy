@@ -8,6 +8,13 @@ class ComplaintDetailValidationService {
     def serviceMethod() {
 
     }
+	def isDeleted(def object){
+		if (object.isDeleted == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah dihapus')
+		}
+		return object
+	}
 	def complaintNotNull(def object){
 		if (object.complaint == null || object.complaint == "")
 		{
@@ -38,6 +45,8 @@ class ComplaintDetailValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 }

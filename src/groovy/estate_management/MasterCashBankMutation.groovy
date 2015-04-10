@@ -170,7 +170,6 @@ class MasterCashBankMutation extends VerticalLayout{
 							{
 								object =  Grails.get(CashBankMutationService).updateObject(object)
 							}
-							println object as JSON
 
 							if (object.errors.hasErrors())
 							{

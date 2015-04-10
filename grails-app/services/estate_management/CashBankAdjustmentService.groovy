@@ -17,7 +17,7 @@ class CashBankAdjustmentService {
 		return CashBankAdjustment.get(object)
 	}
 	def getList(){
-		return CashBankAdjustment.getAll()
+		return CashBankAdjustment.findAll([sort: "id", order: "desc"]){}
 	}
 	
 	def createCode(object)

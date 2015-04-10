@@ -1,19 +1,10 @@
 package estate_management
-
+import org.apache.shiro.SecurityUtils
+import org.apache.shiro.subject.Subject
 import java.awt.event.ItemEvent;
-
 import estate_management.widget.GeneralFunction
-
-
-
-
-
-
+import org.apache.shiro.subject.Subject;
 import org.vaadin.dialogs.ConfirmDialog
-
-
-
-
 import com.vaadin.data.Property
 import com.vaadin.data.Property.ValueChangeEvent
 import com.vaadin.data.fieldgroup.BeanFieldGroup
@@ -46,16 +37,8 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
-
 import estate_management.ProjectService
 import grails.converters.JSON
-
-
-
-
-
-
-
 import com.vaadin.grails.Grails
 
 class MasterInvoicePayment extends VerticalLayout{
@@ -89,7 +72,7 @@ class MasterInvoicePayment extends VerticalLayout{
 	private static final int MAX_PAGE_LENGTH = 15;
 	String Title = "Invoice Payment"
 //						Constant.MenuName.Item + ":";
-	
+	Subject currentUser = SecurityUtils.getSubject();
 	public MasterInvoicePayment() {
 //		currentUser = SecurityUtils.getSubject();
 //		table = new Table()
@@ -429,7 +412,7 @@ class MasterInvoicePayment extends VerticalLayout{
 			layout.addComponent(textId)
 			cmbInvoice = new ComboBox("Invoice:");
 			def beanInvoice = new BeanItemContainer<Invoice>(Invoice.class)
-			def invoiceList = Grails.get(InvoiceService).getListDeleted()
+			def invoiceList = Grails.get(InvoiceService).getListOutstanding(currentUser.getPrincipal())
 			beanInvoice.addAll(invoiceList)
 			cmbInvoice.setContainerDataSource(beanInvoice)
 			cmbInvoice.setItemCaptionPropertyId("code")
@@ -485,7 +468,7 @@ class MasterInvoicePayment extends VerticalLayout{
 			layout.addComponent(textId)
 			cmbInvoice = new ComboBox("Invoice:")
 			def beanInvoice = new BeanItemContainer<Invoice>(Invoice.class)
-			def invoiceList = Grails.get(InvoiceService).getListDeleted()
+			def invoiceList = Grails.get(InvoiceService).getListOutstanding(currentUser.getPrincipal())
 			beanInvoice.addAll(invoiceList)
 			cmbInvoice.setContainerDataSource(beanInvoice)
 			cmbInvoice.setItemCaptionPropertyId("code")

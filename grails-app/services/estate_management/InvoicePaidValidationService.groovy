@@ -8,6 +8,13 @@ class InvoicePaidValidationService {
     def serviceMethod() {
 
     }
+	def isDeleted(def object){
+		if (object.isDeleted == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah dihapus')
+		}
+		return object
+	}
 	def isConfirmed(def object){
 		if (object.isConfirmed == true)
 		{
@@ -19,6 +26,20 @@ class InvoicePaidValidationService {
 		if (object.isConfirmed == false)
 		{
 			object.errors.rejectValue(null,'null','Belum terconfirm')
+		}
+		return object
+	}
+	def isCleared(def object){
+		if (object.invoice.isCleared == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah diclear')
+		}
+		return object
+	}
+	def isNotClear(def object){
+		if (object.invoice.isCleared == false)
+		{
+			object.errors.rejectValue(null,'null','Belum diclear')
 		}
 		return object
 	}
@@ -74,6 +95,8 @@ class InvoicePaidValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def confirmObjectValidation(object)
@@ -86,6 +109,18 @@ class InvoicePaidValidationService {
 	def unConfirmObjectValidation(object)
 	{
 		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
+		return object
+	}
+	def clearObjectValidation(object)
+	{
+		object = isCleared(object)
+		if (object.errors.hasErrors()) return object
+		return object
+	}
+	def unClearObjectValidation(object)
+	{
+		object = isNotClear(object)
 		if (object.errors.hasErrors()) return object
 		return object
 	}

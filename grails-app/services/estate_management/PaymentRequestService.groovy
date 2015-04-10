@@ -16,7 +16,7 @@ class PaymentRequestService {
 		return PaymentRequest.get(object)
 	}
 	def getList(){
-		return PaymentRequest.getAll()
+		return PaymentRequest.findAll([sort: "id", order: "desc"]){}
 	}
 	def createCode(object)
 	{

@@ -77,7 +77,7 @@ class MasterInvoice extends VerticalLayout{
 	private TextField textCode
 	private DateField textInvoiceDate
 	private TextField textDescription
-	//	private DateField textDueDate
+	private DateField textDueDate
 	private TextField textTotalAmount
 
 	private TextField textIdDetail
@@ -209,7 +209,7 @@ class MasterInvoice extends VerticalLayout{
 								code:textCode.getValue(),
 								invoiceDate:textInvoiceDate.getValue(),
 								description:textDescription.getValue(),
-								//								  dueDate:textDueDate.getValue(),
+								dueDate:textDueDate.getValue(),
 								totalAmount:textTotalAmount.getValue()
 							]
 
@@ -229,9 +229,9 @@ class MasterInvoice extends VerticalLayout{
 								textCode.setData("code")
 								textInvoiceDate.setData("invoiceDate")
 								textDescription.setData("description")
-								//						textDueDate.setData("dueDate")
+								textDueDate.setData("dueDate")
 								textTotalAmount.setData("totalAmount")
-								Object[] tv = [cmbHome,textCode,textInvoiceDate,textDescription,textTotalAmount]
+								Object[] tv = [cmbHome,textCode,textInvoiceDate,textDescription,textTotalAmount,textDueDate]
 								generalFunction.setErrorUI(tv,object)
 							}
 							else
@@ -352,7 +352,7 @@ class MasterInvoice extends VerticalLayout{
 								initTable()
 							}
 						} else {
-							
+
 						}
 					}
 				})
@@ -460,7 +460,7 @@ class MasterInvoice extends VerticalLayout{
 		cmbHome.setBuffered(true)
 		cmbHome.setImmediate(false)
 		layout.addComponent(cmbHome)
-		
+
 		textInvoiceDate = new DateField("Invoice Date:");
 		textInvoiceDate.setPropertyDataSource(item.getItemProperty("invoiceDate"))
 		textInvoiceDate.setBuffered(true)
@@ -471,11 +471,11 @@ class MasterInvoice extends VerticalLayout{
 		textDescription.setBuffered(true)
 		textDescription.setImmediate(false)
 		layout.addComponent(textDescription)
-		//			textDueDate = new DateField("Due Date:");
-		//			textDueDate.setPropertyDataSource(item.getItemProperty("dueDate"))
-		//			textDueDate.setBuffered(true)
-		//			textDueDate.setImmediate(false)
-		//			layout.addComponent(textDueDate)
+		textDueDate = new DateField("Due Date:");
+		textDueDate.setPropertyDataSource(item.getItemProperty("dueDate"))
+		textDueDate.setBuffered(true)
+		textDueDate.setImmediate(false)
+		layout.addComponent(textDueDate)
 		textTotalAmount = new TextField("Total Amount:");
 		//			textTotalAmount.setPropertyDataSource(item.getItemProperty("totalAmount"))
 		textTotalAmount.setValue(item.getItemProperty("totalAmount").toString())
@@ -518,13 +518,13 @@ class MasterInvoice extends VerticalLayout{
 		cmbHome.setContainerDataSource(beanHome)
 		cmbHome.setItemCaptionPropertyId("name")
 		layout.addComponent(cmbHome)
-		
+
 		textInvoiceDate = new DateField("Invoice Date:")
 		layout.addComponent(textInvoiceDate)
 		textDescription = new TextField("Description:")
 		layout.addComponent(textDescription)
-		//			textDueDate = new DateField("Due Date:")
-		//			layout.addComponent(textDueDate)
+		textDueDate = new DateField("Due Date:")
+		layout.addComponent(textDueDate)
 		textTotalAmount = new TextField("Total Amount:")
 		layout.addComponent(textTotalAmount)
 		textTotalAmount.setReadOnly(true)
@@ -581,7 +581,7 @@ class MasterInvoice extends VerticalLayout{
 		layout3.addComponent(textDescriptionDetail)
 		textAmountDetail = new TextField("Amount:");
 		layout3.addComponent(textAmountDetail)
-		
+
 		//		comb = new ComboBox("Sales Order Detail Item:")
 		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
 		//			itemlist = Grails.get(SalesOrderDetailService).getListForCombo(item.getItemProperty("salesOrder.id").toString())
@@ -692,8 +692,9 @@ class MasterInvoice extends VerticalLayout{
 		//		table.setColumnHeader("durasi","Duration")
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["id","home.name","code","invoiceDate","description","dueDate","totalAmount","isConfirmed","confirmationDate","isCleared","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","home.name","code","invoiceDate","description","dueDate","totalAmount","isConfirmed","confirmationDate","isCleared","clearDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
+		
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
 		table.setSizeFull()

@@ -9,6 +9,13 @@ class PaymentRequestValidationService {
 	def serviceMethod() {
 
 	}
+	def isDeleted(def object){
+		if (object.isDeleted == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah dihapus')
+		}
+		return object
+	}
 	def isConfirmed(def object){
 		if (object.isConfirmed == true)
 		{
@@ -88,6 +95,13 @@ class PaymentRequestValidationService {
 		}
 		return object
 	}
+	def dueDateNotNull(def object){
+		if (object.dueDate == null)
+		{
+			object.errors.rejectValue('dueDate','null','Due Date tidak boleh kosong')
+		}
+		return object
+	}
 	def createObjectValidation(def object)
 	{
 //		object = usernameNotNull(object)
@@ -99,6 +113,8 @@ class PaymentRequestValidationService {
 		object  = amountNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object  = requestDateNotNull(object)
+		if (object.errors.hasErrors()) return object
+		object  = dueDateNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -112,10 +128,14 @@ class PaymentRequestValidationService {
 		object  = amountNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object  = requestDateNotNull(object)
+		if (object.errors.hasErrors()) return object
+		object  = dueDateNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)
 	{
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def confirmObjectValidation(object)

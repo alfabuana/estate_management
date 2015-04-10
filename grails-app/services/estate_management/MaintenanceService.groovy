@@ -19,7 +19,7 @@ class MaintenanceService {
 		return Maintenance.get(object)
 	}
 	def getList(){
-		return Maintenance.getAll()
+		return Maintenance.findAll([sort: "id", order: "desc"]){}
 	}
 	def createCode(object)
 	{

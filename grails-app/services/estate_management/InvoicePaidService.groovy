@@ -14,7 +14,13 @@ class InvoicePaidService {
 		return InvoicePaid.get(object)
 	}
 	def getList(){
-		return InvoicePaid.getAll()
+		return InvoicePaid.findAll([sort: "id", order: "desc"]){}
+	}
+	def getListForClearance(){
+		return InvoicePaid.findAll([sort: "id", order: "desc"]){
+			isConfirmed == true && 
+			isDeleted == false 
+		}
 	}
 	def createObject(object){
 		object.user = userService.getObjectByUserName(object.username)
@@ -78,6 +84,28 @@ class InvoicePaidService {
 			newObject.isConfirmed = false
 			newObject.confirmationDate = null
 			newObject.confirmedBy = null
+			newObject.save()
+		}
+		return newObject
+	}
+	def clearObject(def object){
+		def newObject = InvoicePaid.get(object.id)
+		newObject = invoicePaidValidationService.clearObjectValidation(newObject)
+		if (newObject.errors.getErrorCount() == 0)
+		{
+			newObject.invoice.isCleared = true
+			newObject.invoice.clearDate = new Date()
+			newObject.save()
+		}
+		return newObject
+	}
+	def unClearObject(def object){
+		def newObject = InvoicePaid.get(object.id)
+		newObject = invoicePaidValidationService.unClearObjectValidation(newObject)
+		if (newObject.errors.getErrorCount() == 0)
+		{
+			newObject.invoice.isCleared = false
+			newObject.invoice.clearDate = null
 			newObject.save()
 		}
 		return newObject

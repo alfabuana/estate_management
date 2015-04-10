@@ -16,6 +16,7 @@ class Invoice {
 	ShiroUser updatedBy
 	ShiroUser confirmedBy
 	Boolean		isCleared
+	Date		clearDate
 	Boolean 	isDeleted
 	Date 		dateCreated // Predefined names by Grails will be filled automatically
 	Date 		lastUpdated // Predefined names by Grails will be filled automatically
@@ -31,5 +32,6 @@ class Invoice {
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
 		code(nullable:true)
+		clearDate(nullable:true)
     }
 }
