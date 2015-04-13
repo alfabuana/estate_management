@@ -1,14 +1,21 @@
 package estate_management
 
 import java.awt.event.ItemEvent;
+import java.util.ArrayList;
+import java.util.Date;
 
+import estate_management.reportModel.PaymentRequestReportModel
 import estate_management.widget.GeneralFunction
 
 
 
 
 
+import net.sf.jasperreports.engine.JasperRunManager
+import net.sf.jasperreports.engine.JRException
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource
 import org.vaadin.dialogs.ConfirmDialog
+
 
 
 
@@ -26,12 +33,15 @@ import com.vaadin.event.ItemClickEvent.ItemClickListener
 import com.vaadin.event.MouseEvents.ClickEvent
 import com.vaadin.event.MouseEvents.ClickListener
 import com.vaadin.server.DefaultErrorHandler
+import com.vaadin.server.StreamResource
 import com.vaadin.server.UserError
 import com.vaadin.ui.Button
 import com.vaadin.ui.ComboBox
 import com.vaadin.ui.Component
 import com.vaadin.shared.ui.datefield.Resolution
+import com.vaadin.ui.BrowserFrame
 import com.vaadin.ui.DateField
+import com.vaadin.ui.Embedded
 import com.vaadin.ui.Field
 import com.vaadin.ui.FormLayout
 import com.vaadin.ui.HorizontalLayout
@@ -44,8 +54,9 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
-
+import com.vaadin.shared.ui.window.WindowMode
 import estate_management.PaymentRequestService
+
 
 
 
@@ -133,6 +144,10 @@ class MasterPaymentRequest extends VerticalLayout{
 								if (table.getValue() != null)
 									windowUnConfirm("Unconfirm");
 								break;
+							case "Print":
+								if (table.getValue() != null)
+									windowPrint("Print");
+								break;
 							case "AddDetail":
 								if (table.getValue() != null)
 									windowAddDetail(tableContainer.getItem(table.getValue()),"AddDetail");
@@ -158,6 +173,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
 		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
+		MenuItem printMenu = menuBar.addItem("Print", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")
 		//	END BUTTON MENU
@@ -477,7 +493,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		textDescription.setBuffered(true)
 		textDescription.setImmediate(false)
 		layout.addComponent(textDescription)
-		
+
 		textAmount = new TextField("Amount:");
 		//			textAmount.setPropertyDataSource(item.getItemProperty("amount"))
 		textAmount.setValue(item.getItemProperty("amount").toString())
@@ -539,7 +555,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		layout.addComponent(cmbProject)
 		textDescription = new TextField("Description:")
 		layout.addComponent(textDescription)
-		
+
 		textAmount = new TextField("Amount:")
 		textAmount.setReadOnly(true)
 		layout.addComponent(textAmount)
@@ -592,7 +608,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		textIdDetail = new TextField("Detail Id:")
 		textIdDetail.setReadOnly(true)
 		layout3.addComponent(textIdDetail)
-		
+
 		textCodeDetail = new TextField("Code:");
 		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
@@ -713,7 +729,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
 		table.visibleColumns = ["id","vendor.name","project.title","description","code","amount","requestDate","dueDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"
-]
+		]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
@@ -768,6 +784,109 @@ class MasterPaymentRequest extends VerticalLayout{
 		tableDetail.setVisible(true)
 		tableDetail.setSizeFull()
 		menuBarDetail.setVisible(true)
+	}
+	private void windowPrint(String caption){
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							object = Grails.get(PaymentRequestService).printObject(object)
+							if (object.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								final Map map = new HashMap();
+								StreamResource.StreamSource source = new StreamResource.StreamSource() {
+											public InputStream getStream() {
+												byte[] b = null;
+												try {
+													DataBeanMaker dataBeanMaker = new DataBeanMaker();
+													object = Grails.get(PaymentRequestDetailService).getList(object.id)
+													ArrayList dataBeanList = dataBeanMaker.getDataBeanList(object);
+													JRBeanCollectionDataSource beanColDataSource = new
+															JRBeanCollectionDataSource(dataBeanList);
+													Map parameters = new HashMap();
+													b = JasperRunManager.runReportToPdf(getClass().
+															getClassLoader().getResourceAsStream("reports/PaymentRequest.jasper"),
+															map,beanColDataSource);
+												} catch (JRException ex) {
+													ex.printStackTrace();
+												}
+
+												return new ByteArrayInputStream(b);
+											}
+										};
+								StreamResource resource = new StreamResource(source, "PaymentRequest.pdf");
+								resource.setMIMEType("application/pdf");
+								BrowserFrame browser = new BrowserFrame("Browser");
+								browser.setWidth("600px");
+								browser.setHeight("400px");
+								VerticalLayout v = new VerticalLayout();
+								Embedded e = new Embedded("", resource);
+								e.setSizeFull();
+								e.setHeight("600px")
+								e.setType(Embedded.TYPE_BROWSER)
+								v.addComponent(e);
+								Window w = new Window()
+								w.setContent(v);
+								w.setWindowMode(WindowMode.MAXIMIZED)
+								UI.getCurrent().addWindow(w);
+
+							}
+						} else {
+
+						}
+					}
+				})
+
+	}
+
+
+	private class DataBeanMaker {
+		public ArrayList getDataBeanList(def object) {
+			ArrayList<PaymentRequestReportModel> dataBeanList = new ArrayList<PaymentRequestReportModel>();
+			for(data in object)
+			{
+				dataBeanList.add(produce(data.paymentRequest.code,data.paymentRequest.requestDate,
+						data.paymentRequest.description, data.paymentRequest.dueDate, data.id.toInteger(),
+						data.description,
+						data.amount, data.paymentRequest.amount, data.paymentRequest.vendor.name, data.paymentRequest.vendor.description));
+			}
+			return dataBeanList
+		}
+
+		private PaymentRequestReportModel produce(
+				String code,
+				Date requestDate,
+				String description,
+				Date dueDate,
+				Integer idDetail,
+				String descriptionDetail,
+				Double amountDetail,
+				Double totalAmount,
+				String vendorName,
+				String vendorDescription
+		) {
+
+			PaymentRequestReportModel dataBean = new PaymentRequestReportModel();
+
+			dataBean.setCode(code);
+			dataBean.setRequestDate(requestDate)
+			dataBean.setDescription(description)
+			dataBean.setDueDate(dueDate)
+			dataBean.setIdDetail(idDetail)
+			dataBean.setDescriptionDetail(descriptionDetail)
+			dataBean.setAmountDetail(amountDetail)
+			dataBean.setTotalAmount(totalAmount)
+			dataBean.setVendorName(vendorName)
+			dataBean.setVendorDescription(vendorDescription)
+
+			return dataBean;
+		}
 	}
 
 

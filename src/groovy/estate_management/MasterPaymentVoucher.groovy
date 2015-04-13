@@ -1,7 +1,10 @@
 package estate_management
 
 import java.awt.event.ItemEvent;
+import java.util.ArrayList;
+import java.util.Date;
 
+import estate_management.reportModel.PaymentVoucherReportModel
 import estate_management.widget.GeneralFunction
 
 
@@ -11,7 +14,11 @@ import estate_management.widget.GeneralFunction
 
 
 
+import net.sf.jasperreports.engine.JasperRunManager
+import net.sf.jasperreports.engine.JRException
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource
 import org.vaadin.dialogs.ConfirmDialog
+
 
 
 
@@ -32,13 +39,16 @@ import com.vaadin.event.ItemClickEvent.ItemClickListener
 import com.vaadin.event.MouseEvents.ClickEvent
 import com.vaadin.event.MouseEvents.ClickListener
 import com.vaadin.server.DefaultErrorHandler
+import com.vaadin.server.StreamResource
 import com.vaadin.server.UserError
 import com.vaadin.ui.Button
 import com.vaadin.ui.ComboBox
 import com.vaadin.ui.Component
 import com.vaadin.shared.ui.datefield.Resolution
+import com.vaadin.ui.BrowserFrame
 import com.vaadin.ui.CheckBox
 import com.vaadin.ui.DateField
+import com.vaadin.ui.Embedded
 import com.vaadin.ui.Field
 import com.vaadin.ui.FormLayout
 import com.vaadin.ui.HorizontalLayout
@@ -51,9 +61,10 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
-
+import com.vaadin.shared.ui.window.WindowMode
 import estate_management.PaymentVoucherService
 import grails.converters.JSON
+
 
 
 
@@ -145,6 +156,10 @@ class MasterPaymentVoucher extends VerticalLayout{
 								if (table.getValue() != null)
 									windowUnConfirm("Unconfirm");
 								break;
+							case "Print":
+								if (table.getValue() != null)
+									windowPrint("Print");
+								break;
 							case "AddDetail":
 								if (table.getValue() != null)
 									windowAddDetail(tableContainer.getItem(table.getValue()),"AddDetail");
@@ -170,6 +185,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
 		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
+		MenuItem printMenu = menuBar.addItem("Print", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")
 		//	END BUTTON MENU
@@ -483,7 +499,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		cmbCashBank.setBuffered(true)
 		cmbCashBank.setImmediate(false)
 		layout.addComponent(cmbCashBank)
-		
+
 		textPaymentDate = new DateField("Payment Date:");
 		textPaymentDate.setPropertyDataSource(item.getItemProperty("paymentDate"))
 		textPaymentDate.setBuffered(true)
@@ -548,7 +564,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		cmbCashBank.setContainerDataSource(beanCashBank)
 		cmbCashBank.setItemCaptionPropertyId("name")
 		layout.addComponent(cmbCashBank)
-		
+
 		textPaymentDate = new DateField("Payment Date:")
 		layout.addComponent(textPaymentDate)
 		chkIsGBCH = new CheckBox("Is GBCH")
@@ -790,5 +806,106 @@ class MasterPaymentVoucher extends VerticalLayout{
 		menuBarDetail.setVisible(true)
 	}
 
+	private void windowPrint(String caption){
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							object = Grails.get(PaymentVoucherService).printObject(object)
+							if (object.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								final Map map = new HashMap();
+								StreamResource.StreamSource source = new StreamResource.StreamSource() {
+											public InputStream getStream() {
+												byte[] b = null;
+												try {
+													DataBeanMaker dataBeanMaker = new DataBeanMaker();
+													object = Grails.get(PaymentVoucherDetailService).getList(object.id)
+													ArrayList dataBeanList = dataBeanMaker.getDataBeanList(object);
+													JRBeanCollectionDataSource beanColDataSource = new
+															JRBeanCollectionDataSource(dataBeanList);
+													Map parameters = new HashMap();
+													b = JasperRunManager.runReportToPdf(getClass().
+															getClassLoader().getResourceAsStream("reports/PaymentVoucher.jasper"),
+															map,beanColDataSource);
+												} catch (JRException ex) {
+													ex.printStackTrace();
+												}
+
+												return new ByteArrayInputStream(b);
+											}
+										};
+								StreamResource resource = new StreamResource(source, "PaymentVoucher.pdf");
+								resource.setMIMEType("application/pdf");
+								BrowserFrame browser = new BrowserFrame("Browser");
+								browser.setWidth("600px");
+								browser.setHeight("400px");
+								VerticalLayout v = new VerticalLayout();
+								Embedded e = new Embedded("", resource);
+								e.setSizeFull();
+								e.setHeight("600px")
+								e.setType(Embedded.TYPE_BROWSER)
+								v.addComponent(e);
+								Window w = new Window()
+								w.setContent(v);
+								w.setWindowMode(WindowMode.MAXIMIZED)
+								UI.getCurrent().addWindow(w);
+
+							}
+						} else {
+
+						}
+					}
+				})
+
+	}
+
+
+	private class DataBeanMaker {
+		public ArrayList getDataBeanList(def object) {
+			ArrayList<PaymentVoucherReportModel> dataBeanList = new ArrayList<PaymentVoucherReportModel>();
+			for(data in object)
+			{
+				dataBeanList.add(produce(data.paymentVoucher.code,data.paymentVoucher.user.username,
+						data.paymentVoucher.cashBank.name, data.paymentVoucher.paymentDate, data.id.toInteger(),
+						data.payable.code,
+						data.description, data.amount, data.paymentVoucher.totalAmount));
+			}
+			return dataBeanList
+		}
+
+		private PaymentVoucherReportModel produce(
+				String code,
+				String username,
+				String cashBankName,
+				Date paymentDate,
+				Integer idDetail,
+				String codePayable,
+				String descriptionDetail,
+				Double amountDetail,
+				Double totalAmount
+		) {
+
+			PaymentVoucherReportModel dataBean = new PaymentVoucherReportModel();
+
+			dataBean.setCode(code);
+			dataBean.setUsername(username)
+			dataBean.setCashBankName(cashBankName)
+			dataBean.setPaymentDate(paymentDate)
+			dataBean.setIdDetail(idDetail)
+			dataBean.setCodePayable(codePayable)
+			dataBean.setDescriptionDetail(descriptionDetail)
+			dataBean.setAmountDetail(amountDetail)
+			dataBean.setTotalAmount(totalAmount)
+
+			return dataBean;
+		}
+	}
 
 }

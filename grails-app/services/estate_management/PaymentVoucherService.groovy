@@ -162,4 +162,15 @@ class PaymentVoucherService {
 		}
 		return newObject
 	}
+	
+	def printObject(def object){
+		def newObject = PaymentVoucher.get(object.id)
+		newObject = paymentVoucherValidationService.printObjectValidation(newObject)
+		if (newObject.errors.getErrorCount() == 0)
+		{
+			
+		}
+		return newObject
+	}
+
 }

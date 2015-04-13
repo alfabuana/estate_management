@@ -152,6 +152,11 @@ class PaymentRequestValidationService {
 		object = payableNotAssociateWithPaymentVoucher(object)
 		return object
 	}
-
+	def printObjectValidation(object)
+	{
+		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
+		return object
+	}
 }
 

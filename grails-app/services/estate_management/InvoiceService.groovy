@@ -10,6 +10,7 @@ import grails.transaction.Transactional
 class InvoiceService {
 	InvoiceValidationService invoiceValidationService
 	UserService userService
+	InvoiceDetailService invoiceDetailService
 
 	def serviceMethod() {
 
@@ -35,9 +36,11 @@ class InvoiceService {
 		return Invoice.findAll([sort: "id", order: "desc"]){
 			isDeleted == false &&
 			isConfirmed == true &&
+			isCleared == false &&
 			home.id in b
 			}
 	}
+	
 	
 	def createCode(object)
 	{
@@ -158,6 +161,16 @@ class InvoiceService {
 				detail.confirmedBy = null
 			}
 			newObject.save()
+		}
+		return newObject
+	}
+	
+	def printObject(def object){
+		def newObject = Invoice.get(object.id)
+		newObject = invoiceValidationService.printObjectValidation(newObject)
+		if (newObject.errors.getErrorCount() == 0)
+		{
+			
 		}
 		return newObject
 	}

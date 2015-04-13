@@ -18,10 +18,12 @@ class InvoiceDetailService {
 	def getList(){
 		return InvoiceDetail.getAll()
 	}
+	
 	def getList(object){
 		def a = object.toLong()
 		return InvoiceDetail.findAll("from InvoiceDetail as b where b.invoice.id=? and b.isDeleted =false",[a])
-	}
+		}
+	
 	def createCode(object)
 	{
 		Date curDate = new Date()
@@ -30,6 +32,8 @@ class InvoiceDetailService {
 		String code = "IVD-"+now+"-"+object.id
 		return code
 	}
+	
+	
 	def createObject(object){
 		Invoice invoice = Invoice.get(object.invoiceId)
 		object.invoice = invoice

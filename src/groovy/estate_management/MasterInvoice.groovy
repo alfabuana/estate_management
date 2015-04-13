@@ -156,7 +156,7 @@ class MasterInvoice extends VerticalLayout{
 								break;
 								case "Print":
 								if (table.getValue() != null)
-									windowPrint();
+									windowPrint("Print");
 								break;
 							case "AddDetail":
 								if (table.getValue() != null)
@@ -762,71 +762,81 @@ class MasterInvoice extends VerticalLayout{
 		tableDetail.setSizeFull()
 		menuBarDetail.setVisible(true)
 	}
-	private void windowPrint(){
-		final Map map = new HashMap();
-
-		StreamResource.StreamSource source = new StreamResource.StreamSource() {
-
-					public InputStream getStream() {
-						byte[] b = null;
-						try {
-							DataBeanMaker dataBeanMaker = new DataBeanMaker();
-							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-							ArrayList dataBeanList = dataBeanMaker.getDataBeanList(object.id);
-							JRBeanCollectionDataSource beanColDataSource = new
-									JRBeanCollectionDataSource(dataBeanList);
-							Map parameters = new HashMap();
-
-							b = JasperRunManager.runReportToPdf(getClass().
-									getClassLoader().getResourceAsStream("reports/Invoice.jasper"),
-									map,beanColDataSource);
-						} catch (JRException ex) {
-							ex.printStackTrace();
+	
+	
+	private void windowPrint(String caption){
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+			new ConfirmDialog.Listener() {
+				public void onClose(ConfirmDialog dialog) {
+					if (dialog.isConfirmed()) {
+						def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+						object = Grails.get(InvoiceService).printObject(object)
+						if (object.hasErrors())
+						{
+							Object[] tv = [textId]
+							generalFunction.setErrorUI(tv,object)
 						}
+						else
+						{
+							final Map map = new HashMap();
+									StreamResource.StreamSource source = new StreamResource.StreamSource() {
+												public InputStream getStream() {
+													byte[] b = null;
+													try {
+														DataBeanMaker dataBeanMaker = new DataBeanMaker()
+														object = Grails.get(InvoiceDetailService).getList(object.id)
+														println object as JSON
+														ArrayList dataBeanList = dataBeanMaker.getDataBeanList(object);
+														JRBeanCollectionDataSource beanColDataSource = new
+																JRBeanCollectionDataSource(dataBeanList);
+														Map parameters = new HashMap();
+														b = JasperRunManager.runReportToPdf(getClass().
+																getClassLoader().getResourceAsStream("reports/Invoice.jasper"),
+																map,beanColDataSource);
+													} catch (JRException ex) {
+														ex.printStackTrace();
+													}
+							
+													return new ByteArrayInputStream(b);
+												}
+											};
+									StreamResource resource = new StreamResource(source, "Invoice.pdf");
+									resource.setMIMEType("application/pdf");
+									BrowserFrame browser = new BrowserFrame("Browser");
+									browser.setWidth("600px");
+									browser.setHeight("400px");
+									VerticalLayout v = new VerticalLayout();
+									Embedded e = new Embedded("", resource);
+									e.setSizeFull();
+									e.setHeight("600px")
+									e.setType(Embedded.TYPE_BROWSER)
+									v.addComponent(e);
+									Window w = new Window()
+									w.setContent(v);
+									w.setWindowMode(WindowMode.MAXIMIZED)
+									UI.getCurrent().addWindow(w);
+							
+						}
+					} else {
 
-						return new ByteArrayInputStream(b);
 					}
-				};
+				}
+			})
 
-		StreamResource resource = new StreamResource(source, "Invoice.pdf");
-		resource.setMIMEType("application/pdf");
-
-
-		BrowserFrame browser = new BrowserFrame("Browser");
-		browser.setWidth("600px");
-		browser.setHeight("400px");
-
-		VerticalLayout v = new VerticalLayout();
-		Embedded e = new Embedded("", resource);
-		e.setSizeFull();
-		e.setHeight("600px")
-		e.setType(Embedded.TYPE_BROWSER)
-		v.addComponent(e);
-
-		Window w = new Window()
-		w.setContent(v);
-		w.setWindowMode(WindowMode.MAXIMIZED)
-		UI.getCurrent().addWindow(w);
 	}
 
 
 	private class DataBeanMaker {
-		public ArrayList getDataBeanList(def Object) {
+		public ArrayList getDataBeanList(def object) {
 			ArrayList<InvoiceReportModel> dataBeanList = new ArrayList<InvoiceReportModel>();
-//			Invoice data = Grails.get(InvoiceService).getObjectById(Object)
-			for(data in Grails.get(InvoiceDetailService).getList(Object))
-			{
-				dataBeanList.add(produce(data.invoice.code,data.invoice.invoiceDate, 
-				data.invoice.description, data.invoice.dueDate, data.id.toInteger(), 
-				data.description, 
-				data.amount, data.invoice.totalAmount));
-			
-			}
-//			dataBeanList.add(produce(data.code,data.invoiceDate, 
-//				data.description, data.dueDate, data.invoiceDetails.id, 
-//				data.invoiceDetails.description, 
-//				data.invoiceDetails.amount, data.totalAmount));
-			return dataBeanList;
+				for(data in object)
+				{
+					dataBeanList.add(produce(data.invoice.code,data.invoice.invoiceDate,
+					data.invoice.description, data.invoice.dueDate, data.id.toInteger(),
+					data.description,
+					data.amount, data.invoice.totalAmount, data.invoice.home.name, data.invoice.home.address));
+				}
+				return dataBeanList
 		}
 
 		private InvoiceReportModel produce(
@@ -837,7 +847,9 @@ class MasterInvoice extends VerticalLayout{
 				Integer idDetail,
 				String descriptionDetail,
 				Double amount,
-				Double totalAmount
+				Double totalAmount,
+				String name,
+				String address
 		) {
 
 			InvoiceReportModel dataBean = new InvoiceReportModel();
@@ -850,6 +862,8 @@ class MasterInvoice extends VerticalLayout{
 			dataBean.setDescriptionDetail(descriptionDetail)
 			dataBean.setAmount(amount)
 			dataBean.setTotalAmount(totalAmount)
+			dataBean.setName(name)
+			dataBean.setAddress(address)
 
 			return dataBean;
 		}

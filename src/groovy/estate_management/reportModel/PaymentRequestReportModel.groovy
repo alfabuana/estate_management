@@ -1,17 +1,17 @@
 package estate_management.reportModel
 
-public class InvoiceReportModel {
+public class PaymentRequestReportModel {
 
 	private String code
-	private Date invoiceDate
+	private Date requestDate
 	private String description
 	private Date dueDate
 	private Integer idDetail
 	private String descriptionDetail
-	private Double amount
+	private Double amountDetail
 	private Double totalAmount
-	private String name
-	private String address
+	private String vendorName
+	private String vendorDescription
 	
 	public void setCode(String code) {
 		this.code = code;
@@ -19,12 +19,12 @@ public class InvoiceReportModel {
 	public String getCode() {
 		return code;
 	} 
-	public void setInvoiceDate(Date invoiceDate) {
-		this.invoiceDate = invoiceDate;
+	public void setRequestDate(Date requestDate) {
+		this.requestDate = requestDate;
 		}
 		 
-	public Date getInvoiceDate() {
-		return invoiceDate;
+	public Date getRequestDate() {
+		return requestDate;
 	}
 	
 	public void setDescription(String description) {
@@ -59,12 +59,12 @@ public class InvoiceReportModel {
 		return descriptionDetail;
 	}
 	
-	public void setAmount(Double amount) {
-		this.amount = amount;
+	public void setAmountDetail(Double amountDetail) {
+		this.amountDetail = amountDetail;
 		}
 		 
-	public Double getAmount() {
-		return amount;
+	public Double getAmountDetail() {
+		return amountDetail;
 	}
 	
 	public void setTotalAmount(Double totalAmount) {
@@ -75,19 +75,19 @@ public class InvoiceReportModel {
 		return totalAmount;
 	}
 	
-	public void setName(String name) {
-		this.name = name;
-		}
-		 
-	public String getName() {
-		return name;
+	public void setVendorName(String vendorName) {
+		this.vendorName = vendorName;
+	}
+	public String getVendorName() {
+		return vendorName;
 	}
 	
-	public void setAddress(String address) {
-		this.address = address;
+	public void setVendorDescription(String vedorDescription) {
+		this.vendorDescription = vendorDescription;
 		}
 		 
-	public String getAddress() {
-		return address;
+	public String getVendorDescription() {
+		return vendorDescription;
 	}
+	
 }

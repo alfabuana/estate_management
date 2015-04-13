@@ -146,7 +146,15 @@ class PaymentRequestService {
 		return newObject
 	}
 
-
+	def printObject(def object){
+		def newObject = PaymentRequest.get(object.id)
+		newObject = paymentRequestValidationService.printObjectValidation(newObject)
+		if (newObject.errors.getErrorCount() == 0)
+		{
+			
+		}
+		return newObject
+	}
 
 
 
