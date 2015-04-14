@@ -1,6 +1,7 @@
 package estate_management
 
 import java.awt.event.ItemEvent;
+import java.text.SimpleDateFormat
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -92,7 +93,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 	private ComboBox cmbCashBank
 	private TextField textCode
 	private DateField textPaymentDate
-	private CheckBox chkIsGBCH
+//	private CheckBox chkIsGBCH
 	//	private DateField textDueDate
 	private TextField textTotalAmount
 
@@ -100,7 +101,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 	private ComboBox cmbPayableDetail
 	private TextField textCodeDetail
 	private TextField textAmountDetail
-	private TextField textDescriptionDetail
+	private TextArea textDescriptionDetail
 
 	//==============================
 
@@ -231,7 +232,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 								cashBank:cmbCashBank.getValue(),
 								code:textCode.getValue(),
 								paymentDate:textPaymentDate.getValue(),
-								isGBCH:chkIsGBCH.getValue(),
+//								isGBCH:chkIsGBCH.getValue(),
 								totalAmount:textTotalAmount.getValue()
 							]
 
@@ -252,16 +253,17 @@ class MasterPaymentVoucher extends VerticalLayout{
 								cmbCashBank.setData("cashBank")
 								textCode.setData("code")
 								textPaymentDate.setData("paymentDate")
-								chkIsGBCH.setData("isGBCH")
+//								chkIsGBCH.setData("isGBCH")
 								textTotalAmount.setData("totalAmount")
-								Object[] tv = [cmbUser,cmbCashBank,textCode,textPaymentDate,chkIsGBCH,textTotalAmount]
+								Object[] tv = [cmbUser,cmbCashBank,textCode,textPaymentDate,textTotalAmount]
 								generalFunction.setErrorUI(tv,object)
 							}
 							else
 							{
 								window.close()
+								initTable()
 							}
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -307,9 +309,10 @@ class MasterPaymentVoucher extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTableDetail()
+								initTable()
 							}
-							initTableDetail()
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -505,11 +508,11 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textPaymentDate.setBuffered(true)
 		textPaymentDate.setImmediate(false)
 		layout.addComponent(textPaymentDate)
-		chkIsGBCH = new CheckBox("is GBCH");
-		chkIsGBCH.setPropertyDataSource(item.getItemProperty("isGBCH"))
-		chkIsGBCH.setBuffered(true)
-		chkIsGBCH.setImmediate(false)
-		layout.addComponent(chkIsGBCH)
+//		chkIsGBCH = new CheckBox("is GBCH");
+//		chkIsGBCH.setPropertyDataSource(item.getItemProperty("isGBCH"))
+//		chkIsGBCH.setBuffered(true)
+//		chkIsGBCH.setImmediate(false)
+//		layout.addComponent(chkIsGBCH)
 		//			textDueDate = new DateField("Due Date:");
 		//			textDueDate.setPropertyDataSource(item.getItemProperty("dueDate"))
 		//			textDueDate.setBuffered(true)
@@ -522,8 +525,10 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textTotalAmount.setBuffered(true)
 		textTotalAmount.setImmediate(false)
 		layout.addComponent(textTotalAmount)
-		layout.addComponent(createSaveButton())
-		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		getUI().addWindow(window);
 		//		} else {
 		//			Notification.show("Access Denied\n",
@@ -567,8 +572,8 @@ class MasterPaymentVoucher extends VerticalLayout{
 
 		textPaymentDate = new DateField("Payment Date:")
 		layout.addComponent(textPaymentDate)
-		chkIsGBCH = new CheckBox("Is GBCH")
-		layout.addComponent(chkIsGBCH)
+//		chkIsGBCH = new CheckBox("Is GBCH")
+//		layout.addComponent(chkIsGBCH)
 		//			textDueDate = new DateField("Due Date:")
 		//			layout.addComponent(textDueDate)
 		textTotalAmount = new TextField("Total Amount:")
@@ -586,14 +591,17 @@ class MasterPaymentVoucher extends VerticalLayout{
 		//			===================
 		//TOMBOL SAVE
 		//			===================
-		layout.addComponent(createSaveButton())
+//		layout.addComponent(createSaveButton())
 		//			==================
 
 		//			===================
 		//			TOMBOL CANCEL
 		//			===================
-		layout.addComponent(createCancelButton())
-
+//		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		//			===================
 		getUI().addWindow(window);
 		//		} else {
@@ -632,7 +640,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textAmountDetail = new TextField("Amount:");
 		textAmountDetail.setReadOnly(true)
 		layout3.addComponent(textAmountDetail)
-		textDescriptionDetail = new TextField("Description:");
+		textDescriptionDetail = new TextArea("Description:");
 		layout3.addComponent(textDescriptionDetail)
 		//		comb = new ComboBox("Sales Order Detail Item:")
 		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
@@ -645,9 +653,10 @@ class MasterPaymentVoucher extends VerticalLayout{
 		//		layout3.addComponent(comb)
 		//			textQuantity = new TextField("Quantity:")
 		//		layout3.addComponent(textQuantity)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
-
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveDetailButton())
+		horizontal3.addComponent(createCancelButton())
 		getUI().addWindow(window);
 		//		} else {
 		//			Notification.show("Access Denied\n",
@@ -709,13 +718,14 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textAmountDetail.setBuffered(true)
 		textAmountDetail.setReadOnly(true)
 		layout3.addComponent(textAmountDetail)
-		textDescriptionDetail = new TextField("Description:")
+		textDescriptionDetail = new TextArea("Description:")
 		textDescriptionDetail.setPropertyDataSource(itemDetail.getItemProperty("description"))
 		textDescriptionDetail.setBuffered(true)
 		layout3.addComponent(textDescriptionDetail)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
-
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveDetailButton())
+		horizontal3.addComponent(createCancelButton())
 		getUI().addWindow(window);
 		//		} else {
 		//			Notification.show("Access Denied\n",
@@ -756,7 +766,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		//		table.setColumnHeader("durasi","Duration")
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["id","user.username","cashBank.name","code","paymentDate","isGBCH","dueDate","isReconciled","reconciliationDate","totalAmount","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","user.username","cashBank.name","code","paymentDate","dueDate","totalAmount","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
@@ -798,7 +808,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		tableDetailContainer.addAll(itemListDetail)
 		tableDetail.setColumnHeader("paymentVoucher.id","Payment Voucher Id")
 		tableDetail.setContainerDataSource(tableDetailContainer);
-		tableDetail.visibleColumns = ["id","paymentVoucher.id","payable.code","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
+		tableDetail.visibleColumns = ["id","payable.code","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
 		tableDetail.setSelectable(true)
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)
@@ -841,7 +851,10 @@ class MasterPaymentVoucher extends VerticalLayout{
 												return new ByteArrayInputStream(b);
 											}
 										};
-								StreamResource resource = new StreamResource(source, "PaymentVoucher.pdf");
+								Date curDate = new Date()
+								SimpleDateFormat format = new SimpleDateFormat("yyMMddhhMMss");
+								String now = format.format(curDate)
+								StreamResource resource = new StreamResource(source, "PaymentVoucher${now}.pdf");
 								resource.setMIMEType("application/pdf");
 								BrowserFrame browser = new BrowserFrame("Browser");
 								browser.setWidth("600px");

@@ -87,6 +87,7 @@ class MaintenanceService {
 				def invoice = [
 					home:home,
 					username:object.username,
+					maintenance:newObject,
 					code:"MF${object.username}",
 					invoiceDate:newObject.maintenanceDate,
 					description:newObject.description,

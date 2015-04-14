@@ -94,8 +94,8 @@ class ReceiptVoucherValidationService {
 //		object = codeNotNull(object)
 //		if (object.errors.hasErrors()) return object
 		object = receiptDateNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = isGBCHNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = isGBCHNotNull(object)
 		if (object.errors.hasErrors()) return object
 //		object = dueDateNotNull(object)
 //		if (object.errors.hasErrors()) return object
@@ -104,6 +104,8 @@ class ReceiptVoucherValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = usernameNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = cashBankNotNull(object)
@@ -112,8 +114,8 @@ class ReceiptVoucherValidationService {
 //		if (object.errors.hasErrors()) return object
 		object = receiptDateNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = isGBCHNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = isGBCHNotNull(object)
+//		if (object.errors.hasErrors()) return object
 //		object = dueDateNotNull(object)
 //		if (object.errors.hasErrors()) return object
 		object = totalAmountNotNull(object)
@@ -121,8 +123,9 @@ class ReceiptVoucherValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
 		return object
 	}
 	def confirmObjectValidation(object)
@@ -139,4 +142,10 @@ class ReceiptVoucherValidationService {
 		return object
 	}
 
+	def printObjectValidation(object)
+	{
+		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
+		return object
+	}
 }

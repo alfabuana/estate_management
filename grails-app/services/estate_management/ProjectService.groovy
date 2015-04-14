@@ -94,6 +94,7 @@ class ProjectService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 
 	}
 	def confirmObject(def object){
@@ -106,6 +107,7 @@ class ProjectService {
 			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
+		return newObject
 
 	}
 	def unConfirmObject(def object){
@@ -118,6 +120,7 @@ class ProjectService {
 			newObject.confirmedBy = null
 			newObject.save()
 		}
+		return newObject
 
 	}
 	def finishObject(def object){
@@ -129,7 +132,8 @@ class ProjectService {
 			newObject.finishDate = new Date()
 			newObject.save()
 		}
-
+		return newObject
+		
 	}
 	def unFinishObject(def object){
 		def newObject = Project.get(object.id)
@@ -140,6 +144,7 @@ class ProjectService {
 			newObject.finishDate = null
 			newObject.save()
 		}
+		return newObject
 
 	}
 }

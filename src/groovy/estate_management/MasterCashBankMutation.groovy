@@ -183,8 +183,9 @@ class MasterCashBankMutation extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTable()
 							}
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -346,8 +347,10 @@ class MasterCashBankMutation extends VerticalLayout{
 		textAmount.setImmediate(false)
 		layout.addComponent(textAmount)
 		
-		layout.addComponent(createSaveButton())
-		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		getUI().addWindow(window);
 		//		} else {
 		//			Notification.show("Access Denied\n",
@@ -404,14 +407,17 @@ class MasterCashBankMutation extends VerticalLayout{
 		//			===================
 		//TOMBOL SAVE
 		//			===================
-		layout.addComponent(createSaveButton())
+//		layout.addComponent(createSaveButton())
 		//			==================
 
 		//			===================
 		//			TOMBOL CANCEL
 		//			===================
-		layout.addComponent(createCancelButton())
-
+//		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		//			===================
 		getUI().addWindow(window);
 		//		} else {

@@ -73,7 +73,7 @@ class MasterCashBank extends VerticalLayout{
 
 	//==============================
 	private TextField textName
-	private TextField textDescription
+	private TextArea textDescription
 	private TextField textAmount
 	private CheckBox chkBank
 	//==============================
@@ -188,8 +188,9 @@ class MasterCashBank extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTable()
 							}
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -256,7 +257,7 @@ class MasterCashBank extends VerticalLayout{
 		textName.setBuffered(true)
 		textName.setImmediate(false)
 		layout.addComponent(textName)
-		textDescription = new TextField("Description:");
+		textDescription = new TextArea("Description:");
 		textDescription.setPropertyDataSource(item.getItemProperty("description"))
 		textDescription.setBuffered(true)
 		textDescription.setImmediate(false)
@@ -266,14 +267,17 @@ class MasterCashBank extends VerticalLayout{
 		textAmount.setValue(item.getItemProperty("amount").toString())
 		textAmount.setBuffered(true)
 		textAmount.setImmediate(false)
+		textAmount.setReadOnly(true)
 		layout.addComponent(textAmount)
 		chkBank = new CheckBox("isBank");
 		chkBank.setPropertyDataSource(item.getItemProperty("isBank"))
 		chkBank.setBuffered(true)
 		chkBank.setImmediate(false)
 		layout.addComponent(chkBank)
-		layout.addComponent(createSaveButton())
-		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		getUI().addWindow(window);
 		//		} else {
 		//			Notification.show("Access Denied\n",
@@ -299,9 +303,10 @@ class MasterCashBank extends VerticalLayout{
 		layout.addComponent(textId)
 		textName = new TextField("Name:")
 		layout.addComponent(textName)
-		textDescription = new TextField("Description:")
+		textDescription = new TextArea("Description:")
 		layout.addComponent(textDescription)
 		textAmount = new TextField("Amount:")
+		textAmount.setReadOnly(true)
 		layout.addComponent(textAmount)
 		chkBank = new CheckBox("isBank")
 		layout.addComponent(chkBank)
@@ -314,17 +319,18 @@ class MasterCashBank extends VerticalLayout{
 		//			comboBox.addItem("test2")
 		//			layout.addComponent(comboBox)
 		//
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
 		//			===================
 		//TOMBOL SAVE
 		//			===================
-		layout.addComponent(createSaveButton())
+		horizontal.addComponent(createSaveButton())
 		//			==================
 
 		//			===================
 		//			TOMBOL CANCEL
 		//			===================
-		layout.addComponent(createCancelButton())
-
+		horizontal.addComponent(createCancelButton())
 		//			===================
 		getUI().addWindow(window);
 		//		} else {

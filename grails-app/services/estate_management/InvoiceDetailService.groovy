@@ -1,5 +1,6 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 import java.text.SimpleDateFormat
 
@@ -41,6 +42,7 @@ class InvoiceDetailService {
 		object.isConfirmed = false
 		object.createdBy = userService.getObjectByUserName(object.username)
 		object = invoiceDetailValidationService.createObjectValidation(object as InvoiceDetail)
+		
 		if (object.errors.getErrorCount() == 0)
 		{
 			object = object.save()
@@ -79,6 +81,7 @@ class InvoiceDetailService {
 			newObject.save()
 			invoiceService.calculateTotal(newObject.invoice.id)
 		}
+		return newObject
 
 	}
 	def confirmObject(def object){
@@ -91,6 +94,7 @@ class InvoiceDetailService {
 			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
+		return newObject
 	}
 	def unConfirmObject(def object){
 		def newObject = InvoiceDetail.get(object.id)
@@ -102,5 +106,6 @@ class InvoiceDetailService {
 			newObject.confirmedBy = null
 			newObject.save()
 		}
+		return newObject
 	}
 }

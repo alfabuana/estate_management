@@ -101,8 +101,8 @@ class PaymentVoucherValidationService {
 //		object = codeNotNull(object)
 //		if (object.errors.hasErrors()) return object
 		object = paymentDateNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = isGBCHNotNull(object)
+//		if (object.errors.hasErrors()) return object
+//		object = isGBCHNotNull(object)
 		if (object.errors.hasErrors()) return object
 //		object = dueDateNotNull(object)
 //		if (object.errors.hasErrors()) return object
@@ -111,6 +111,8 @@ class PaymentVoucherValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = usernameNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = cashBankNotNull(object)
@@ -119,8 +121,8 @@ class PaymentVoucherValidationService {
 //		if (object.errors.hasErrors()) return object
 		object = paymentDateNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = isGBCHNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = isGBCHNotNull(object)
+//		if (object.errors.hasErrors()) return object
 //		object = dueDateNotNull(object)
 //		if (object.errors.hasErrors()) return object
 		object = totalAmountNotNull(object)
@@ -128,8 +130,9 @@ class PaymentVoucherValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
 		return object
 	}
 	def confirmObjectValidation(object)

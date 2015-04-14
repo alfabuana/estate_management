@@ -56,7 +56,7 @@ class MasterComplaint extends VerticalLayout{
 	private ComboBox cmbUser
 	private ComboBox cmbHome
 	private TextField textTitle
-	private TextField textDescription
+	private TextArea textDescription
 	private TextField textCode
 	
 	private TextField textIdDetail
@@ -224,8 +224,9 @@ class MasterComplaint extends VerticalLayout{
 					{
 						
 						window.close()
+						initTable()
 					}
-					initTable()
+					
 				}catch (Exception e)
 				{
 					Notification.show("Error\n",
@@ -265,8 +266,9 @@ class MasterComplaint extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTableDetail()
 							}
-							initTableDetail()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -520,13 +522,15 @@ class MasterComplaint extends VerticalLayout{
 			textTitle.setBuffered(true)
 			textTitle.setImmediate(false)
 			layout.addComponent(textTitle)
-			textDescription = new TextField("Description:");
+			textDescription = new TextArea("Description:");
 			textDescription.setPropertyDataSource(item.getItemProperty("description"))
 			textDescription.setBuffered(true)
 			textDescription.setImmediate(false)
 			layout.addComponent(textDescription)
-			layout.addComponent(createSaveButton())
-			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 			getUI().addWindow(window);
 //		} else {
 //			Notification.show("Access Denied\n",
@@ -570,7 +574,7 @@ class MasterComplaint extends VerticalLayout{
 			layout.addComponent(cmbHome)
 			textTitle = new TextField("Title:")
 			layout.addComponent(textTitle)
-			textDescription = new TextField("Description:")
+			textDescription = new TextArea("Description:")
 			layout.addComponent(textDescription)
 //			def textArea = new TextArea("Text Area")
 //			layout.addComponent(textArea)
@@ -584,14 +588,17 @@ class MasterComplaint extends VerticalLayout{
 //			===================
 			//TOMBOL SAVE
 //			===================
-			layout.addComponent(createSaveButton())
+//			layout.addComponent(createSaveButton())
 //			==================
 			
 //			===================
 //			TOMBOL CANCEL
 //			===================
-			layout.addComponent(createCancelButton())
-			
+//			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+			layout.addComponent(horizontal)
+			horizontal.addComponent(createSaveButton())
+			horizontal.addComponent(createCancelButton())
 //			===================
 			getUI().addWindow(window);
 //		} else {
@@ -630,8 +637,10 @@ class MasterComplaint extends VerticalLayout{
 		//		layout3.addComponent(comb)
 		//			textQuantity = new TextField("Quantity:")
 		//		layout3.addComponent(textQuantity)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveButton())
+		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
 		//		} else {
@@ -677,8 +686,10 @@ class MasterComplaint extends VerticalLayout{
 		//		comb.select(comb.getItemIds().find{ it.id == itemDetail.getItemProperty("salesOrderDetail.id").value})
 		//
 		//		layout3.addComponent(comb)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveButton())
+		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
 		//		} else {

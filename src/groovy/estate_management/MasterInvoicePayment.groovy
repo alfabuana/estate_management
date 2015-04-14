@@ -53,7 +53,7 @@ class MasterInvoicePayment extends VerticalLayout{
 	//==============================
 	private ComboBox cmbInvoice
 	private ComboBox cmbUser
-	private TextField textDescription
+	private TextArea textDescription
 	private DateField textPaidDate
 	
 	private TextField textIdDetail
@@ -206,8 +206,9 @@ class MasterInvoicePayment extends VerticalLayout{
 					else
 					{
 						window.close()
+						initTable()
 					}
-					initTable()
+					
 				}catch (Exception e)
 				{
 					Notification.show("Error\n",
@@ -247,8 +248,9 @@ class MasterInvoicePayment extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTableDetail()
 							}
-							initTableDetail()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -431,7 +433,7 @@ class MasterInvoicePayment extends VerticalLayout{
 			cmbUser.setImmediate(false)
 			cmbUser.setReadOnly(true)
 			layout.addComponent(cmbUser)
-			textDescription = new TextField("Description:");
+			textDescription = new TextArea("Description:");
 			textDescription.setPropertyDataSource(item.getItemProperty("description"))
 			textDescription.setBuffered(true)
 			textDescription.setImmediate(false)
@@ -441,8 +443,10 @@ class MasterInvoicePayment extends VerticalLayout{
 			textPaidDate.setBuffered(true)
 			textPaidDate.setImmediate(false)
 			layout.addComponent(textPaidDate)
-			layout.addComponent(createSaveButton())
-			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 			getUI().addWindow(window);
 //		} else {
 //			Notification.show("Access Denied\n",
@@ -481,7 +485,7 @@ class MasterInvoicePayment extends VerticalLayout{
 			cmbUser.setItemCaptionPropertyId("username")
 			cmbUser.setReadOnly(true)
 			layout.addComponent(cmbUser)
-			textDescription = new TextField("Description:")
+			textDescription = new TextArea("Description:")
 			layout.addComponent(textDescription)
 			textPaidDate = new DateField("Paid Date:")
 			layout.addComponent(textPaidDate)
@@ -497,14 +501,17 @@ class MasterInvoicePayment extends VerticalLayout{
 //			===================
 			//TOMBOL SAVE
 //			===================
-			layout.addComponent(createSaveButton())
+//			layout.addComponent(createSaveButton())
 //			==================
 			
 //			===================
 //			TOMBOL CANCEL
 //			===================
-			layout.addComponent(createCancelButton())
-			
+//			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+			layout.addComponent(horizontal)
+			horizontal.addComponent(createSaveButton())
+			horizontal.addComponent(createCancelButton())
 //			===================
 			getUI().addWindow(window);
 //		} else {
@@ -543,8 +550,10 @@ class MasterInvoicePayment extends VerticalLayout{
 		//		layout3.addComponent(comb)
 		//			textQuantity = new TextField("Quantity:")
 		//		layout3.addComponent(textQuantity)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveButton())
+		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
 		//		} else {
@@ -590,8 +599,10 @@ class MasterInvoicePayment extends VerticalLayout{
 		//		comb.select(comb.getItemIds().find{ it.id == itemDetail.getItemProperty("salesOrderDetail.id").value})
 		//
 		//		layout3.addComponent(comb)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveButton())
+		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
 		//		} else {

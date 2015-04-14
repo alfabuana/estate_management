@@ -1,6 +1,7 @@
 package estate_management
 
 import java.awt.event.ItemEvent;
+import java.text.SimpleDateFormat
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -79,7 +80,7 @@ class MasterPaymentRequest extends VerticalLayout{
 	//==============================
 	private ComboBox cmbVendor
 	private ComboBox cmbProject
-	private TextField textDescription
+	private TextArea textDescription
 	private TextField textCode
 	private TextField textAmount
 	private DateField textRequestDate
@@ -88,7 +89,7 @@ class MasterPaymentRequest extends VerticalLayout{
 	private TextField textIdDetail
 	private TextField textCodeDetail
 	private TextField textAmountDetail
-	private TextField textDescriptionDetail
+	private TextArea textDescriptionDetail
 
 	//==============================
 
@@ -252,8 +253,9 @@ class MasterPaymentRequest extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTable()
 							}
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -298,9 +300,10 @@ class MasterPaymentRequest extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTableDetail()
+								initTable()
 							}
-							initTableDetail()
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -488,7 +491,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		cmbProject.setBuffered(true)
 		cmbProject.setImmediate(false)
 		layout.addComponent(cmbProject)
-		textDescription = new TextField("Description:");
+		textDescription = new TextArea("Description:");
 		textDescription.setPropertyDataSource(item.getItemProperty("description"))
 		textDescription.setBuffered(true)
 		textDescription.setImmediate(false)
@@ -511,8 +514,10 @@ class MasterPaymentRequest extends VerticalLayout{
 		textDueDate.setBuffered(true)
 		textDueDate.setImmediate(false)
 		layout.addComponent(textDueDate)
-		layout.addComponent(createSaveButton())
-		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		getUI().addWindow(window);
 		//		} else {
 		//			Notification.show("Access Denied\n",
@@ -553,7 +558,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		cmbProject.setContainerDataSource(beanProject)
 		cmbProject.setItemCaptionPropertyId("title")
 		layout.addComponent(cmbProject)
-		textDescription = new TextField("Description:")
+		textDescription = new TextArea("Description:")
 		layout.addComponent(textDescription)
 
 		textAmount = new TextField("Amount:")
@@ -575,14 +580,17 @@ class MasterPaymentRequest extends VerticalLayout{
 		//			===================
 		//TOMBOL SAVE
 		//			===================
-		layout.addComponent(createSaveButton())
+//		layout.addComponent(createSaveButton())
 		//			==================
 
 		//			===================
 		//			TOMBOL CANCEL
 		//			===================
-		layout.addComponent(createCancelButton())
-
+//		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		//			===================
 		getUI().addWindow(window);
 		//		} else {
@@ -614,7 +622,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		layout3.addComponent(textCodeDetail)
 		textAmountDetail = new TextField("Amount:");
 		layout3.addComponent(textAmountDetail)
-		textDescriptionDetail = new TextField("Description:");
+		textDescriptionDetail = new TextArea("Description:");
 		layout3.addComponent(textDescriptionDetail)
 		//		comb = new ComboBox("Sales Order Detail Item:")
 		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
@@ -627,8 +635,10 @@ class MasterPaymentRequest extends VerticalLayout{
 		//		layout3.addComponent(comb)
 		//			textQuantity = new TextField("Quantity:")
 		//		layout3.addComponent(textQuantity)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveDetailButton())
+		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
 		//		} else {
@@ -680,13 +690,14 @@ class MasterPaymentRequest extends VerticalLayout{
 		textAmountDetail.setValue(itemDetail.getItemProperty("amount").toString())
 		textAmountDetail.setBuffered(true)
 		layout3.addComponent(textAmountDetail)
-		textDescriptionDetail = new TextField("Description:")
+		textDescriptionDetail = new TextArea("Description:")
 		textDescriptionDetail.setPropertyDataSource(itemDetail.getItemProperty("description"))
 		textDescriptionDetail.setBuffered(true)
 		layout3.addComponent(textDescriptionDetail)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
-
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveDetailButton())
+		horizontal3.addComponent(createCancelButton())
 		getUI().addWindow(window);
 		//		} else {
 		//			Notification.show("Access Denied\n",
@@ -820,7 +831,10 @@ class MasterPaymentRequest extends VerticalLayout{
 												return new ByteArrayInputStream(b);
 											}
 										};
-								StreamResource resource = new StreamResource(source, "PaymentRequest.pdf");
+								Date curDate = new Date()
+								SimpleDateFormat format = new SimpleDateFormat("yyMMddhhMMss");
+								String now = format.format(curDate)
+								StreamResource resource = new StreamResource(source, "PaymentRequest${now}.pdf");
 								resource.setMIMEType("application/pdf");
 								BrowserFrame browser = new BrowserFrame("Browser");
 								browser.setWidth("600px");

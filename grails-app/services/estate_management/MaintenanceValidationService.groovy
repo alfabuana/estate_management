@@ -71,6 +71,8 @@ class MaintenanceValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
@@ -82,8 +84,9 @@ class MaintenanceValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
 		return object
 	}
 	def confirmObjectValidation(object)

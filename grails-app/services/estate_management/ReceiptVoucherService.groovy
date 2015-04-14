@@ -85,6 +85,7 @@ class ReceiptVoucherService {
 			}
 			newObject.save()
 		}
+		return newObject
 
 	}
 	def confirmObject(def object){
@@ -160,4 +161,15 @@ class ReceiptVoucherService {
 		}
 		return newObject
 	}
+	
+	def printObject(def object){
+		def newObject = ReceiptVoucher.get(object.id)
+		newObject = receiptVoucherValidationService.printObjectValidation(newObject)
+		if (newObject.errors.getErrorCount() == 0)
+		{
+			
+		}
+		return newObject
+	}
+
 }

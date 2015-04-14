@@ -87,6 +87,7 @@ class PaymentVoucherService {
 			}
 			newObject.save()
 		}
+		return newObject
 	}
 	def confirmObject(def object){
 		def newObject = PaymentVoucher.get(object.id)

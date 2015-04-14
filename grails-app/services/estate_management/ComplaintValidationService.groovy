@@ -36,6 +36,13 @@ class ComplaintValidationService {
 		}
 		return object
 	}
+	def isNotCleared(def object){
+		if (object.isCleared == false)
+		{
+			object.errors.rejectValue(null,'null','Belum clear')
+		}
+		return object
+	}
 	def usernameNotNull(def object){
 		if (object.user == null || object.user == "")
 		{
@@ -77,6 +84,8 @@ class ComplaintValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = usernameNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = homeNotNull(object)
@@ -88,8 +97,9 @@ class ComplaintValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
 		return object
 	}
 	def confirmObjectValidation(object)
@@ -102,6 +112,7 @@ class ComplaintValidationService {
 	{
 		object = isCleared(object)
 		if (object.errors.hasErrors()) return object
+		object = isNotConfirmed(object)
 		return object
 	}
 	
@@ -115,6 +126,7 @@ class ComplaintValidationService {
 	{
 		object = isNotConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isNotCleared(object)
 		return object
 	}
 }

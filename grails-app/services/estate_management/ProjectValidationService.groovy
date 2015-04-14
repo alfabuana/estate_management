@@ -29,6 +29,20 @@ class ProjectValidationService {
 		}
 		return object
 	}
+	def isFinished(def object){
+		if (object.isFinished == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah finish')
+		}
+		return object
+	}
+	def isNotFinish(def object){
+		if (object.isFinished == false)
+		{
+			object.errors.rejectValue(null,'null','Belum finish')
+		}
+		return object
+	}
 	def titleNotNull(def object){
 		if (object.title == null || object.title == "")
 		{
@@ -68,6 +82,8 @@ class ProjectValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = titleNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
@@ -77,29 +93,35 @@ class ProjectValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
 		return object
 	}
 	def confirmObjectValidation(object)
 	{
 		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
-		
 		return object
 	}
 	def unConfirmObjectValidation(object)
 	{
 		object = isNotConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isFinished(object)
 		return object
+		
 	}
 	def finishObjectValidation(object)
 	{
+		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def unFinishObjectValidation(object)
 	{
+//		object = isConfirmed(object)
+//		if (object.errors.hasErrors()) return object
 		return object
 	}
 }

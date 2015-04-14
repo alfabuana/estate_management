@@ -76,6 +76,7 @@ class PaymentRequestDetailService {
 			newObject.save()
 			paymentRequestService.calculateTotal(newObject.paymentRequest.id)
 		}
+		return newObject
 	}
 	def confirmObject(def object){
 		def newObject = PaymentRequestDetail.get(object.id)
@@ -87,6 +88,7 @@ class PaymentRequestDetailService {
 			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
+		return newObject
 	}
 	def unConfirmObject(def object){
 		def newObject = PaymentRequestDetail.get(object.id)
@@ -98,6 +100,7 @@ class PaymentRequestDetailService {
 			newObject.confirmedBy = null
 			newObject.save()
 		}
+		return newObject
 	}
 
 

@@ -173,8 +173,9 @@ class MasterUser extends VerticalLayout{
 					else
 					{
 						window.close()
+						initTable()
 					}
-					initTable()
+					
 				}catch (Exception e)
 				{
 					Notification.show("Error\n",
@@ -242,7 +243,7 @@ class MasterUser extends VerticalLayout{
 			textUserName.setImmediate(false)
 			layout.addComponent(textUserName)
 			textPassword = new TextField("Password:");
-			textUserName.setPropertyDataSource(item.getItemProperty("passwordHash"))
+			textPassword.setPropertyDataSource(item.getItemProperty("passwordHash"))
 			textPassword.setBuffered(true)
 			textPassword.setImmediate(false)
 			layout.addComponent(textPassword)
@@ -251,8 +252,10 @@ class MasterUser extends VerticalLayout{
 //			textEmail.setBuffered(true)
 //			textEmail.setImmediate(false)
 //			layout.addComponent(textEmail)
-			layout.addComponent(createSaveButton())
-			layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 			getUI().addWindow(window);
 //		} else {
 //			Notification.show("Access Denied\n",
@@ -294,14 +297,17 @@ class MasterUser extends VerticalLayout{
 //			===================
 			//TOMBOL SAVE
 //			===================
-			layout.addComponent(createSaveButton())
+//			layout.addComponent(createSaveButton())
 //			==================
 			
 //			===================
 //			TOMBOL CANCEL
 //			===================
-			layout.addComponent(createCancelButton())
-			
+//			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+			layout.addComponent(horizontal)
+			horizontal.addComponent(createSaveButton())
+			horizontal.addComponent(createCancelButton())
 //			===================
 			getUI().addWindow(window);
 //		} else {

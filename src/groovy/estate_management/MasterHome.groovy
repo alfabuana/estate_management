@@ -62,7 +62,7 @@ class MasterHome extends VerticalLayout{
 	
 	//==============================
 	private TextField textName
-	private TextField textAddress
+	private TextArea textAddress
 	
 	//==============================
 	
@@ -170,8 +170,9 @@ class MasterHome extends VerticalLayout{
 					else
 					{
 						window.close()
+						initTable()
 					}
-					initTable()
+					
 				}catch (Exception e)
 				{
 					Notification.show("Error\n",
@@ -238,13 +239,15 @@ class MasterHome extends VerticalLayout{
 			textName.setBuffered(true)
 			textName.setImmediate(false)
 			layout.addComponent(textName)
-			textAddress = new TextField("Address:");
+			textAddress = new TextArea("Address:");
 			textAddress.setPropertyDataSource(item.getItemProperty("address"))
 			textAddress.setBuffered(true)
 			textAddress.setImmediate(false)
 			layout.addComponent(textAddress)
-			layout.addComponent(createSaveButton())
-			layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 			getUI().addWindow(window);
 //		} else {
 //			Notification.show("Access Denied\n",
@@ -270,7 +273,7 @@ class MasterHome extends VerticalLayout{
 			layout.addComponent(textId)
 			textName = new TextField("Name:")
 			layout.addComponent(textName)
-			textAddress = new TextField("Address:")
+			textAddress = new TextArea("Address:")
 			layout.addComponent(textAddress)
 			//			def textArea = new TextArea("Text Area")
 //			layout.addComponent(textArea)
@@ -284,14 +287,17 @@ class MasterHome extends VerticalLayout{
 //			===================
 			//TOMBOL SAVE
 //			===================
-			layout.addComponent(createSaveButton())
+//			layout.addComponent(createSaveButton())
 //			==================
 			
 //			===================
 //			TOMBOL CANCEL
 //			===================
-			layout.addComponent(createCancelButton())
-			
+//			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+			layout.addComponent(horizontal)
+			horizontal.addComponent(createSaveButton())
+			horizontal.addComponent(createCancelButton())
 //			===================
 			getUI().addWindow(window);
 //		} else {

@@ -41,6 +41,11 @@ class InvoiceService {
 			}
 	}
 	
+	def getListForMaintenance(def object){
+		return Invoice.findAll([sort: "id", order: "desc"]){
+			maintenance.id == object
+		}
+	}
 	
 	def createCode(object)
 	{
@@ -79,7 +84,7 @@ class InvoiceService {
 	def updateObject(def object){
 		def valObject = Invoice.read(object.id)
 		valObject.home = object.home
-		valObject.code = object.code
+//		valObject.code = object.code
 		valObject.invoiceDate = object.invoiceDate
 		valObject.description = object.description
 //		valObject.dueDate = object.dueDate

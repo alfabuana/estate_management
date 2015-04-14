@@ -119,8 +119,8 @@ class PaymentRequestValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
-//		object = usernameNotNull(object)
-//		if (object.errors.hasErrors()) return object
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = descriptionNotNull(object)
 		if (object.errors.hasErrors()) return object
 //		object  = codeNotNull(object)
@@ -134,8 +134,9 @@ class PaymentRequestValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
 		return object
 	}
 	def confirmObjectValidation(object)

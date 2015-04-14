@@ -162,8 +162,9 @@ class MasterRole extends VerticalLayout{
 					else
 					{
 						window.close()
+						initTable()
 					}
-					initTable()
+					
 				}catch (Exception e)
 				{
 					Notification.show("Error\n",
@@ -226,12 +227,14 @@ class MasterRole extends VerticalLayout{
 			textId.setReadOnly(true)
 			layout.addComponent(textId)
 			textName = new TextField("Name:");
-//			textName.setPropertyDataSource(item.getItemProperty("username"))
+			textName.setPropertyDataSource(item.getItemProperty("name"))
 			textName.setBuffered(true)
 			textName.setImmediate(false)
 			layout.addComponent(textName)
-			layout.addComponent(createSaveButton())
-			layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 			getUI().addWindow(window);
 //		} else {
 //			Notification.show("Access Denied\n",
@@ -269,14 +272,17 @@ class MasterRole extends VerticalLayout{
 //			===================
 			//TOMBOL SAVE
 //			===================
-			layout.addComponent(createSaveButton())
+//			layout.addComponent(createSaveButton())
 //			==================
 			
 //			===================
 //			TOMBOL CANCEL
 //			===================
-			layout.addComponent(createCancelButton())
-			
+//			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+			layout.addComponent(horizontal)
+			horizontal.addComponent(createSaveButton())
+			horizontal.addComponent(createCancelButton())
 //			===================
 			getUI().addWindow(window);
 //		} else {

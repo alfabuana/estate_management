@@ -183,8 +183,9 @@ class MasterHomeAssignment extends VerticalLayout{
 					else
 					{
 						window.close()
+						initTable()
 					}
-					initTable()
+					
 				}catch (Exception e)
 				{
 					Notification.show("Error\n",
@@ -321,8 +322,10 @@ class MasterHomeAssignment extends VerticalLayout{
 			textAssignDate.setBuffered(true)
 			textAssignDate.setImmediate(false)
 			layout.addComponent(textAssignDate)
-			layout.addComponent(createSaveButton())
-			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 			getUI().addWindow(window);
 //		} else {
 //			Notification.show("Access Denied\n",
@@ -366,14 +369,17 @@ class MasterHomeAssignment extends VerticalLayout{
 //			===================
 			//TOMBOL SAVE
 //			===================
-			layout.addComponent(createSaveButton())
+//			layout.addComponent(createSaveButton())
 //			==================
 			
 //			===================
 //			TOMBOL CANCEL
 //			===================
-			layout.addComponent(createCancelButton())
-			
+//			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+			layout.addComponent(horizontal)
+			horizontal.addComponent(createSaveButton())
+			horizontal.addComponent(createCancelButton())
 //			===================
 			getUI().addWindow(window);
 //		} else {

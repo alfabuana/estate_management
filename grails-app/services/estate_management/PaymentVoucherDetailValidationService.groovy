@@ -8,6 +8,14 @@ class PaymentVoucherDetailValidationService {
 	def serviceMethod() {
 
 	}
+	def isConfirmed(def object){
+		if (object.paymentVoucher.isConfirmed == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah terconfirm')
+		}
+		return object
+	}
+	
 	def isDeleted(def object){
 		if (object.isDeleted == true)
 		{
@@ -53,6 +61,8 @@ class PaymentVoucherDetailValidationService {
 	}
 	def createObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = paymentVoucherNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = payableNotNull(object)
@@ -66,6 +76,8 @@ class PaymentVoucherDetailValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = paymentVoucherNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = payableNotNull(object)
@@ -79,8 +91,9 @@ class PaymentVoucherDetailValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
 		return object
 	}
 	def confirmObjectValidation(object)

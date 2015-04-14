@@ -8,6 +8,13 @@ class InvoiceDetailValidationService {
     def serviceMethod() {
 
     }
+	def isConfirmed(def object){
+		if (object.invoice.isConfirmed == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah terconfirm')
+		}
+		return object
+	}
 	def isDeleted(def object){
 		if (object.isDeleted == true)
 		{
@@ -45,6 +52,8 @@ class InvoiceDetailValidationService {
 	}
 	def createObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = invoiceNotNull(object)
 //		if (object.errors.hasErrors()) return object
 //		object = codeNotNull(object)
@@ -56,6 +65,8 @@ class InvoiceDetailValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = invoiceNotNull(object)
 //		if (object.errors.hasErrors()) return object
 //		object = codeNotNull(object)
@@ -67,8 +78,9 @@ class InvoiceDetailValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
 		return object
 	}
 	def confirmObjectValidation(object)

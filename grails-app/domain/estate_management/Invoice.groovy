@@ -5,6 +5,7 @@ import java.util.Date;
 class Invoice {
 	Home		home
 	ShiroUser	user
+	Maintenance maintenance
 	String		code
 	Date		invoiceDate
 	String		description
@@ -33,5 +34,6 @@ class Invoice {
 		confirmedBy(nullable : true)
 		code(nullable:true)
 		clearDate(nullable:true)
+		maintenance(nullable:true)
     }
 }

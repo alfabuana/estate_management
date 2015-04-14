@@ -38,7 +38,7 @@ import com.vaadin.ui.MenuBar.MenuItem
 
 import com.vaadin.annotations.Theme;
 
-@Theme("runo")
+@Theme("chameleon")
 public class MyUI extends UI{
 	Navigator navigator
 

@@ -84,6 +84,8 @@ class InvoicePaidValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = invoiceNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = usernameNotNull(object)
@@ -95,8 +97,9 @@ class InvoicePaidValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
 		return object
 	}
 	def confirmObjectValidation(object)

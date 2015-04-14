@@ -61,7 +61,7 @@ class MasterVendor extends VerticalLayout{
 	
 	//==============================
 	private TextField textName
-	private TextField textDescription
+	private TextArea textDescription
 	private TextField textTelephone
 	private TextField textFax
 	private TextField textEmail
@@ -176,8 +176,9 @@ class MasterVendor extends VerticalLayout{
 					else
 					{
 						window.close()
+						initTable()
 					}
-					initTable()
+					
 				}catch (Exception e)
 				{
 					Notification.show("Error\n",
@@ -244,7 +245,7 @@ class MasterVendor extends VerticalLayout{
 			textName.setBuffered(true)
 			textName.setImmediate(false)
 			layout.addComponent(textName)
-			textDescription = new TextField("Description:");
+			textDescription = new TextArea("Description:");
 			textDescription.setPropertyDataSource(item.getItemProperty("description"))
 			textDescription.setBuffered(true)
 			textDescription.setImmediate(false)
@@ -264,8 +265,10 @@ class MasterVendor extends VerticalLayout{
 			textEmail.setBuffered(true)
 			textEmail.setImmediate(false)
 			layout.addComponent(textEmail)
-			layout.addComponent(createSaveButton())
-			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+			layout.addComponent(horizontal)
+			horizontal.addComponent(createSaveButton())
+			horizontal.addComponent(createCancelButton())
 			getUI().addWindow(window);
 //		} else {
 //			Notification.show("Access Denied\n",
@@ -291,7 +294,7 @@ class MasterVendor extends VerticalLayout{
 			layout.addComponent(textId)
 			textName = new TextField("Name:")
 			layout.addComponent(textName)
-			textDescription = new TextField("Description:")
+			textDescription = new TextArea("Description:")
 			layout.addComponent(textDescription)
 			textTelephone = new TextField("Telephone:")
 			layout.addComponent(textTelephone)
@@ -311,14 +314,17 @@ class MasterVendor extends VerticalLayout{
 //			===================
 			//TOMBOL SAVE
 //			===================
-			layout.addComponent(createSaveButton())
+//			layout.addComponent(createSaveButton())
 //			==================
 			
 //			===================
 //			TOMBOL CANCEL
 //			===================
-			layout.addComponent(createCancelButton())
-			
+//			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+			layout.addComponent(horizontal)
+			horizontal.addComponent(createSaveButton())
+			horizontal.addComponent(createCancelButton())
 //			===================
 			getUI().addWindow(window);
 //		} else {

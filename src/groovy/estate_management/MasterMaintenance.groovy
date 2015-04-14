@@ -73,7 +73,7 @@ class MasterMaintenance extends VerticalLayout{
 //	private TextField textDescription
 	
 	//==============================
-	private TextField textDescription
+	private TextArea textDescription
 	private TextField textAmount
 	private TextField textCode
 	private DateField textMaintenanceDate
@@ -85,9 +85,9 @@ class MasterMaintenance extends VerticalLayout{
 	//==============================
 	
 	private Table table = new Table();
-//	private Table tableDetail = new Table()
+	private Table tableDetail = new Table()
 	private BeanItemContainer<Maintenance> tableContainer;
-//	private BeanItemContainer tableDetailContainer
+	private BeanItemContainer tableDetailContainer
 	private FieldGroup fieldGroup;
 	private FormLayout layout
 	private Action actionDelete = new Action("Delete");
@@ -160,7 +160,7 @@ class MasterMaintenance extends VerticalLayout{
 		MenuItem updateMenu = menuBar.addItem("Edit", mycommand)
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
-		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
+//		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")	
 		//	END BUTTON MENU
@@ -176,7 +176,7 @@ class MasterMaintenance extends VerticalLayout{
 //		menuBarDetail.setWidth("100%")
 //		menuBarDetail.setVisible(false)
 //		addComponent(menuBarDetail)
-//		addComponent(tableDetail)
+		addComponent(tableDetail)
 
 		//		==========================
 		//		ENd View Detail
@@ -232,8 +232,9 @@ class MasterMaintenance extends VerticalLayout{
 					else
 					{
 						window.close()
+						initTable()
 					}
-					initTable()
+					
 				}catch (Exception e)
 				{
 					Notification.show("Error\n",
@@ -423,7 +424,7 @@ class MasterMaintenance extends VerticalLayout{
 			textCode.setImmediate(false)
 			textCode.setReadOnly(true)
 			layout.addComponent(textCode)
-			textDescription = new TextField("Description:");
+			textDescription = new TextArea("Description:");
 			textDescription.setPropertyDataSource(item.getItemProperty("description"))
 			textDescription.setBuffered(true)
 			textDescription.setImmediate(false)
@@ -444,8 +445,10 @@ class MasterMaintenance extends VerticalLayout{
 			textDueDate.setBuffered(true)
 			textDueDate.setImmediate(false)
 			layout.addComponent(textDueDate)
-			layout.addComponent(createSaveButton())
-			layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 			getUI().addWindow(window);
 //		} else {
 //			Notification.show("Access Denied\n",
@@ -472,7 +475,7 @@ class MasterMaintenance extends VerticalLayout{
 			textCode = new TextField("Code:")
 			textCode.setReadOnly(true)
 			layout.addComponent(textCode)
-			textDescription = new TextField("Description:")
+			textDescription = new TextArea("Description:")
 			layout.addComponent(textDescription)
 			textAmount = new TextField("Amount:")
 			layout.addComponent(textAmount)
@@ -493,14 +496,17 @@ class MasterMaintenance extends VerticalLayout{
 //			===================
 			//TOMBOL SAVE
 //			===================
-			layout.addComponent(createSaveButton())
+//			layout.addComponent(createSaveButton())
 //			==================
 			
 //			===================
 //			TOMBOL CANCEL
 //			===================
-			layout.addComponent(createCancelButton())
-			
+//			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+			layout.addComponent(horizontal)
+			horizontal.addComponent(createSaveButton())
+			horizontal.addComponent(createCancelButton())
 //			===================
 			getUI().addWindow(window);
 //		} else {
@@ -640,41 +646,51 @@ table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 						//				print selectedRow
 					}
 				});
-//		table.addValueChangeListener(new Property.ValueChangeListener() {
-//					public void valueChange(ValueChangeEvent event) {
-//						selectedRow = table.getValue()
-//						if (selectedRow != null) {
-//							initTableDetail()
-//
-//						}
-//						else
-//						{
-//							tableDetail.setVisible(false)
+		table.addValueChangeListener(new Property.ValueChangeListener() {
+					public void valueChange(ValueChangeEvent event) {
+						selectedRow = table.getValue()
+						if (selectedRow != null) {
+							initTableDetail()
+
+						}
+						else
+						{
+							tableDetail.setVisible(false)
 //							menuBarDetail.setVisible(false)
-//						}
-//					}
-//				})
+						}
+					}
+				})
 
 	}
-//	 void initTableDetail() {
-//		 tableDetailContainer = new BeanItemContainer<MaintenanceDetail>(MaintenanceDetail.class);
-//		 def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
-//		 def itemListDetail = Grails.get(MaintenanceDetailService).getList(ind)
-////		 tableDetailContainer.addNestedContainerProperty("complaint.id")
-//		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
-//		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
-//		 //		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
-//		 tableDetailContainer.addAll(itemListDetail)
-////		 tableDetail.setColumnHeader("complaint.id","Complaint Id")
-//		 tableDetail.setContainerDataSource(tableDetailContainer);
-//		 tableDetail.visibleColumns = ["id","maintenance","user","isDeleted","dateCreated","lastUpdated"]
-//		 tableDetail.setSelectable(true)
-//		 tableDetail.setImmediate(false)
-//		 tableDetail.setVisible(true)
-//		 tableDetail.setSizeFull()
-////		 menuBarDetail.setVisible(true)
-//	 }
-//	 
+	 void initTableDetail() {
+		 tableDetailContainer = new BeanItemContainer<Invoice>(Invoice.class);
+		 def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+		 def itemListDetail = Grails.get(InvoiceService).getListForMaintenance(ind)
+//		 tableDetailContainer.addNestedContainerProperty("complaint.id")
+		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
+		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
+		 //		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
+		 tableDetailContainer.addAll(itemListDetail)
+		 tableDetailContainer.addNestedContainerProperty("createdBy.id")
+		 tableDetailContainer.addNestedContainerProperty("createdBy.username")
+		 tableDetailContainer.addNestedContainerProperty("updatedBy.id")
+		 tableDetailContainer.addNestedContainerProperty("updatedBy.username")
+		 tableDetailContainer.addNestedContainerProperty("confirmedBy.id")
+		 tableDetailContainer.addNestedContainerProperty("confirmedBy.username")
+		 tableDetailContainer.addNestedContainerProperty("home.id")
+		 tableDetailContainer.addNestedContainerProperty("home.name")
+		 tableDetailContainer.addNestedContainerProperty("maintenance.id")
+		 tableDetailContainer.addNestedContainerProperty("maintenance.code")
+//		 tableDetail.setColumnHeader("complaint.id","Complaint Id")
+		 tableDetail.setContainerDataSource(tableDetailContainer);
+		 tableDetail.visibleColumns = ["id","home.name","code","invoiceDate","description","dueDate","totalAmount","isConfirmed","confirmationDate","isCleared","clearDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		 tableDetail.setSelectable(true)
+		 tableDetail.setImmediate(false)
+		 tableDetail.setVisible(true)
+		 tableDetail.setSizeFull()
+//		 menuBarDetail.setVisible(true)
+	 }
+	 
 }
 	
 
