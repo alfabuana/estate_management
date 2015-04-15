@@ -2,9 +2,11 @@ package estate_management.widget
 
 public final class Constant {
 	public enum MenuGroup {
+		ProjectManagement("ProjectManagement"),
 		Master("Master"),
-		Transaction("Transaction"),
-		Setting("Setting");
+		Finance("Finance"),
+		Maintenance("Maintenance"),
+		Tenant("Tenant");
 		
 		private final String name;
 		
@@ -29,16 +31,31 @@ public final class Constant {
 	}
 	
 	public enum MenuName {
-		Item("Item"),
-		Contact("Contact"),
+		ProjectVoting("ProjectVoting"),
+		PostProject("PostProject"),
 		
-		PurchaseOrder("PurchaseOrder"),
-		PurchaseReceival("PurchaseReceival"),
-		SalesOrder("SalesOrder"),
-		DeliveryOrder("DeliveryOrder"),
+		Home("Home"),
+		User("User"),
+		UserRole("UserRole"),
+		Vendor("Vendor"),
 		
-		Role("Role"),
-		User("User");
+		
+		CashBank("CashBank"),
+		CashBankAdjustment("CashBankAdjustment"),
+		CashBankMutation("CashBankMutation"),
+		PaymentRequest("PaymentRequest"),
+		PaymentVoucher("PaymentVoucher"),
+		ReceiptVoucher("ReceiptVoucher"),
+		Invoice("Invoice"),
+		InvoiceClearance("InvoiceClearance"),
+		
+		MaintenanceFee("MaintenanceFee"),
+		
+		Complaint("Complaint"),
+		HomeAssignment("HomeAssignment"),
+		InvoicePayment("InvoicePayment"),
+		OutstandingInvoice("OutstandingInvoice"),
+		ParkingRegistration("ParkingRegistration");
 		
 		private final String name;
 		
@@ -68,6 +85,10 @@ public final class Constant {
 		Delete("Delete"),
 		Confirm("Confirm"),
 		Unconfirm("Unconfirm"),
+		Clear("Clear"),
+		Unclear("Unclear"),
+		Finish("Finish"),
+		Unfinish("Unfinish"),
 		Print("Print");
 		
 		private final String name;

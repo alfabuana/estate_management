@@ -213,6 +213,12 @@ public class MyUI extends UI{
 					case "Outstanding Invoice":
 						panelContent.addComponent(new MasterOutstandingInvoice())
 						break
+					case "Parking Registration":
+						panelContent.addComponent(new MasterParkingRegistration())
+						break
+					case "Permit":
+						panelContent.addComponent(new MasterPermit())
+						break
 				}
 			}
 		}

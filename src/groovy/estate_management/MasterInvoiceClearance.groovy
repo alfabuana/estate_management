@@ -3,7 +3,9 @@ package estate_management
 import java.awt.event.ItemEvent;
 
 import estate_management.widget.GeneralFunction
-
+import estate_management.widget.Constant
+import org.apache.shiro.subject.Subject
+import org.apache.shiro.SecurityUtils
 
 
 
@@ -88,9 +90,9 @@ class MasterInvoiceClearance extends VerticalLayout{
 	private static final int MAX_PAGE_LENGTH = 15;
 	String Title = "Invoice Payment"
 //						Constant.MenuName.Item + ":";
-	
+	private Subject currentUser
 	public MasterInvoiceClearance() {
-//		currentUser = SecurityUtils.getSubject();
+		currentUser = SecurityUtils.getSubject();
 //		table = new Table()
 		initTable();
 		
@@ -334,7 +336,7 @@ class MasterInvoiceClearance extends VerticalLayout{
 		
 		//@RequiresPermissions("Master:Item:Delete")
 		private void windowClear(String caption) {
-	//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+			if (currentUser.isPermitted(Title + Constant.AccessType.Clear)) {
 				ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -356,11 +358,11 @@ class MasterInvoiceClearance extends VerticalLayout{
 						}
 					}
 				})
-	//		} else {
-	//			Notification.show("Access Denied\n",
-	//				"Anda tidak memiliki izin untuk Menghapus Record",
-	//				Notification.Type.ERROR_MESSAGE);
-	//		}
+			} else {
+				Notification.show("Access Denied\n",
+					"Anda tidak memiliki izin untuk Mengclear Record",
+					Notification.Type.ERROR_MESSAGE);
+			}
 		}
 		//	===========================================
 		//	WINDOW UNCLEAR
@@ -368,7 +370,7 @@ class MasterInvoiceClearance extends VerticalLayout{
 			
 			//@RequiresPermissions("Master:Item:Delete")
 			private void windowUnClear(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Unclear)) {
 					ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 					new ConfirmDialog.Listener() {
 						public void onClose(ConfirmDialog dialog) {
@@ -389,11 +391,11 @@ class MasterInvoiceClearance extends VerticalLayout{
 							}
 						}
 					})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Unclear Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 			}
 ////	========================================
 //	//WINDOW EDIT

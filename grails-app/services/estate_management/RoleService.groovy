@@ -18,6 +18,11 @@ class RoleService {
 	def getList(){
 		return ShiroRole.getAll()
 	}
+	def getListDeleted(){
+		return ShiroRole.findAll{
+			isDeleted == false
+		}
+	}
 	
 	def createObject(object){
 			object.isDeleted = false

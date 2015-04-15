@@ -9,7 +9,7 @@ class Home {
 	Date dateCreated
 	Date lastUpdated
 	
-	static hasMany = [ homeDetails: HomeDetail ]
+	static hasMany = [ homeDetails: HomeDetail , parkingRegistrations : ParkingRegistration]
 
     static constraints = {
 		createdBy(nullable : true)
