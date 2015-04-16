@@ -3,7 +3,6 @@ import estate_management.ShiroRole
 import estate_management.ShiroUser
 
 class BootStrap {
-	def itemService
     def init = { servletContext ->
 		
 		//Shiro
