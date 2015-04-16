@@ -21,6 +21,7 @@ class CashBankService {
 	
 	def createObject(object){
 		object.isDeleted = false
+		object.amount = 0
 		object.createdBy = userService.getObjectByUserName(object.username)
 		object = cashBankValidationService.createObjectValidation(object as CashBank)
 		

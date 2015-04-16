@@ -3,7 +3,9 @@ package estate_management
 import java.awt.event.ItemEvent;
 import estate_management.widget.GeneralFunction
 
-
+import estate_management.widget.Constant
+import org.apache.shiro.subject.Subject
+import org.apache.shiro.SecurityUtils
 
 
 import org.vaadin.dialogs.ConfirmDialog
@@ -35,6 +37,7 @@ import com.vaadin.ui.HorizontalLayout
 import com.vaadin.ui.Label
 import com.vaadin.ui.MenuBar
 import com.vaadin.ui.Notification
+import com.vaadin.ui.PasswordField
 import com.vaadin.ui.Table
 import com.vaadin.ui.TextArea
 import com.vaadin.ui.TextField
@@ -42,6 +45,7 @@ import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
 import estate_management.UserService
+import grails.converters.JSON
 
 
 
@@ -52,6 +56,7 @@ import com.vaadin.grails.Grails
 class MasterUser extends VerticalLayout{
 	def selectedRow
 	def itemlist
+	
 	GeneralFunction generalFunction = new GeneralFunction()
 	private MenuBar menuBar
 	private Window window
@@ -61,7 +66,8 @@ class MasterUser extends VerticalLayout{
 	
 	//==============================
 	private TextField textUserName
-	private TextField textPassword
+	private PasswordField textPassword
+	private ComboBox cmbRole
 //	private TextField textEmail
 	
 	//==============================
@@ -77,9 +83,9 @@ class MasterUser extends VerticalLayout{
 	private static final int MAX_PAGE_LENGTH = 15;
 	String Title = "User"
 //						Constant.MenuName.Item + ":";
-	
+	private Subject currentUser
 	public MasterUser() {
-//		currentUser = SecurityUtils.getSubject();
+		currentUser = SecurityUtils.getSubject();
 		
 		initTable();
 		
@@ -149,6 +155,7 @@ class MasterUser extends VerticalLayout{
 					def object = [id:textId.getValue(),
 								  username:textUserName.getValue(),
 								  passwordHash:textPassword.getValue(),
+								  roles:cmbRole.getValue()
 //								  email:textEmail.getValue()
 								  ]
 					
@@ -166,15 +173,17 @@ class MasterUser extends VerticalLayout{
 					{
 						textUserName.setData("username")
 						textPassword.setData("passwordHash")
+						cmbRole.setData("roles")
 //						textEmail.setData("email")
-						Object[] tv = [textUserName,textPassword] //textEmail]
+						Object[] tv = [textUserName,textPassword,cmbRole] //textEmail]
 						generalFunction.setErrorUI(tv,object)
 					}
 					else
 					{
 						window.close()
+						initTable()
 					}
-					initTable()
+					
 				}catch (Exception e)
 				{
 					Notification.show("Error\n",
@@ -194,7 +203,7 @@ class MasterUser extends VerticalLayout{
 	
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDelete(String caption) {
-//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 			ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 			new ConfirmDialog.Listener() {
 				public void onClose(ConfirmDialog dialog) {
@@ -215,100 +224,107 @@ class MasterUser extends VerticalLayout{
 					}
 				}
 			})
-//		} else {
-//			Notification.show("Access Denied\n",
-//				"Anda tidak memiliki izin untuk Menghapus Record",
-//				Notification.Type.ERROR_MESSAGE);
-//		}
+		} else {
+			Notification.show("Access Denied\n",
+				"Anda tidak memiliki izin untuk Menghapus Record",
+				Notification.Type.ERROR_MESSAGE);
+		}
 	}
 //	========================================
 	//WINDOW EDIT
 //	========================================
 	//@RequiresPermissions("Master:Item:Edit")
 	private void windowEdit(def item,String caption) {
-//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
-			window = new Window(caption);
-			window.setModal(true);
-			layout = new FormLayout();
-			layout.setMargin(true);
-			window.setContent(layout);
-			textId = new TextField("Id:");
-			textId.setPropertyDataSource(item.getItemProperty("id"))
-			textId.setReadOnly(true)
-			layout.addComponent(textId)
-			textUserName = new TextField("Username:");
-			textUserName.setPropertyDataSource(item.getItemProperty("username"))
-			textUserName.setBuffered(true)
-			textUserName.setImmediate(false)
-			layout.addComponent(textUserName)
-			textPassword = new TextField("Password:");
-			textUserName.setPropertyDataSource(item.getItemProperty("passwordHash"))
-			textPassword.setBuffered(true)
-			textPassword.setImmediate(false)
-			layout.addComponent(textPassword)
-//			textEmail = new TextField("Email:");
-//			textUserName.setPropertyDataSource(item.getItemProperty("email"))
-//			textEmail.setBuffered(true)
-//			textEmail.setImmediate(false)
-//			layout.addComponent(textEmail)
-			layout.addComponent(createSaveButton())
-			layout.addComponent(createCancelButton())
-			getUI().addWindow(window);
-//		} else {
-//			Notification.show("Access Denied\n",
-//				"Anda tidak memiliki izin untuk Mengubah Record",
-//				Notification.Type.ERROR_MESSAGE);
-//		}
+				if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+		window = new Window(caption);
+		window.setModal(true);
+		layout = new FormLayout();
+		layout.setMargin(true);
+		window.setContent(layout);
+		textId = new TextField("Id:");
+		textId.setPropertyDataSource(item.getItemProperty("id"))
+		textId.setReadOnly(true)
+		layout.addComponent(textId)
+		textUserName = new TextField("Username:");
+		textUserName.setPropertyDataSource(item.getItemProperty("username"))
+		textUserName.setBuffered(true)
+		textUserName.setImmediate(false)
+		layout.addComponent(textUserName)
+		textPassword = new PasswordField("Password:");
+//		textPassword.setPropertyDataSource(item.getItemProperty("passwordHash"))
+		textPassword.setBuffered(true)
+		textPassword.setImmediate(false)
+		layout.addComponent(textPassword)
+		cmbRole = new ComboBox("Role:");
+		def beanRole = new BeanItemContainer<ShiroRole>(ShiroRole.class)
+		def roleList = Grails.get(RoleService).getListDeleted()
+		beanRole.addAll(roleList)
+		cmbRole.setContainerDataSource(beanRole)
+		cmbRole.setItemCaptionPropertyId("name")
+		cmbRole.select(cmbRole.getItemIds().find{ it.id == item.getItemProperty("roles.id").value})
+		cmbRole.setBuffered(true)
+		cmbRole.setImmediate(false)
+		layout.addComponent(cmbRole)
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
+		getUI().addWindow(window);
+		} else {
+			Notification.show("Access Denied\n",
+				"Anda tidak memiliki izin untuk Mengubah Record",
+				Notification.Type.ERROR_MESSAGE);
+		}
 	}
 	
 	
-//	========================================
+	//	========================================
 	//WINDOW ADD
-//	========================================
+	//	========================================
 	//@RequiresPermissions("Master:Item:Add")
 	private void windowAdd(String caption) {
-//		if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
-			window = new Window(caption);
-			window.setModal(true);
-			def layout = new FormLayout();
-			layout.setMargin(true);
-			window.setContent(layout);
-			textId = new TextField("Id:");
-			textId.setReadOnly(true)
-			layout.addComponent(textId)
-			textUserName = new TextField("Username:")
-			layout.addComponent(textUserName)
-			textPassword = new TextField("PasswordHash:")
-			layout.addComponent(textPassword)
-//			textEmail = new TextField("email")
-//			layout.addComponent(textEmail)
-			//			def textArea = new TextArea("Text Area")
-//			layout.addComponent(textArea)
-//			def dateField = new DateField("Date Field")
-//			layout.addComponent(dateField)
-//			def comboBox = new ComboBox("combo Box")
-//			comboBox.addItem("test")
-//			comboBox.addItem("test2")
-//			layout.addComponent(comboBox)
-//			
+				if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
+		window = new Window(caption);
+		window.setModal(true);
+		def layout = new FormLayout();
+		layout.setMargin(true);
+		window.setContent(layout);
+		textId = new TextField("Id:");
+		textId.setReadOnly(true)
+		layout.addComponent(textId)
+		textUserName = new TextField("Username:")
+		layout.addComponent(textUserName)
+		textPassword = new PasswordField("PasswordHash:")
+		layout.addComponent(textPassword)
+		cmbRole = new ComboBox("Role:")
+		def beanRole = new BeanItemContainer<ShiroRole>(ShiroRole.class)
+		def roleList = Grails.get(RoleService).getListDeleted()
+		beanRole.addAll(roleList)
+		cmbRole.setContainerDataSource(beanRole)
+		cmbRole.setItemCaptionPropertyId("name")
+		layout.addComponent(cmbRole)
+					
 //			===================
 			//TOMBOL SAVE
 //			===================
-			layout.addComponent(createSaveButton())
+//			layout.addComponent(createSaveButton())
 //			==================
 			
 //			===================
 //			TOMBOL CANCEL
 //			===================
-			layout.addComponent(createCancelButton())
-			
+//			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+			layout.addComponent(horizontal)
+			horizontal.addComponent(createSaveButton())
+			horizontal.addComponent(createCancelButton())
 //			===================
 			getUI().addWindow(window);
-//		} else {
-//			Notification.show("Access Denied\n",
-//				"Anda tidak memiliki izin untuk Membuat Record",
-//				Notification.Type.ERROR_MESSAGE);
-//		}
+		} else {
+			Notification.show("Access Denied\n",
+				"Anda tidak memiliki izin untuk Membuat Record",
+				Notification.Type.ERROR_MESSAGE);
+		}
 	}
 	
 	 void updateTable() {
@@ -325,14 +341,14 @@ class MasterUser extends VerticalLayout{
 		//fillTableContainer(tableContainer);
 	    itemlist = Grails.get(UserService).getList()
 		tableContainer.addAll(itemlist)
-//		tableContainer.addNestedContainerProperty("facility1.id")
-//		tableContainer.addNestedContainerProperty("facility1.nama")
+		tableContainer.addNestedContainerProperty("roles.id")
+		tableContainer.addNestedContainerProperty("roles.name")
 //		tableContainer.addNestedContainerProperty("customer1.id")
 		
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("username","User Name")
 		table.setColumnHeader("passwordHash","Password")
-		table.visibleColumns = ["id","username","passwordHash","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["id","username","passwordHash","roles.name","dateCreated","lastUpdated","isDeleted"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 //		table.setPageLength(table.size())

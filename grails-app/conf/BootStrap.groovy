@@ -15,8 +15,7 @@ class BootStrap {
 		}
 		if (ShiroUser.findAllByUsernameAndIsDeleted("ADMIN",false).isEmpty()) {
 			def user = new ShiroUser(username: "ADMIN", passwordHash: new Sha256Hash("sysadmin").toHex()
-				,isDeleted:false)
-			user.addToRoles(adminRole)
+				,isDeleted:false,roles :adminRole)
 			//		user.addToPermissions("*:*")
 			//		user.addToPermissions("admin")
 			user.save(flush:true, failOnError:true)

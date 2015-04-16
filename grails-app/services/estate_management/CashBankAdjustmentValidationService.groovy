@@ -70,6 +70,8 @@ class CashBankAdjustmentValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = cashBankNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = adjustmentDateNotNull(object)
@@ -81,8 +83,9 @@ class CashBankAdjustmentValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
 		return object
 	}
 	def confirmObjectValidation(object)

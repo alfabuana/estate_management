@@ -5,6 +5,7 @@ import java.util.Date;
 class Invoice {
 	Home		home
 	ShiroUser	user
+	Maintenance maintenance
 	String		code
 	Date		invoiceDate
 	String		description
@@ -22,7 +23,7 @@ class Invoice {
 	Date 		lastUpdated // Predefined names by Grails will be filled automatically
 
 	static hasMany = [invoiceDetails : InvoiceDetail]
-	static belongsTo = Invoice
+	
     static constraints = {
 		user(nullable:true)
 		home(nullable:true)
@@ -33,5 +34,6 @@ class Invoice {
 		confirmedBy(nullable : true)
 		code(nullable:true)
 		clearDate(nullable:true)
+		maintenance(nullable:true)
     }
 }

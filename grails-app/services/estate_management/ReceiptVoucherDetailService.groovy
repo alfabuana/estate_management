@@ -76,6 +76,7 @@ class ReceiptVoucherDetailService {
 			newObject.save()
 			receiptVoucherService.calculateTotal(newObject.receiptVoucher.id)
 		}
+		return newObject
 
 	}
 	def confirmObject(def object){

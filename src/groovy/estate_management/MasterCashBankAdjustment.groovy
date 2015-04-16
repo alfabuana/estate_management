@@ -3,7 +3,9 @@ package estate_management
 import java.awt.event.ItemEvent;
 import estate_management.widget.GeneralFunction
 
-
+import estate_management.widget.Constant
+import org.apache.shiro.subject.Subject
+import org.apache.shiro.SecurityUtils
 
 
 import org.vaadin.dialogs.ConfirmDialog
@@ -76,9 +78,9 @@ class MasterCashBankAdjustment extends VerticalLayout{
 	private static final int MAX_PAGE_LENGTH = 15;
 	String Title = "Cash Bank Adjustment"
 	//						Constant.MenuName.Item + ":";
-
+	private Subject currentUser
 	public MasterCashBankAdjustment() {
-		//		currentUser = SecurityUtils.getSubject();
+				currentUser = SecurityUtils.getSubject();
 
 		initTable();
 
@@ -183,8 +185,9 @@ class MasterCashBankAdjustment extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTable()
 							}
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -204,7 +207,7 @@ class MasterCashBankAdjustment extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDelete(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -225,11 +228,11 @@ class MasterCashBankAdjustment extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Menghapus Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW CONFIRM
@@ -237,7 +240,7 @@ class MasterCashBankAdjustment extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowConfirm(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Confirm)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -259,11 +262,11 @@ class MasterCashBankAdjustment extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Mengkonfirmasi Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW UNCONFIRM
@@ -271,7 +274,7 @@ class MasterCashBankAdjustment extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowUnConfirm(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Unconfirm)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -292,18 +295,18 @@ class MasterCashBankAdjustment extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Unkonfirmasi Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	========================================
 	//WINDOW EDIT
 	//	========================================
 	//@RequiresPermissions("Master:Item:Edit")
 	private void windowEdit(def item,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
 		window = new Window(caption);
 		window.setModal(true);
 		layout = new FormLayout();
@@ -341,14 +344,16 @@ class MasterCashBankAdjustment extends VerticalLayout{
 		textAmount.setImmediate(false)
 		layout.addComponent(textAmount)
 		
-		layout.addComponent(createSaveButton())
-		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Mengubah Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Mengubah Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 
@@ -357,7 +362,7 @@ class MasterCashBankAdjustment extends VerticalLayout{
 	//	========================================
 	//@RequiresPermissions("Master:Item:Add")
 	private void windowAdd(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
 		window = new Window(caption);
 		window.setModal(true);
 		def layout = new FormLayout();
@@ -393,21 +398,24 @@ class MasterCashBankAdjustment extends VerticalLayout{
 		//			===================
 		//TOMBOL SAVE
 		//			===================
-		layout.addComponent(createSaveButton())
+//		layout.addComponent(createSaveButton())
 		//			==================
 
 		//			===================
 		//			TOMBOL CANCEL
 		//			===================
-		layout.addComponent(createCancelButton())
-
+//		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		//			===================
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Membuat Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Membuat Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 	void updateTable() {

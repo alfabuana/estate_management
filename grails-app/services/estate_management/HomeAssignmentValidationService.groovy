@@ -61,6 +61,8 @@ class HomeAssignmentValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = homeNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = usernameNotNull(object)
@@ -70,9 +72,9 @@ class HomeAssignmentValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
-		return object
+		object = isDeleted(object)
 	}
 	def confirmObjectValidation(object)
 	{

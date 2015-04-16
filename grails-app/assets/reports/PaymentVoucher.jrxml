@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 6.0.3  -->
+<!-- 2015-04-13T15:17:46 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PaymentVoucher" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="0173eb90-4409-479c-aaea-e111e603a13d">
+	<queryString language="SQL">
+		<![CDATA[]]>
+	</queryString>
+	<field name="code" class="java.lang.String"/>
+	<field name="username" class="java.lang.String"/>
+	<field name="cashBankName" class="java.lang.String"/>
+	<field name="paymentDate" class="java.util.Date"/>
+	<field name="idDetail" class="java.lang.Integer"/>
+	<field name="codePayable" class="java.lang.String"/>
+	<field name="descriptionDetail" class="java.lang.String"/>
+	<field name="amountDetail" class="java.lang.Double"/>
+	<field name="totalAmount" class="java.lang.Double"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="180" y="0" width="200" height="30" uuid="c6899e50-69dd-4b66-8d67-eb1cad52a2fb"/>
+				<textElement>
+					<font size="18"/>
+				</textElement>
+				<text><![CDATA[PAYMENT VOUCHER]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="60" splitType="Stretch">
+			<staticText>
+				<reportElement x="20" y="0" width="100" height="20" uuid="9115aa5b-b43a-4b87-9d80-be7d66235f38"/>
+				<text><![CDATA[Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="20" width="100" height="20" uuid="50863309-9627-4643-98a7-35699b3bc28f"/>
+				<text><![CDATA[Username]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="40" width="100" height="20" uuid="fce7385a-4c45-4e79-a5ef-9b38b2968dec"/>
+				<text><![CDATA[Cash Bank Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="320" y="0" width="100" height="20" uuid="a933d3f5-5167-43a9-a5b7-582eb9200a21"/>
+				<text><![CDATA[Payment Date]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="20" width="100" height="20" uuid="367debd1-bc76-4b2e-8e0b-23d56e4e71d3"/>
+				<textFieldExpression><![CDATA[$F{username}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="40" width="100" height="20" uuid="f47cc1b0-e9c2-4047-a1e6-c5ac982f05fe"/>
+				<textFieldExpression><![CDATA[$F{cashBankName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="0" width="100" height="20" uuid="09107762-e735-4476-a7e2-ee370f8c5483"/>
+				<textFieldExpression><![CDATA[$F{paymentDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="0" width="100" height="20" uuid="aa5778df-4ffb-4c42-b02d-46bf25c0967f"/>
+				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="20" y="0" width="100" height="20" uuid="961e1352-b55a-42b7-8b1c-f5f340ce27e5"/>
+				<text><![CDATA[Id]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="0" width="100" height="20" uuid="e1d0845d-dfac-4a27-8b81-4adc579c44fb"/>
+				<text><![CDATA[Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="0" width="200" height="20" uuid="19a0ea7b-eca5-49a3-9af1-bd17264e0332"/>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="420" y="0" width="100" height="20" uuid="a0a5fd96-d521-49de-85b2-359a994b1dd8"/>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement x="20" y="0" width="100" height="20" uuid="23940f6c-52ca-4f8d-a2da-2f2cd87311c7"/>
+				<textFieldExpression><![CDATA[$F{idDetail}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="0" width="100" height="20" uuid="26b46fb1-013e-4085-a80d-15d5291a1a1e"/>
+				<textFieldExpression><![CDATA[$F{codePayable}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="0" width="200" height="20" uuid="71718945-c5f4-41c6-b975-f2eca0edc5a3"/>
+				<textFieldExpression><![CDATA[$F{descriptionDetail}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="0" width="100" height="20" uuid="f46b73f3-0888-4b2e-a50e-8d0f37f9c0c0"/>
+				<textFieldExpression><![CDATA[$F{amountDetail}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="59" splitType="Stretch">
+			<staticText>
+				<reportElement x="320" y="0" width="100" height="20" uuid="2eaadf01-ee3d-4deb-b8a2-37e79b8ae1fa"/>
+				<text><![CDATA[Total Amount]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="420" y="0" width="100" height="20" uuid="e2cf7889-251d-4ca0-93c4-e35bb6840e7c"/>
+				<textFieldExpression><![CDATA[$F{totalAmount}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

@@ -18,8 +18,9 @@ hibernate {
 environments {
     development {
         dataSource {
-            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
-            url = "jdbc:postgresql://localhost:5432/estatemanagement"
+//            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
+			dbCreate = "update"
+			url = "jdbc:postgresql://localhost:5432/estatemanagement"
         }
     }
     test {

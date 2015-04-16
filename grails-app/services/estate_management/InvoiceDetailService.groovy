@@ -1,5 +1,6 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 import java.text.SimpleDateFormat
 
@@ -18,10 +19,12 @@ class InvoiceDetailService {
 	def getList(){
 		return InvoiceDetail.getAll()
 	}
+	
 	def getList(object){
 		def a = object.toLong()
 		return InvoiceDetail.findAll("from InvoiceDetail as b where b.invoice.id=? and b.isDeleted =false",[a])
-	}
+		}
+	
 	def createCode(object)
 	{
 		Date curDate = new Date()
@@ -30,6 +33,8 @@ class InvoiceDetailService {
 		String code = "IVD-"+now+"-"+object.id
 		return code
 	}
+	
+	
 	def createObject(object){
 		Invoice invoice = Invoice.get(object.invoiceId)
 		object.invoice = invoice
@@ -37,6 +42,7 @@ class InvoiceDetailService {
 		object.isConfirmed = false
 		object.createdBy = userService.getObjectByUserName(object.username)
 		object = invoiceDetailValidationService.createObjectValidation(object as InvoiceDetail)
+		
 		if (object.errors.getErrorCount() == 0)
 		{
 			object = object.save()
@@ -75,6 +81,7 @@ class InvoiceDetailService {
 			newObject.save()
 			invoiceService.calculateTotal(newObject.invoice.id)
 		}
+		return newObject
 
 	}
 	def confirmObject(def object){
@@ -87,6 +94,7 @@ class InvoiceDetailService {
 			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
+		return newObject
 	}
 	def unConfirmObject(def object){
 		def newObject = InvoiceDetail.get(object.id)
@@ -98,5 +106,6 @@ class InvoiceDetailService {
 			newObject.confirmedBy = null
 			newObject.save()
 		}
+		return newObject
 	}
 }

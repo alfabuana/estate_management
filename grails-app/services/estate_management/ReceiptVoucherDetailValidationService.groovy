@@ -8,6 +8,14 @@ class ReceiptVoucherDetailValidationService {
     def serviceMethod() {
 
     }
+	def isConfirmed(def object){
+		if (object.receiptVoucher.isConfirmed == true)
+		{
+			object.errors.rejectValue(null,'null','Sudah terconfirm')
+		}
+		return object
+	}
+	
 	def isDeleted(def object){
 		if (object.isDeleted == true)
 		{
@@ -52,6 +60,8 @@ class ReceiptVoucherDetailValidationService {
 	}
 	def createObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = receiptVoucherNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = receivableNotNull(object)
@@ -65,6 +75,8 @@ class ReceiptVoucherDetailValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
+		object = isConfirmed(object)
+		if (object.errors.hasErrors()) return object
 		object = receiptVoucherNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = receivableNotNull(object)
@@ -78,8 +90,9 @@ class ReceiptVoucherDetailValidationService {
 	}
 	def softdeleteObjectValidation(object)
 	{
-		object = isDeleted(object)
+		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
 		return object
 	}
 	def confirmObjectValidation(object)

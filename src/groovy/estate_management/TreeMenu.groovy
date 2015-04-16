@@ -83,7 +83,14 @@ class TreeMenu extends Tree{
 		setParent("Maintenance Fee", "Maintenance")
 		setChildrenAllowed( "Maintenance Fee", false)
 
-		
+		addItem("Permit")
+		setParent("Permit", "Maintenance")
+		setChildrenAllowed( "Permit", false)
+
+		addItem("Claim")
+		setParent("Claim", "Maintenance")
+		setChildrenAllowed( "Claim", false)
+
 		
 		addItem( "Tenant" )
 		//Child
@@ -102,6 +109,10 @@ class TreeMenu extends Tree{
 		addItem("Outstanding Invoice")
 		setParent("Outstanding Invoice", "Tenant")
 		setChildrenAllowed( "Outstanding Invoice", false)
+		
+		addItem("Parking Registration")
+		setParent("Parking Registration", "Tenant")
+		setChildrenAllowed( "Parking Registration", false)
 		//	   if (currentUser.hasRole("Administrator"))
 		//	   {
 		//		   //Parent

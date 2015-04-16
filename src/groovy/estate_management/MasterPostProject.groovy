@@ -56,7 +56,9 @@ import estate_management.ProjectService
 
 
 import com.vaadin.grails.Grails
-
+import estate_management.widget.Constant
+import org.apache.shiro.subject.Subject
+import org.apache.shiro.SecurityUtils
 class MasterPostProject extends VerticalLayout{
 	def selectedRow
 	def itemlist
@@ -70,7 +72,7 @@ class MasterPostProject extends VerticalLayout{
 
 	//==============================
 	private TextField textTitle
-	private TextField textDescription
+	private TextArea textDescription
 	private ComboBox cmbComplaint
 	private TextField textCode
 
@@ -90,9 +92,9 @@ class MasterPostProject extends VerticalLayout{
 	private static final int MAX_PAGE_LENGTH = 15;
 	String Title = "Project"
 	//						Constant.MenuName.Item + ":";
-
+	private Subject currentUser
 	public MasterPostProject() {
-		//		currentUser = SecurityUtils.getSubject();
+				currentUser = SecurityUtils.getSubject();
 		//		table = new Table()
 		initTable();
 
@@ -235,8 +237,9 @@ class MasterPostProject extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTable()
 							}
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -277,8 +280,9 @@ class MasterPostProject extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTableDetail()
 							}
-							initTableDetail()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -297,7 +301,7 @@ class MasterPostProject extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDelete(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -318,11 +322,11 @@ class MasterPostProject extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Menghapus Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW DELETE DETAIL
@@ -330,7 +334,7 @@ class MasterPostProject extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDeleteDetail(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -351,11 +355,11 @@ class MasterPostProject extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Menghapus Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 	//	===========================================
@@ -364,7 +368,7 @@ class MasterPostProject extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowConfirm(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Confirm)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -386,11 +390,11 @@ class MasterPostProject extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Mengkonfirmasi Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW UNCONFIRM
@@ -398,7 +402,7 @@ class MasterPostProject extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowUnConfirm(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Unconfirm)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -419,11 +423,11 @@ class MasterPostProject extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Unkonfirmasi Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW FINISH
@@ -431,7 +435,7 @@ class MasterPostProject extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowFinish(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Finish)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -452,11 +456,11 @@ class MasterPostProject extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Finish Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 
@@ -466,7 +470,7 @@ class MasterPostProject extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowUnFinish(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Unfinish)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -487,18 +491,18 @@ class MasterPostProject extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Unfinish Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	========================================
 	//WINDOW EDIT
 	//	========================================
 	//@RequiresPermissions("Master:Item:Edit")
 	private void windowEdit(def item,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
 		window = new Window(caption);
 		window.setModal(true);
 		layout = new FormLayout();
@@ -519,7 +523,7 @@ class MasterPostProject extends VerticalLayout{
 		textTitle.setBuffered(true)
 		textTitle.setImmediate(false)
 		layout.addComponent(textTitle)
-		textDescription = new TextField("Description:");
+		textDescription = new TextArea("Description:");
 		textDescription.setPropertyDataSource(item.getItemProperty("description"))
 		textDescription.setBuffered(true)
 		textDescription.setImmediate(false)
@@ -534,14 +538,16 @@ class MasterPostProject extends VerticalLayout{
 		cmbComplaint.setBuffered(true)
 		cmbComplaint.setImmediate(false)
 		layout.addComponent(cmbComplaint)
-		layout.addComponent(createSaveButton())
-		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Mengubah Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Mengubah Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 
@@ -550,7 +556,7 @@ class MasterPostProject extends VerticalLayout{
 	//	========================================
 	//@RequiresPermissions("Master:Item:Add")
 	private void windowAdd(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
 		window = new Window(caption);
 		window.setModal(true);
 		def layout = new FormLayout();
@@ -564,7 +570,7 @@ class MasterPostProject extends VerticalLayout{
 		layout.addComponent(textCode)
 		textTitle = new TextField("Title:")
 		layout.addComponent(textTitle)
-		textDescription = new TextField("Description:")
+		textDescription = new TextArea("Description:")
 		layout.addComponent(textDescription)
 		cmbComplaint = new ComboBox("Complaint:")
 		def beanComplaint = new BeanItemContainer<Complaint>(Complaint.class)
@@ -585,27 +591,30 @@ class MasterPostProject extends VerticalLayout{
 		//			===================
 		//TOMBOL SAVE
 		//			===================
-		layout.addComponent(createSaveButton())
+//		layout.addComponent(createSaveButton())
 		//			==================
 
 		//			===================
 		//			TOMBOL CANCEL
 		//			===================
-		layout.addComponent(createCancelButton())
-
+//		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		//			===================
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Membuat Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Membuat Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	=======================
 	//	WINDOW ADD DETAIL
 	//	=======================
 	private void windowAddDetail(item,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
 		window = new Window(caption)
 		window.setModal(true)
 		def layout3 = new FormLayout()
@@ -631,22 +640,24 @@ class MasterPostProject extends VerticalLayout{
 		//		layout3.addComponent(comb)
 		//			textQuantity = new TextField("Quantity:")
 		//		layout3.addComponent(textQuantity)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveButton())
+		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//					"Anda tidak memiliki izin untuk Mengubah Record",
-		//					Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+							"Anda tidak memiliki izin untuk Membuat Record",
+							Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	========================
 	//	WINDOW EDIT DETAIL
 	//	========================
 	//@RequiresPermissions("Transaction:DeliveryOrder:Edit")
 	private void windowEditDetail(item,itemDetail,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
 		window = new Window(caption)
 		window.setModal(true)
 		def layout3 = new FormLayout()
@@ -678,15 +689,17 @@ class MasterPostProject extends VerticalLayout{
 		//		comb.select(comb.getItemIds().find{ it.id == itemDetail.getItemProperty("salesOrderDetail.id").value})
 		//
 		//		layout3.addComponent(comb)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveButton())
+		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//					"Anda tidak memiliki izin untuk Mengubah Record",
-		//					Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+							"Anda tidak memiliki izin untuk Mengubah Record",
+							Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 	void updateTable() {

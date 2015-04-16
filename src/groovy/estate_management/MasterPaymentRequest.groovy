@@ -1,14 +1,22 @@
 package estate_management
 
 import java.awt.event.ItemEvent;
+import java.text.SimpleDateFormat
+import java.util.ArrayList;
+import java.util.Date;
 
+import estate_management.reportModel.PaymentRequestReportModel
 import estate_management.widget.GeneralFunction
 
 
 
 
 
+import net.sf.jasperreports.engine.JasperRunManager
+import net.sf.jasperreports.engine.JRException
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource
 import org.vaadin.dialogs.ConfirmDialog
+
 
 
 
@@ -26,12 +34,15 @@ import com.vaadin.event.ItemClickEvent.ItemClickListener
 import com.vaadin.event.MouseEvents.ClickEvent
 import com.vaadin.event.MouseEvents.ClickListener
 import com.vaadin.server.DefaultErrorHandler
+import com.vaadin.server.StreamResource
 import com.vaadin.server.UserError
 import com.vaadin.ui.Button
 import com.vaadin.ui.ComboBox
 import com.vaadin.ui.Component
 import com.vaadin.shared.ui.datefield.Resolution
+import com.vaadin.ui.BrowserFrame
 import com.vaadin.ui.DateField
+import com.vaadin.ui.Embedded
 import com.vaadin.ui.Field
 import com.vaadin.ui.FormLayout
 import com.vaadin.ui.HorizontalLayout
@@ -44,7 +55,7 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
-
+import com.vaadin.shared.ui.window.WindowMode
 import estate_management.PaymentRequestService
 
 
@@ -52,8 +63,11 @@ import estate_management.PaymentRequestService
 
 
 
-import com.vaadin.grails.Grails
 
+import com.vaadin.grails.Grails
+import estate_management.widget.Constant
+import org.apache.shiro.subject.Subject
+import org.apache.shiro.SecurityUtils
 class MasterPaymentRequest extends VerticalLayout{
 	def selectedRow
 	def itemlist
@@ -68,7 +82,7 @@ class MasterPaymentRequest extends VerticalLayout{
 	//==============================
 	private ComboBox cmbVendor
 	private ComboBox cmbProject
-	private TextField textDescription
+	private TextArea textDescription
 	private TextField textCode
 	private TextField textAmount
 	private DateField textRequestDate
@@ -77,7 +91,7 @@ class MasterPaymentRequest extends VerticalLayout{
 	private TextField textIdDetail
 	private TextField textCodeDetail
 	private TextField textAmountDetail
-	private TextField textDescriptionDetail
+	private TextArea textDescriptionDetail
 
 	//==============================
 
@@ -92,9 +106,10 @@ class MasterPaymentRequest extends VerticalLayout{
 	private static final int MAX_PAGE_LENGTH = 15;
 	String Title = "Payment Request"
 	//						Constant.MenuName.Item + ":";
-
+	
+	private Subject currentUser
 	public MasterPaymentRequest() {
-		//		currentUser = SecurityUtils.getSubject();
+				currentUser = SecurityUtils.getSubject();
 
 		initTable();
 
@@ -133,6 +148,10 @@ class MasterPaymentRequest extends VerticalLayout{
 								if (table.getValue() != null)
 									windowUnConfirm("Unconfirm");
 								break;
+							case "Print":
+								if (table.getValue() != null)
+									windowPrint("Print");
+								break;
 							case "AddDetail":
 								if (table.getValue() != null)
 									windowAddDetail(tableContainer.getItem(table.getValue()),"AddDetail");
@@ -158,6 +177,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
 		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
+		MenuItem printMenu = menuBar.addItem("Print", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")
 		//	END BUTTON MENU
@@ -236,8 +256,9 @@ class MasterPaymentRequest extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTable()
 							}
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -282,9 +303,10 @@ class MasterPaymentRequest extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTableDetail()
+								initTable()
 							}
-							initTableDetail()
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -303,7 +325,7 @@ class MasterPaymentRequest extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDelete(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -324,11 +346,11 @@ class MasterPaymentRequest extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Menghapus Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW DELETE DETAIL
@@ -336,7 +358,7 @@ class MasterPaymentRequest extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDeleteDetail(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -358,11 +380,11 @@ class MasterPaymentRequest extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Menghapus Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW CONFIRM
@@ -370,7 +392,7 @@ class MasterPaymentRequest extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowConfirm(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Confirm)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -392,11 +414,11 @@ class MasterPaymentRequest extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Mengkonfirmasi Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW UNCONFIRM
@@ -404,7 +426,7 @@ class MasterPaymentRequest extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowUnConfirm(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Unconfirm)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -425,18 +447,18 @@ class MasterPaymentRequest extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Unkonfirmasi Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	========================================
 	//WINDOW EDIT
 	//	========================================
 	//@RequiresPermissions("Master:Item:Edit")
 	private void windowEdit(def item,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
 		window = new Window(caption);
 		window.setModal(true);
 		layout = new FormLayout();
@@ -472,12 +494,12 @@ class MasterPaymentRequest extends VerticalLayout{
 		cmbProject.setBuffered(true)
 		cmbProject.setImmediate(false)
 		layout.addComponent(cmbProject)
-		textDescription = new TextField("Description:");
+		textDescription = new TextArea("Description:");
 		textDescription.setPropertyDataSource(item.getItemProperty("description"))
 		textDescription.setBuffered(true)
 		textDescription.setImmediate(false)
 		layout.addComponent(textDescription)
-		
+
 		textAmount = new TextField("Amount:");
 		//			textAmount.setPropertyDataSource(item.getItemProperty("amount"))
 		textAmount.setValue(item.getItemProperty("amount").toString())
@@ -495,14 +517,16 @@ class MasterPaymentRequest extends VerticalLayout{
 		textDueDate.setBuffered(true)
 		textDueDate.setImmediate(false)
 		layout.addComponent(textDueDate)
-		layout.addComponent(createSaveButton())
-		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Mengubah Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Mengubah Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 
@@ -511,7 +535,7 @@ class MasterPaymentRequest extends VerticalLayout{
 	//	========================================
 	//@RequiresPermissions("Master:Item:Add")
 	private void windowAdd(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
 		window = new Window(caption);
 		window.setModal(true);
 		def layout = new FormLayout();
@@ -537,9 +561,9 @@ class MasterPaymentRequest extends VerticalLayout{
 		cmbProject.setContainerDataSource(beanProject)
 		cmbProject.setItemCaptionPropertyId("title")
 		layout.addComponent(cmbProject)
-		textDescription = new TextField("Description:")
+		textDescription = new TextArea("Description:")
 		layout.addComponent(textDescription)
-		
+
 		textAmount = new TextField("Amount:")
 		textAmount.setReadOnly(true)
 		layout.addComponent(textAmount)
@@ -559,27 +583,30 @@ class MasterPaymentRequest extends VerticalLayout{
 		//			===================
 		//TOMBOL SAVE
 		//			===================
-		layout.addComponent(createSaveButton())
+//		layout.addComponent(createSaveButton())
 		//			==================
 
 		//			===================
 		//			TOMBOL CANCEL
 		//			===================
-		layout.addComponent(createCancelButton())
-
+//		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		//			===================
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Membuat Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Membuat Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	=======================
 	//	WINDOW ADD DETAIL
 	//	=======================
 	private void windowAddDetail(item,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
 		window = new Window(caption)
 		window.setModal(true)
 		def layout3 = new FormLayout()
@@ -592,13 +619,13 @@ class MasterPaymentRequest extends VerticalLayout{
 		textIdDetail = new TextField("Detail Id:")
 		textIdDetail.setReadOnly(true)
 		layout3.addComponent(textIdDetail)
-		
+
 		textCodeDetail = new TextField("Code:");
 		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
 		textAmountDetail = new TextField("Amount:");
 		layout3.addComponent(textAmountDetail)
-		textDescriptionDetail = new TextField("Description:");
+		textDescriptionDetail = new TextArea("Description:");
 		layout3.addComponent(textDescriptionDetail)
 		//		comb = new ComboBox("Sales Order Detail Item:")
 		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
@@ -611,22 +638,24 @@ class MasterPaymentRequest extends VerticalLayout{
 		//		layout3.addComponent(comb)
 		//			textQuantity = new TextField("Quantity:")
 		//		layout3.addComponent(textQuantity)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveDetailButton())
+		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//					"Anda tidak memiliki izin untuk Mengubah Record",
-		//					Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+							"Anda tidak memiliki izin untuk Membuat Record",
+							Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	========================
 	//	WINDOW EDIT DETAIL
 	//	========================
 	//@RequiresPermissions("Transaction:DeliveryOrder:Edit")
 	private void windowEditDetail(item,itemDetail,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
 		window = new Window(caption)
 		window.setModal(true)
 		def layout3 = new FormLayout()
@@ -664,19 +693,20 @@ class MasterPaymentRequest extends VerticalLayout{
 		textAmountDetail.setValue(itemDetail.getItemProperty("amount").toString())
 		textAmountDetail.setBuffered(true)
 		layout3.addComponent(textAmountDetail)
-		textDescriptionDetail = new TextField("Description:")
+		textDescriptionDetail = new TextArea("Description:")
 		textDescriptionDetail.setPropertyDataSource(itemDetail.getItemProperty("description"))
 		textDescriptionDetail.setBuffered(true)
 		layout3.addComponent(textDescriptionDetail)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
-
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveDetailButton())
+		horizontal3.addComponent(createCancelButton())
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//					"Anda tidak memiliki izin untuk Mengubah Record",
-		//					Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+							"Anda tidak memiliki izin untuk Mengubah Record",
+							Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 
@@ -713,7 +743,7 @@ class MasterPaymentRequest extends VerticalLayout{
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
 		table.visibleColumns = ["id","vendor.name","project.title","description","code","amount","requestDate","dueDate","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"
-]
+		]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
@@ -768,6 +798,112 @@ class MasterPaymentRequest extends VerticalLayout{
 		tableDetail.setVisible(true)
 		tableDetail.setSizeFull()
 		menuBarDetail.setVisible(true)
+	}
+	private void windowPrint(String caption){
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							object = Grails.get(PaymentRequestService).printObject(object)
+							if (object.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								final Map map = new HashMap();
+								StreamResource.StreamSource source = new StreamResource.StreamSource() {
+											public InputStream getStream() {
+												byte[] b = null;
+												try {
+													DataBeanMaker dataBeanMaker = new DataBeanMaker();
+													object = Grails.get(PaymentRequestDetailService).getList(object.id)
+													ArrayList dataBeanList = dataBeanMaker.getDataBeanList(object);
+													JRBeanCollectionDataSource beanColDataSource = new
+															JRBeanCollectionDataSource(dataBeanList);
+													Map parameters = new HashMap();
+													b = JasperRunManager.runReportToPdf(getClass().
+															getClassLoader().getResourceAsStream("reports/PaymentRequest.jasper"),
+															map,beanColDataSource);
+												} catch (JRException ex) {
+													ex.printStackTrace();
+												}
+
+												return new ByteArrayInputStream(b);
+											}
+										};
+								Date curDate = new Date()
+								SimpleDateFormat format = new SimpleDateFormat("yyMMddhhMMss");
+								String now = format.format(curDate)
+								StreamResource resource = new StreamResource(source, "PaymentRequest${now}.pdf");
+								resource.setMIMEType("application/pdf");
+								BrowserFrame browser = new BrowserFrame("Browser");
+								browser.setWidth("600px");
+								browser.setHeight("400px");
+								VerticalLayout v = new VerticalLayout();
+								Embedded e = new Embedded("", resource);
+								e.setSizeFull();
+								e.setHeight("600px")
+								e.setType(Embedded.TYPE_BROWSER)
+								v.addComponent(e);
+								Window w = new Window()
+								w.setContent(v);
+								w.setWindowMode(WindowMode.MAXIMIZED)
+								UI.getCurrent().addWindow(w);
+
+							}
+						} else {
+
+						}
+					}
+				})
+
+	}
+
+
+	private class DataBeanMaker {
+		public ArrayList getDataBeanList(def object) {
+			ArrayList<PaymentRequestReportModel> dataBeanList = new ArrayList<PaymentRequestReportModel>();
+			for(data in object)
+			{
+				dataBeanList.add(produce(data.paymentRequest.code,data.paymentRequest.requestDate,
+						data.paymentRequest.description, data.paymentRequest.dueDate, data.id.toInteger(),
+						data.description,
+						data.amount, data.paymentRequest.amount, data.paymentRequest.vendor.name, data.paymentRequest.vendor.description));
+			}
+			return dataBeanList
+		}
+
+		private PaymentRequestReportModel produce(
+				String code,
+				Date requestDate,
+				String description,
+				Date dueDate,
+				Integer idDetail,
+				String descriptionDetail,
+				Double amountDetail,
+				Double totalAmount,
+				String vendorName,
+				String vendorDescription
+		) {
+
+			PaymentRequestReportModel dataBean = new PaymentRequestReportModel();
+
+			dataBean.setCode(code);
+			dataBean.setRequestDate(requestDate)
+			dataBean.setDescription(description)
+			dataBean.setDueDate(dueDate)
+			dataBean.setIdDetail(idDetail)
+			dataBean.setDescriptionDetail(descriptionDetail)
+			dataBean.setAmountDetail(amountDetail)
+			dataBean.setTotalAmount(totalAmount)
+			dataBean.setVendorName(vendorName)
+			dataBean.setVendorDescription(vendorDescription)
+
+			return dataBean;
+		}
 	}
 
 

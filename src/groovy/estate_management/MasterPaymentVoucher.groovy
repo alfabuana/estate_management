@@ -1,7 +1,11 @@
 package estate_management
 
 import java.awt.event.ItemEvent;
+import java.text.SimpleDateFormat
+import java.util.ArrayList;
+import java.util.Date;
 
+import estate_management.reportModel.PaymentVoucherReportModel
 import estate_management.widget.GeneralFunction
 
 
@@ -11,7 +15,11 @@ import estate_management.widget.GeneralFunction
 
 
 
+import net.sf.jasperreports.engine.JasperRunManager
+import net.sf.jasperreports.engine.JRException
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource
 import org.vaadin.dialogs.ConfirmDialog
+
 
 
 
@@ -32,13 +40,16 @@ import com.vaadin.event.ItemClickEvent.ItemClickListener
 import com.vaadin.event.MouseEvents.ClickEvent
 import com.vaadin.event.MouseEvents.ClickListener
 import com.vaadin.server.DefaultErrorHandler
+import com.vaadin.server.StreamResource
 import com.vaadin.server.UserError
 import com.vaadin.ui.Button
 import com.vaadin.ui.ComboBox
 import com.vaadin.ui.Component
 import com.vaadin.shared.ui.datefield.Resolution
+import com.vaadin.ui.BrowserFrame
 import com.vaadin.ui.CheckBox
 import com.vaadin.ui.DateField
+import com.vaadin.ui.Embedded
 import com.vaadin.ui.Field
 import com.vaadin.ui.FormLayout
 import com.vaadin.ui.HorizontalLayout
@@ -51,7 +62,7 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
-
+import com.vaadin.shared.ui.window.WindowMode
 import estate_management.PaymentVoucherService
 import grails.converters.JSON
 
@@ -63,8 +74,11 @@ import grails.converters.JSON
 
 
 
-import com.vaadin.grails.Grails
 
+import com.vaadin.grails.Grails
+import estate_management.widget.Constant
+import org.apache.shiro.subject.Subject
+import org.apache.shiro.SecurityUtils
 class MasterPaymentVoucher extends VerticalLayout{
 	def selectedRow
 	def itemlist
@@ -81,7 +95,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 	private ComboBox cmbCashBank
 	private TextField textCode
 	private DateField textPaymentDate
-	private CheckBox chkIsGBCH
+//	private CheckBox chkIsGBCH
 	//	private DateField textDueDate
 	private TextField textTotalAmount
 
@@ -89,7 +103,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 	private ComboBox cmbPayableDetail
 	private TextField textCodeDetail
 	private TextField textAmountDetail
-	private TextField textDescriptionDetail
+	private TextArea textDescriptionDetail
 
 	//==============================
 
@@ -104,9 +118,9 @@ class MasterPaymentVoucher extends VerticalLayout{
 	private static final int MAX_PAGE_LENGTH = 15;
 	String Title = "Payment Voucher"
 	//						Constant.MenuName.Item + ":";
-
+	private Subject currentUser
 	public MasterPaymentVoucher() {
-		//		currentUser = SecurityUtils.getSubject();
+				currentUser = SecurityUtils.getSubject();
 
 		initTable();
 
@@ -145,6 +159,10 @@ class MasterPaymentVoucher extends VerticalLayout{
 								if (table.getValue() != null)
 									windowUnConfirm("Unconfirm");
 								break;
+							case "Print":
+								if (table.getValue() != null)
+									windowPrint("Print");
+								break;
 							case "AddDetail":
 								if (table.getValue() != null)
 									windowAddDetail(tableContainer.getItem(table.getValue()),"AddDetail");
@@ -170,6 +188,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
 		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
+		MenuItem printMenu = menuBar.addItem("Print", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")
 		//	END BUTTON MENU
@@ -215,7 +234,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 								cashBank:cmbCashBank.getValue(),
 								code:textCode.getValue(),
 								paymentDate:textPaymentDate.getValue(),
-								isGBCH:chkIsGBCH.getValue(),
+//								isGBCH:chkIsGBCH.getValue(),
 								totalAmount:textTotalAmount.getValue()
 							]
 
@@ -236,16 +255,17 @@ class MasterPaymentVoucher extends VerticalLayout{
 								cmbCashBank.setData("cashBank")
 								textCode.setData("code")
 								textPaymentDate.setData("paymentDate")
-								chkIsGBCH.setData("isGBCH")
+//								chkIsGBCH.setData("isGBCH")
 								textTotalAmount.setData("totalAmount")
-								Object[] tv = [cmbUser,cmbCashBank,textCode,textPaymentDate,chkIsGBCH,textTotalAmount]
+								Object[] tv = [cmbUser,cmbCashBank,textCode,textPaymentDate,textTotalAmount]
 								generalFunction.setErrorUI(tv,object)
 							}
 							else
 							{
 								window.close()
+								initTable()
 							}
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -291,9 +311,10 @@ class MasterPaymentVoucher extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTableDetail()
+								initTable()
 							}
-							initTableDetail()
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -312,7 +333,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDelete(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -333,11 +354,11 @@ class MasterPaymentVoucher extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Menghapus Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW DELETE DETAIL
@@ -345,7 +366,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDeleteDetail(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -367,11 +388,11 @@ class MasterPaymentVoucher extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Menghapus Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 	//	===========================================
@@ -380,7 +401,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowConfirm(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Confirm)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -403,11 +424,11 @@ class MasterPaymentVoucher extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Mengkonfirmasi Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW UNCONFIRM
@@ -415,7 +436,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowUnConfirm(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Unconfirm)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -436,18 +457,18 @@ class MasterPaymentVoucher extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Unkonfirmasi Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	========================================
 	//WINDOW EDIT
 	//	========================================
 	//@RequiresPermissions("Master:Item:Edit")
 	private void windowEdit(def item,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
 		window = new Window(caption);
 		window.setModal(true);
 		layout = new FormLayout();
@@ -483,17 +504,17 @@ class MasterPaymentVoucher extends VerticalLayout{
 		cmbCashBank.setBuffered(true)
 		cmbCashBank.setImmediate(false)
 		layout.addComponent(cmbCashBank)
-		
+
 		textPaymentDate = new DateField("Payment Date:");
 		textPaymentDate.setPropertyDataSource(item.getItemProperty("paymentDate"))
 		textPaymentDate.setBuffered(true)
 		textPaymentDate.setImmediate(false)
 		layout.addComponent(textPaymentDate)
-		chkIsGBCH = new CheckBox("is GBCH");
-		chkIsGBCH.setPropertyDataSource(item.getItemProperty("isGBCH"))
-		chkIsGBCH.setBuffered(true)
-		chkIsGBCH.setImmediate(false)
-		layout.addComponent(chkIsGBCH)
+//		chkIsGBCH = new CheckBox("is GBCH");
+//		chkIsGBCH.setPropertyDataSource(item.getItemProperty("isGBCH"))
+//		chkIsGBCH.setBuffered(true)
+//		chkIsGBCH.setImmediate(false)
+//		layout.addComponent(chkIsGBCH)
 		//			textDueDate = new DateField("Due Date:");
 		//			textDueDate.setPropertyDataSource(item.getItemProperty("dueDate"))
 		//			textDueDate.setBuffered(true)
@@ -506,14 +527,16 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textTotalAmount.setBuffered(true)
 		textTotalAmount.setImmediate(false)
 		layout.addComponent(textTotalAmount)
-		layout.addComponent(createSaveButton())
-		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Mengubah Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Mengubah Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 
@@ -522,7 +545,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 	//	========================================
 	//@RequiresPermissions("Master:Item:Add")
 	private void windowAdd(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
 		window = new Window(caption);
 		window.setModal(true);
 		def layout = new FormLayout();
@@ -548,11 +571,11 @@ class MasterPaymentVoucher extends VerticalLayout{
 		cmbCashBank.setContainerDataSource(beanCashBank)
 		cmbCashBank.setItemCaptionPropertyId("name")
 		layout.addComponent(cmbCashBank)
-		
+
 		textPaymentDate = new DateField("Payment Date:")
 		layout.addComponent(textPaymentDate)
-		chkIsGBCH = new CheckBox("Is GBCH")
-		layout.addComponent(chkIsGBCH)
+//		chkIsGBCH = new CheckBox("Is GBCH")
+//		layout.addComponent(chkIsGBCH)
 		//			textDueDate = new DateField("Due Date:")
 		//			layout.addComponent(textDueDate)
 		textTotalAmount = new TextField("Total Amount:")
@@ -570,27 +593,30 @@ class MasterPaymentVoucher extends VerticalLayout{
 		//			===================
 		//TOMBOL SAVE
 		//			===================
-		layout.addComponent(createSaveButton())
+//		layout.addComponent(createSaveButton())
 		//			==================
 
 		//			===================
 		//			TOMBOL CANCEL
 		//			===================
-		layout.addComponent(createCancelButton())
-
+//		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		//			===================
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Membuat Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Membuat Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	=======================
 	//	WINDOW ADD DETAIL
 	//	=======================
 	private void windowAddDetail(item,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
 		window = new Window(caption)
 		window.setModal(true)
 		def layout3 = new FormLayout()
@@ -616,7 +642,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textAmountDetail = new TextField("Amount:");
 		textAmountDetail.setReadOnly(true)
 		layout3.addComponent(textAmountDetail)
-		textDescriptionDetail = new TextField("Description:");
+		textDescriptionDetail = new TextArea("Description:");
 		layout3.addComponent(textDescriptionDetail)
 		//		comb = new ComboBox("Sales Order Detail Item:")
 		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
@@ -629,22 +655,23 @@ class MasterPaymentVoucher extends VerticalLayout{
 		//		layout3.addComponent(comb)
 		//			textQuantity = new TextField("Quantity:")
 		//		layout3.addComponent(textQuantity)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
-
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveDetailButton())
+		horizontal3.addComponent(createCancelButton())
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//					"Anda tidak memiliki izin untuk Mengubah Record",
-		//					Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+							"Anda tidak memiliki izin untuk Membuat Record",
+							Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	========================
 	//	WINDOW EDIT DETAIL
 	//	========================
 	//@RequiresPermissions("Transaction:DeliveryOrder:Edit")
 	private void windowEditDetail(item,itemDetail,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
 		window = new Window(caption)
 		window.setModal(true)
 		def layout3 = new FormLayout()
@@ -693,19 +720,20 @@ class MasterPaymentVoucher extends VerticalLayout{
 		textAmountDetail.setBuffered(true)
 		textAmountDetail.setReadOnly(true)
 		layout3.addComponent(textAmountDetail)
-		textDescriptionDetail = new TextField("Description:")
+		textDescriptionDetail = new TextArea("Description:")
 		textDescriptionDetail.setPropertyDataSource(itemDetail.getItemProperty("description"))
 		textDescriptionDetail.setBuffered(true)
 		layout3.addComponent(textDescriptionDetail)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
-
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveDetailButton())
+		horizontal3.addComponent(createCancelButton())
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//					"Anda tidak memiliki izin untuk Mengubah Record",
-		//					Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+							"Anda tidak memiliki izin untuk Mengubah Record",
+							Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 	void updateTable() {
@@ -740,7 +768,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		//		table.setColumnHeader("durasi","Duration")
 		//		table.setColumnHeader("dateStartUsing","Date Start Using")
 		//		table.setColumnHeader("dateEndUsing","Date End Using")
-		table.visibleColumns = ["id","user.username","cashBank.name","code","paymentDate","isGBCH","dueDate","isReconciled","reconciliationDate","totalAmount","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		table.visibleColumns = ["id","user.username","cashBank.name","code","paymentDate","dueDate","totalAmount","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
@@ -782,7 +810,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 		tableDetailContainer.addAll(itemListDetail)
 		tableDetail.setColumnHeader("paymentVoucher.id","Payment Voucher Id")
 		tableDetail.setContainerDataSource(tableDetailContainer);
-		tableDetail.visibleColumns = ["id","paymentVoucher.id","payable.code","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
+		tableDetail.visibleColumns = ["id","payable.code","code","amount","description","isConfirmed","confirmationDate","isDeleted","dateCreated","lastUpdated"]
 		tableDetail.setSelectable(true)
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)
@@ -790,5 +818,109 @@ class MasterPaymentVoucher extends VerticalLayout{
 		menuBarDetail.setVisible(true)
 	}
 
+	private void windowPrint(String caption){
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							object = Grails.get(PaymentVoucherService).printObject(object)
+							if (object.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								final Map map = new HashMap();
+								StreamResource.StreamSource source = new StreamResource.StreamSource() {
+											public InputStream getStream() {
+												byte[] b = null;
+												try {
+													DataBeanMaker dataBeanMaker = new DataBeanMaker();
+													object = Grails.get(PaymentVoucherDetailService).getList(object.id)
+													ArrayList dataBeanList = dataBeanMaker.getDataBeanList(object);
+													JRBeanCollectionDataSource beanColDataSource = new
+															JRBeanCollectionDataSource(dataBeanList);
+													Map parameters = new HashMap();
+													b = JasperRunManager.runReportToPdf(getClass().
+															getClassLoader().getResourceAsStream("reports/PaymentVoucher.jasper"),
+															map,beanColDataSource);
+												} catch (JRException ex) {
+													ex.printStackTrace();
+												}
+
+												return new ByteArrayInputStream(b);
+											}
+										};
+								Date curDate = new Date()
+								SimpleDateFormat format = new SimpleDateFormat("yyMMddhhMMss");
+								String now = format.format(curDate)
+								StreamResource resource = new StreamResource(source, "PaymentVoucher${now}.pdf");
+								resource.setMIMEType("application/pdf");
+								BrowserFrame browser = new BrowserFrame("Browser");
+								browser.setWidth("600px");
+								browser.setHeight("400px");
+								VerticalLayout v = new VerticalLayout();
+								Embedded e = new Embedded("", resource);
+								e.setSizeFull();
+								e.setHeight("600px")
+								e.setType(Embedded.TYPE_BROWSER)
+								v.addComponent(e);
+								Window w = new Window()
+								w.setContent(v);
+								w.setWindowMode(WindowMode.MAXIMIZED)
+								UI.getCurrent().addWindow(w);
+
+							}
+						} else {
+
+						}
+					}
+				})
+
+	}
+
+
+	private class DataBeanMaker {
+		public ArrayList getDataBeanList(def object) {
+			ArrayList<PaymentVoucherReportModel> dataBeanList = new ArrayList<PaymentVoucherReportModel>();
+			for(data in object)
+			{
+				dataBeanList.add(produce(data.paymentVoucher.code,data.paymentVoucher.user.username,
+						data.paymentVoucher.cashBank.name, data.paymentVoucher.paymentDate, data.id.toInteger(),
+						data.payable.code,
+						data.description, data.amount, data.paymentVoucher.totalAmount));
+			}
+			return dataBeanList
+		}
+
+		private PaymentVoucherReportModel produce(
+				String code,
+				String username,
+				String cashBankName,
+				Date paymentDate,
+				Integer idDetail,
+				String codePayable,
+				String descriptionDetail,
+				Double amountDetail,
+				Double totalAmount
+		) {
+
+			PaymentVoucherReportModel dataBean = new PaymentVoucherReportModel();
+
+			dataBean.setCode(code);
+			dataBean.setUsername(username)
+			dataBean.setCashBankName(cashBankName)
+			dataBean.setPaymentDate(paymentDate)
+			dataBean.setIdDetail(idDetail)
+			dataBean.setCodePayable(codePayable)
+			dataBean.setDescriptionDetail(descriptionDetail)
+			dataBean.setAmountDetail(amountDetail)
+			dataBean.setTotalAmount(totalAmount)
+
+			return dataBean;
+		}
+	}
 
 }

@@ -60,7 +60,9 @@ import estate_management.MaintenanceService
 
 
 import com.vaadin.grails.Grails
-
+import estate_management.widget.Constant
+import org.apache.shiro.subject.Subject
+import org.apache.shiro.SecurityUtils
 class MasterMaintenance extends VerticalLayout{
 	def selectedRow
 	def itemlist
@@ -73,7 +75,7 @@ class MasterMaintenance extends VerticalLayout{
 //	private TextField textDescription
 	
 	//==============================
-	private TextField textDescription
+	private TextArea textDescription
 	private TextField textAmount
 	private TextField textCode
 	private DateField textMaintenanceDate
@@ -85,9 +87,9 @@ class MasterMaintenance extends VerticalLayout{
 	//==============================
 	
 	private Table table = new Table();
-//	private Table tableDetail = new Table()
+	private Table tableDetail = new Table()
 	private BeanItemContainer<Maintenance> tableContainer;
-//	private BeanItemContainer tableDetailContainer
+	private BeanItemContainer tableDetailContainer
 	private FieldGroup fieldGroup;
 	private FormLayout layout
 	private Action actionDelete = new Action("Delete");
@@ -95,9 +97,9 @@ class MasterMaintenance extends VerticalLayout{
 	private static final int MAX_PAGE_LENGTH = 15;
 	String Title = "Maintenance"
 //						Constant.MenuName.Item + ":";
-	
+	private Subject currentUser
 	public MasterMaintenance() {
-//		currentUser = SecurityUtils.getSubject();
+		currentUser = SecurityUtils.getSubject();
 		
 		initTable();
 		
@@ -160,7 +162,7 @@ class MasterMaintenance extends VerticalLayout{
 		MenuItem updateMenu = menuBar.addItem("Edit", mycommand)
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
-		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
+//		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")	
 		//	END BUTTON MENU
@@ -176,7 +178,7 @@ class MasterMaintenance extends VerticalLayout{
 //		menuBarDetail.setWidth("100%")
 //		menuBarDetail.setVisible(false)
 //		addComponent(menuBarDetail)
-//		addComponent(tableDetail)
+		addComponent(tableDetail)
 
 		//		==========================
 		//		ENd View Detail
@@ -232,8 +234,9 @@ class MasterMaintenance extends VerticalLayout{
 					else
 					{
 						window.close()
+						initTable()
 					}
-					initTable()
+					
 				}catch (Exception e)
 				{
 					Notification.show("Error\n",
@@ -292,7 +295,7 @@ class MasterMaintenance extends VerticalLayout{
 	
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDelete(String caption) {
-//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 			ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 			new ConfirmDialog.Listener() {
 				public void onClose(ConfirmDialog dialog) {
@@ -313,6 +316,11 @@ class MasterMaintenance extends VerticalLayout{
 					}
 				}
 			})
+		} else {
+			Notification.show("Access Denied\n",
+				"Anda tidak memiliki izin untuk Menghapus Record",
+				Notification.Type.ERROR_MESSAGE);
+		}
 	}
 //	//	===========================================
 //	//	WINDOW DELETE DETAIL
@@ -346,7 +354,7 @@ class MasterMaintenance extends VerticalLayout{
 
 		//@RequiresPermissions("Master:Item:Delete")
 		private void windowConfirm(String caption) {
-			//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+					if (currentUser.isPermitted(Title + Constant.AccessType.Confirm)) {
 			ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 			new ConfirmDialog.Listener() {
 				public void onClose(ConfirmDialog dialog) {
@@ -364,18 +372,23 @@ class MasterMaintenance extends VerticalLayout{
 								initTable()
 							}
 					} else {
-
+								
 					}
 				}
 			})
-			}
+		} else {
+			Notification.show("Access Denied\n",
+				"Anda tidak memiliki izin untuk Mengkonfirmasi Record",
+				Notification.Type.ERROR_MESSAGE);
+		}
+	}
 			//	===========================================
 			//	WINDOW UNCONFIRM
 			//	===========================================
 
 			//@RequiresPermissions("Master:Item:Delete")
 			private void windowUnConfirm(String caption) {
-				//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+						if (currentUser.isPermitted(Title + Constant.AccessType.Unconfirm)) {
 				ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -396,18 +409,18 @@ class MasterMaintenance extends VerticalLayout{
 						}
 					}
 				})
-//		} else {
-//			Notification.show("Access Denied\n",
-//				"Anda tidak memiliki izin untuk Menghapus Record",
-//				Notification.Type.ERROR_MESSAGE);
-//		}
+		} else {
+			Notification.show("Access Denied\n",
+				"Anda tidak memiliki izin untuk Unkonfirmasi Record",
+				Notification.Type.ERROR_MESSAGE);
+		}
 	}
 //	========================================
 	//WINDOW EDIT
 //	========================================
 	//@RequiresPermissions("Master:Item:Edit")
 	private void windowEdit(def item,String caption) {
-//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
 			window = new Window(caption);
 			window.setModal(true);
 			layout = new FormLayout();
@@ -423,7 +436,7 @@ class MasterMaintenance extends VerticalLayout{
 			textCode.setImmediate(false)
 			textCode.setReadOnly(true)
 			layout.addComponent(textCode)
-			textDescription = new TextField("Description:");
+			textDescription = new TextArea("Description:");
 			textDescription.setPropertyDataSource(item.getItemProperty("description"))
 			textDescription.setBuffered(true)
 			textDescription.setImmediate(false)
@@ -444,14 +457,16 @@ class MasterMaintenance extends VerticalLayout{
 			textDueDate.setBuffered(true)
 			textDueDate.setImmediate(false)
 			layout.addComponent(textDueDate)
-			layout.addComponent(createSaveButton())
-			layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 			getUI().addWindow(window);
-//		} else {
-//			Notification.show("Access Denied\n",
-//				"Anda tidak memiliki izin untuk Mengubah Record",
-//				Notification.Type.ERROR_MESSAGE);
-//		}
+		} else {
+			Notification.show("Access Denied\n",
+				"Anda tidak memiliki izin untuk Mengubah Record",
+				Notification.Type.ERROR_MESSAGE);
+		}
 	}
 	
 
@@ -460,7 +475,7 @@ class MasterMaintenance extends VerticalLayout{
 //	========================================
 	//@RequiresPermissions("Master:Item:Add")
 	private void windowAdd(String caption) {
-//		if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
+		if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
 			window = new Window(caption);
 			window.setModal(true);
 			def layout = new FormLayout();
@@ -472,7 +487,7 @@ class MasterMaintenance extends VerticalLayout{
 			textCode = new TextField("Code:")
 			textCode.setReadOnly(true)
 			layout.addComponent(textCode)
-			textDescription = new TextField("Description:")
+			textDescription = new TextArea("Description:")
 			layout.addComponent(textDescription)
 			textAmount = new TextField("Amount:")
 			layout.addComponent(textAmount)
@@ -493,27 +508,30 @@ class MasterMaintenance extends VerticalLayout{
 //			===================
 			//TOMBOL SAVE
 //			===================
-			layout.addComponent(createSaveButton())
+//			layout.addComponent(createSaveButton())
 //			==================
 			
 //			===================
 //			TOMBOL CANCEL
 //			===================
-			layout.addComponent(createCancelButton())
-			
+//			layout.addComponent(createCancelButton())
+			def horizontal = new HorizontalLayout()
+			layout.addComponent(horizontal)
+			horizontal.addComponent(createSaveButton())
+			horizontal.addComponent(createCancelButton())
 //			===================
 			getUI().addWindow(window);
-//		} else {
-//			Notification.show("Access Denied\n",
-//				"Anda tidak memiliki izin untuk Membuat Record",
-//				Notification.Type.ERROR_MESSAGE);
-//		}
+		} else {
+			Notification.show("Access Denied\n",
+				"Anda tidak memiliki izin untuk Membuat Record",
+				Notification.Type.ERROR_MESSAGE);
+		}
 	}
 //	//	=======================
 //	//	WINDOW ADD DETAIL
 //	//	=======================
 //	private void windowAddDetail(item,String caption) {
-//		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
 //		window = new Window(caption)
 //		window.setModal(true)
 //		def layout3 = new FormLayout()
@@ -640,41 +658,51 @@ table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 						//				print selectedRow
 					}
 				});
-//		table.addValueChangeListener(new Property.ValueChangeListener() {
-//					public void valueChange(ValueChangeEvent event) {
-//						selectedRow = table.getValue()
-//						if (selectedRow != null) {
-//							initTableDetail()
-//
-//						}
-//						else
-//						{
-//							tableDetail.setVisible(false)
+		table.addValueChangeListener(new Property.ValueChangeListener() {
+					public void valueChange(ValueChangeEvent event) {
+						selectedRow = table.getValue()
+						if (selectedRow != null) {
+							initTableDetail()
+
+						}
+						else
+						{
+							tableDetail.setVisible(false)
 //							menuBarDetail.setVisible(false)
-//						}
-//					}
-//				})
+						}
+					}
+				})
 
 	}
-//	 void initTableDetail() {
-//		 tableDetailContainer = new BeanItemContainer<MaintenanceDetail>(MaintenanceDetail.class);
-//		 def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
-//		 def itemListDetail = Grails.get(MaintenanceDetailService).getList(ind)
-////		 tableDetailContainer.addNestedContainerProperty("complaint.id")
-//		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
-//		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
-//		 //		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
-//		 tableDetailContainer.addAll(itemListDetail)
-////		 tableDetail.setColumnHeader("complaint.id","Complaint Id")
-//		 tableDetail.setContainerDataSource(tableDetailContainer);
-//		 tableDetail.visibleColumns = ["id","maintenance","user","isDeleted","dateCreated","lastUpdated"]
-//		 tableDetail.setSelectable(true)
-//		 tableDetail.setImmediate(false)
-//		 tableDetail.setVisible(true)
-//		 tableDetail.setSizeFull()
-////		 menuBarDetail.setVisible(true)
-//	 }
-//	 
+	 void initTableDetail() {
+		 tableDetailContainer = new BeanItemContainer<Invoice>(Invoice.class);
+		 def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+		 def itemListDetail = Grails.get(InvoiceService).getListForMaintenance(ind)
+//		 tableDetailContainer.addNestedContainerProperty("complaint.id")
+		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.id");
+		 //					tableDetailContainer.addNestedContainerProperty("salesOrderDetail.item.sku");
+		 //		tableDetailContainer.addNestedContainerProperty("deliveryOrder.id");
+		 tableDetailContainer.addAll(itemListDetail)
+		 tableDetailContainer.addNestedContainerProperty("createdBy.id")
+		 tableDetailContainer.addNestedContainerProperty("createdBy.username")
+		 tableDetailContainer.addNestedContainerProperty("updatedBy.id")
+		 tableDetailContainer.addNestedContainerProperty("updatedBy.username")
+		 tableDetailContainer.addNestedContainerProperty("confirmedBy.id")
+		 tableDetailContainer.addNestedContainerProperty("confirmedBy.username")
+		 tableDetailContainer.addNestedContainerProperty("home.id")
+		 tableDetailContainer.addNestedContainerProperty("home.name")
+		 tableDetailContainer.addNestedContainerProperty("maintenance.id")
+		 tableDetailContainer.addNestedContainerProperty("maintenance.code")
+//		 tableDetail.setColumnHeader("complaint.id","Complaint Id")
+		 tableDetail.setContainerDataSource(tableDetailContainer);
+		 tableDetail.visibleColumns = ["id","home.name","code","invoiceDate","description","dueDate","totalAmount","isConfirmed","confirmationDate","isCleared","clearDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"]
+		 tableDetail.setSelectable(true)
+		 tableDetail.setImmediate(false)
+		 tableDetail.setVisible(true)
+		 tableDetail.setSizeFull()
+//		 menuBarDetail.setVisible(true)
+	 }
+	 
 }
 	
 

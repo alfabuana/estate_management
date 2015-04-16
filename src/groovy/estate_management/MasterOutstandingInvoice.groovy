@@ -1,9 +1,20 @@
 package estate_management
+import net.sf.jasperreports.engine.JasperRunManager
+import net.sf.jasperreports.engine.JRException
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource
 import org.apache.shiro.SecurityUtils
 import org.apache.shiro.subject.Subject
+
 import java.awt.event.ItemEvent;
+import java.text.SimpleDateFormat
+import java.util.ArrayList;
+import java.util.Date;
+
+import estate_management.reportModel.InvoiceReportModel;
 import estate_management.widget.GeneralFunction
+
 import org.vaadin.dialogs.ConfirmDialog
+
 import com.vaadin.data.Property
 import com.vaadin.data.Property.ValueChangeEvent
 import com.vaadin.data.fieldgroup.BeanFieldGroup
@@ -18,12 +29,15 @@ import com.vaadin.event.ItemClickEvent.ItemClickListener
 import com.vaadin.event.MouseEvents.ClickEvent
 import com.vaadin.event.MouseEvents.ClickListener
 import com.vaadin.server.DefaultErrorHandler
+import com.vaadin.server.StreamResource
 import com.vaadin.server.UserError
 import com.vaadin.ui.Button
 import com.vaadin.ui.ComboBox
 import com.vaadin.ui.Component
 import com.vaadin.shared.ui.datefield.Resolution
+import com.vaadin.ui.BrowserFrame
 import com.vaadin.ui.DateField
+import com.vaadin.ui.Embedded
 import com.vaadin.ui.Field
 import com.vaadin.ui.FormLayout
 import com.vaadin.ui.HorizontalLayout
@@ -36,10 +50,14 @@ import com.vaadin.ui.TextField
 import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
+import com.vaadin.shared.ui.window.WindowMode
 import estate_management.InvoiceService
 import grails.converters.JSON
-import com.vaadin.grails.Grails
 
+import com.vaadin.grails.Grails
+import estate_management.widget.Constant
+import org.apache.shiro.subject.Subject
+import org.apache.shiro.SecurityUtils
 class MasterOutstandingInvoice extends VerticalLayout{
 	def selectedRow
 	def itemlist
@@ -55,14 +73,14 @@ class MasterOutstandingInvoice extends VerticalLayout{
 	private ComboBox cmbHome
 	private TextField textCode
 	private DateField textInvoiceDate
-	private TextField textDescription
+	private TextArea textDescription
 	//	private DateField textDueDate
 	private TextField textTotalAmount
 
 	private TextField textIdDetail
 	private TextField textCodeDetail
 	private TextField textAmountDetail
-	private TextField textDescriptionDetail
+	private TextArea textDescriptionDetail
 
 	//==============================
 
@@ -80,7 +98,7 @@ class MasterOutstandingInvoice extends VerticalLayout{
 	Subject currentUser = SecurityUtils.getSubject();
 	public MasterOutstandingInvoice() {
 		initTable();
-		
+
 		HorizontalLayout menu = new HorizontalLayout()
 		menu.setWidth("100%")
 		//		menu.addComponent(createAddButton())
@@ -116,6 +134,10 @@ class MasterOutstandingInvoice extends VerticalLayout{
 								if (table.getValue() != null)
 									windowUnConfirm("Unconfirm");
 								break;
+							case "Print":
+								if (table.getValue() != null)
+									windowPrint("Print");
+								break;
 							case "AddDetail":
 								if (table.getValue() != null)
 									windowAddDetail(tableContainer.getItem(table.getValue()),"AddDetail");
@@ -141,6 +163,7 @@ class MasterOutstandingInvoice extends VerticalLayout{
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
 		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
+		MenuItem printMenu = menuBar.addItem("Print", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")
 		//	END BUTTON MENU
@@ -153,17 +176,17 @@ class MasterOutstandingInvoice extends VerticalLayout{
 		MenuItem saveDetailMenu =  menuBarDetail.addItem("AddDetail",mycommand)
 		MenuItem editDetailMenu = menuBarDetail.addItem("EditDetail", mycommand)
 		MenuItem deleteDetailMenu = menuBarDetail.addItem("DeleteDetail",mycommand)
-//		menuBarDetail.setWidth("100%")
-//		menuBarDetail.setVisible(false)
-//		addComponent(menuBarDetail)
+		//		menuBarDetail.setWidth("100%")
+		//		menuBarDetail.setVisible(false)
+		//		addComponent(menuBarDetail)
 		addComponent(tableDetail)
 
 		//		==========================
 		//		ENd View Detail
 		//		==========================
 		//		table.setPageLength(table.size())
-		
-	
+
+
 	}
 
 
@@ -216,8 +239,9 @@ class MasterOutstandingInvoice extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTable()
 							}
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -260,9 +284,10 @@ class MasterOutstandingInvoice extends VerticalLayout{
 							else
 							{
 								window.close()
+								initTableDetail()
+								initTable()
 							}
-							initTableDetail()
-							initTable()
+							
 						}catch (Exception e)
 						{
 							Notification.show("Error\n",
@@ -281,7 +306,7 @@ class MasterOutstandingInvoice extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDelete(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -298,16 +323,16 @@ class MasterOutstandingInvoice extends VerticalLayout{
 								initTable()
 							}
 						} else {
-						
-						
+
+
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Menghapus Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW DELETE DETAIL
@@ -315,7 +340,7 @@ class MasterOutstandingInvoice extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowDeleteDetail(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableDetailContainer.getItem(tableDetail.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -336,11 +361,11 @@ class MasterOutstandingInvoice extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Menghapus Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW CONFIRM
@@ -348,7 +373,7 @@ class MasterOutstandingInvoice extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowConfirm(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Confirm)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -370,11 +395,11 @@ class MasterOutstandingInvoice extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Mengkonfirmasi Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	===========================================
 	//	WINDOW UNCONFIRM
@@ -382,7 +407,7 @@ class MasterOutstandingInvoice extends VerticalLayout{
 
 	//@RequiresPermissions("Master:Item:Delete")
 	private void windowUnConfirm(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Delete)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Unconfirm)) {
 		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
 				new ConfirmDialog.Listener() {
 					public void onClose(ConfirmDialog dialog) {
@@ -403,18 +428,18 @@ class MasterOutstandingInvoice extends VerticalLayout{
 						}
 					}
 				})
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Menghapus Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Unkonfirmasi Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	========================================
 	//WINDOW EDIT
 	//	========================================
 	//@RequiresPermissions("Master:Item:Edit")
 	private void windowEdit(def item,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
 		window = new Window(caption);
 		window.setModal(true);
 		layout = new FormLayout();
@@ -433,20 +458,20 @@ class MasterOutstandingInvoice extends VerticalLayout{
 		cmbHome = new ComboBox("Home:");
 		def beanHome = new BeanItemContainer<Home>(Home.class)
 		def homeList = Grails.get(HomeService).getListDeleted()
-		beanHome.addAll(userList)
+		beanHome.addAll(homeList)
 		cmbHome.setContainerDataSource(beanHome)
 		cmbHome.setItemCaptionPropertyId("name")
 		cmbHome.select(cmbHome.getItemIds().find{ it.id == item.getItemProperty("home.id").value})
 		cmbHome.setBuffered(true)
 		cmbHome.setImmediate(false)
 		layout.addComponent(cmbHome)
-		
+
 		textInvoiceDate = new DateField("Invoice Date:");
 		textInvoiceDate.setPropertyDataSource(item.getItemProperty("invoiceDate"))
 		textInvoiceDate.setBuffered(true)
 		textInvoiceDate.setImmediate(false)
 		layout.addComponent(textInvoiceDate)
-		textDescription = new TextField("Description:");
+		textDescription = new TextArea("Description:");
 		textDescription.setPropertyDataSource(item.getItemProperty("description"))
 		textDescription.setBuffered(true)
 		textDescription.setImmediate(false)
@@ -463,14 +488,16 @@ class MasterOutstandingInvoice extends VerticalLayout{
 		textTotalAmount.setImmediate(false)
 		textTotalAmount.setReadOnly(true)
 		layout.addComponent(textTotalAmount)
-		layout.addComponent(createSaveButton())
-		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Mengubah Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Mengubah Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 
@@ -479,7 +506,7 @@ class MasterOutstandingInvoice extends VerticalLayout{
 	//	========================================
 	//@RequiresPermissions("Master:Item:Add")
 	private void windowAdd(String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
 		println getSession()
 		window = new Window(caption);
 		window.setModal(true);
@@ -499,10 +526,10 @@ class MasterOutstandingInvoice extends VerticalLayout{
 		cmbHome.setContainerDataSource(beanHome)
 		cmbHome.setItemCaptionPropertyId("name")
 		layout.addComponent(cmbHome)
-		
+
 		textInvoiceDate = new DateField("Invoice Date:")
 		layout.addComponent(textInvoiceDate)
-		textDescription = new TextField("Description:")
+		textDescription = new TextArea("Description:")
 		layout.addComponent(textDescription)
 		//			textDueDate = new DateField("Due Date:")
 		//			layout.addComponent(textDueDate)
@@ -522,27 +549,30 @@ class MasterOutstandingInvoice extends VerticalLayout{
 		//			===================
 		//TOMBOL SAVE
 		//			===================
-		layout.addComponent(createSaveButton())
+		//		layout.addComponent(createSaveButton())
 		//			==================
 
 		//			===================
 		//			TOMBOL CANCEL
 		//			===================
-		layout.addComponent(createCancelButton())
-
+		//		layout.addComponent(createCancelButton())
+		def horizontal = new HorizontalLayout()
+		layout.addComponent(horizontal)
+		horizontal.addComponent(createSaveButton())
+		horizontal.addComponent(createCancelButton())
 		//			===================
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//				"Anda tidak memiliki izin untuk Membuat Record",
-		//				Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Membuat Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	=======================
 	//	WINDOW ADD DETAIL
 	//	=======================
 	private void windowAddDetail(item,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Add)) {
 		window = new Window(caption)
 		window.setModal(true)
 		def layout3 = new FormLayout()
@@ -558,11 +588,11 @@ class MasterOutstandingInvoice extends VerticalLayout{
 		textCodeDetail = new TextField("Code:");
 		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
-		textDescriptionDetail = new TextField("Description:");
+		textDescriptionDetail = new TextArea("Description:");
 		layout3.addComponent(textDescriptionDetail)
 		textAmountDetail = new TextField("Amount:");
 		layout3.addComponent(textAmountDetail)
-		
+
 		//		comb = new ComboBox("Sales Order Detail Item:")
 		//			tableSearchContainer = new BeanItemContainer<SalesOrderDetail>(SalesOrderDetail.class);
 		//			itemlist = Grails.get(SalesOrderDetailService).getListForCombo(item.getItemProperty("salesOrder.id").toString())
@@ -574,22 +604,24 @@ class MasterOutstandingInvoice extends VerticalLayout{
 		//		layout3.addComponent(comb)
 		//			textQuantity = new TextField("Quantity:")
 		//		layout3.addComponent(textQuantity)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveButton())
+		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//					"Anda tidak memiliki izin untuk Mengubah Record",
-		//					Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+							"Anda tidak memiliki izin untuk Membuat Record",
+							Notification.Type.ERROR_MESSAGE);
+				}
 	}
 	//	========================
 	//	WINDOW EDIT DETAIL
 	//	========================
 	//@RequiresPermissions("Transaction:DeliveryOrder:Edit")
 	private void windowEditDetail(item,itemDetail,String caption) {
-		//		if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Edit)) {
 		window = new Window(caption)
 		window.setModal(true)
 		def layout3 = new FormLayout()
@@ -609,7 +641,7 @@ class MasterOutstandingInvoice extends VerticalLayout{
 		textCodeDetail.setImmediate(false)
 		textCodeDetail.setReadOnly(true)
 		layout3.addComponent(textCodeDetail)
-		textDescriptionDetail = new TextField("Description:");
+		textDescriptionDetail = new TextArea("Description:");
 		textDescriptionDetail.setPropertyDataSource(itemDetail.getItemProperty("description"))
 		textDescriptionDetail.setBuffered(true)
 		textDescriptionDetail.setImmediate(false)
@@ -632,15 +664,17 @@ class MasterOutstandingInvoice extends VerticalLayout{
 		textAmountDetail.setValue(itemDetail.getItemProperty("amount").toString())
 		textAmountDetail.setBuffered(true)
 		layout3.addComponent(textAmountDetail)
-		layout3.addComponent(createSaveDetailButton())
-		layout3.addComponent(createCancelButton())
+		def horizontal3 = new HorizontalLayout()
+		layout3.addComponent(horizontal3)
+		horizontal3.addComponent(createSaveButton())
+		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
-		//		} else {
-		//			Notification.show("Access Denied\n",
-		//					"Anda tidak memiliki izin untuk Mengubah Record",
-		//					Notification.Type.ERROR_MESSAGE);
-		//		}
+				} else {
+					Notification.show("Access Denied\n",
+							"Anda tidak memiliki izin untuk Mengubah Record",
+							Notification.Type.ERROR_MESSAGE);
+				}
 	}
 
 	void updateTable() {
@@ -654,9 +688,9 @@ class MasterOutstandingInvoice extends VerticalLayout{
 
 	void initTable() {
 		tableContainer = new BeanItemContainer<Invoice>(Invoice.class);
-		//fillTableContainer(tableContainer);
-//		getSession().getAttribute("user")
-		
+		//fillTableContainer(tableContainer);s
+		//		getSession().getAttribute("user")
+
 		itemlist = Grails.get(InvoiceService).getListOutstanding(currentUser.getPrincipal())
 		tableContainer.addAll(itemlist)
 		tableContainer.addNestedContainerProperty("createdBy.id")
@@ -700,7 +734,7 @@ class MasterOutstandingInvoice extends VerticalLayout{
 						else
 						{
 							tableDetail.setVisible(false)
-//							menuBarDetail.setVisible(false)
+							//							menuBarDetail.setVisible(false)
 						}
 					}
 				})
@@ -722,9 +756,115 @@ class MasterOutstandingInvoice extends VerticalLayout{
 		tableDetail.setImmediate(false)
 		tableDetail.setVisible(true)
 		tableDetail.setSizeFull()
-//		menuBarDetail.setVisible(true)
+		//		menuBarDetail.setVisible(true)
 	}
 
+	private void windowPrint(String caption){
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							object = Grails.get(InvoiceService).printObject(object)
+							if (object.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								final Map map = new HashMap();
+								StreamResource.StreamSource source = new StreamResource.StreamSource() {
+											public InputStream getStream() {
+												byte[] b = null;
+												try {
+													DataBeanMaker dataBeanMaker = new DataBeanMaker()
+													object = Grails.get(InvoiceDetailService).getList(object.id)
+													ArrayList dataBeanList = dataBeanMaker.getDataBeanList(object);
+													JRBeanCollectionDataSource beanColDataSource = new
+															JRBeanCollectionDataSource(dataBeanList);
+													Map parameters = new HashMap();
+													b = JasperRunManager.runReportToPdf(getClass().
+															getClassLoader().getResourceAsStream("reports/Invoice.jasper"),
+															map,beanColDataSource);
+												} catch (JRException ex) {
+													ex.printStackTrace();
+												}
+
+												return new ByteArrayInputStream(b);
+											}
+										};
+								Date curDate = new Date()
+								SimpleDateFormat format = new SimpleDateFormat("yyMMddhhMMss");
+								String now = format.format(curDate)
+								StreamResource resource = new StreamResource(source, "Invoice${now}.pdf");
+								resource.setMIMEType("application/pdf");
+								BrowserFrame browser = new BrowserFrame("Browser");
+								browser.setWidth("600px");
+								browser.setHeight("400px");
+								VerticalLayout v = new VerticalLayout();
+								Embedded e = new Embedded("", resource);
+								e.setSizeFull();
+								e.setHeight("600px")
+								e.setType(Embedded.TYPE_BROWSER)
+								v.addComponent(e);
+								Window w = new Window()
+								w.setContent(v);
+								w.setWindowMode(WindowMode.MAXIMIZED)
+								UI.getCurrent().addWindow(w);
+
+							}
+						} else {
+
+						}
+					}
+				})
+
+	}
+
+
+	private class DataBeanMaker {
+		public ArrayList getDataBeanList(def object) {
+			ArrayList<InvoiceReportModel> dataBeanList = new ArrayList<InvoiceReportModel>();
+			for(data in object)
+			{
+				dataBeanList.add(produce(data.invoice.code,data.invoice.invoiceDate,
+						data.invoice.description, data.invoice.dueDate, data.id.toInteger(),
+						data.description,
+						data.amount, data.invoice.totalAmount, data.invoice.home.name, data.invoice.home.address));
+			}
+			return dataBeanList
+		}
+
+		private InvoiceReportModel produce(
+				String code,
+				Date invoiceDate,
+				String description,
+				Date dueDate,
+				Integer idDetail,
+				String descriptionDetail,
+				Double amount,
+				Double totalAmount,
+				String name,
+				String address
+		) {
+
+			InvoiceReportModel dataBean = new InvoiceReportModel();
+
+			dataBean.setCode(code);
+			dataBean.setInvoiceDate(invoiceDate)
+			dataBean.setDescription(description)
+			dataBean.setDueDate(dueDate)
+			dataBean.setIdDetail(idDetail)
+			dataBean.setDescriptionDetail(descriptionDetail)
+			dataBean.setAmount(amount)
+			dataBean.setTotalAmount(totalAmount)
+			dataBean.setName(name)
+			dataBean.setAddress(address)
+
+			return dataBean;
+		}
+	}
 
 
 
