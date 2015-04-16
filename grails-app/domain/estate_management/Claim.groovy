@@ -4,6 +4,7 @@ import java.util.Date;
 
 class Claim {
 	Permit permit
+	String code
 	String description
 	Double amount
 	Date claimDate
@@ -21,5 +22,9 @@ class Claim {
     static constraints = {
 		description(nullable : true)
 		confirmationDate(nullable : true)
+		createdBy(nullable : true)
+		updatedBy(nullable : true)
+		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

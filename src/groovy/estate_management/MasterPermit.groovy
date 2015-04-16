@@ -6,19 +6,13 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import estate_management.reportModel.PaymentRequestReportModel
+import estate_management.reportModel.PermitReportModel
 import estate_management.widget.GeneralFunction
-
-
-
-
-
 import net.sf.jasperreports.engine.JasperRunManager
 import net.sf.jasperreports.engine.JRException
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource
+
 import org.vaadin.dialogs.ConfirmDialog
-
-
-
 
 import com.vaadin.data.Property
 import com.vaadin.data.Property.ValueChangeEvent
@@ -56,16 +50,13 @@ import com.vaadin.ui.VerticalLayout
 import com.vaadin.ui.Window
 import com.vaadin.ui.MenuBar.MenuItem
 import com.vaadin.shared.ui.window.WindowMode
-import estate_management.PaymentRequestService
 
-
-
-
-
-
+import estate_management.PermitService
 
 import com.vaadin.grails.Grails
+
 import estate_management.widget.Constant
+
 import org.apache.shiro.subject.Subject
 import org.apache.shiro.SecurityUtils
 class MasterPermit extends VerticalLayout{
@@ -79,11 +70,15 @@ class MasterPermit extends VerticalLayout{
 
 	//==============================
 	private TextField textConstructionType
+	private TextField textCode
 	private ComboBox cmbVendor
 	private ComboBox cmbHome
 	private TextArea textDescription
 	private TextField textNumberIMB
 	private TextField textEstimateWorkDays
+	private TextField textAmountDeposit
+	private DateField textStartDate
+	
 
 	//==============================
 
@@ -138,10 +133,22 @@ class MasterPermit extends VerticalLayout{
 								if (table.getValue() != null)
 									windowUnConfirm("Unconfirm");
 								break;
-//							case "Print":
-//								if (table.getValue() != null)
-//									windowPrint("Print");
-//								break;
+								case "Unconfirm":
+								if (table.getValue() != null)
+									windowUnConfirm("Unconfirm");
+								break;
+								case "Clear":
+								if (table.getValue() != null)
+									windowClear("Clear");
+								break;
+								case "Unclear":
+								if (table.getValue() != null)
+									windowUnclear("Unclear");
+								break;
+							case "Print":
+								if (table.getValue() != null)
+									windowPrint("Print");
+								break;
 //							case "AddDetail":
 //								if (table.getValue() != null)
 //									windowAddDetail(tableContainer.getItem(table.getValue()),"AddDetail");
@@ -167,7 +174,9 @@ class MasterPermit extends VerticalLayout{
 		MenuItem deleteMenu = menuBar.addItem("Delete", mycommand)
 		MenuItem confirmMenu = menuBar.addItem("Confirm", mycommand)
 		MenuItem unconfirmMenu = menuBar.addItem("Unconfirm", mycommand)
-//		MenuItem printMenu = menuBar.addItem("Print", mycommand)
+		MenuItem clearMenu = menuBar.addItem("Clear", mycommand)
+		MenuItem unclearMenu = menuBar.addItem("Unclear", mycommand)
+		MenuItem printMenu = menuBar.addItem("Print", mycommand)
 		menu.addComponent(menuBar)
 		menuBar.setWidth("100%")
 		//	END BUTTON MENU
@@ -211,12 +220,15 @@ class MasterPermit extends VerticalLayout{
 						try{
 							def object = [id:textId.getValue(),
 								constructionType:textConstructionType.getValue(),
+								code:textCode.getValue(),
 								vendor:cmbVendor.getValue(),
 								home:cmbHome.getValue(),
 								username:String.valueOf(getSession().getAttribute("user")),
 								description:textDescription.getValue(),
 								numberIMB:textNumberIMB.getValue(),
 								estimateWorkDays:textEstimateWorkDays.getValue().toString(),
+								amountDeposit:textAmountDeposit.getValue().toString(),
+								startDate:textStartDate.getValue()
 							]
 							if (object.id == "")
 							{
@@ -231,12 +243,15 @@ class MasterPermit extends VerticalLayout{
 							if (object.errors.hasErrors())
 							{
 								textConstructionType.setData("constructionType")
+								textCode.setData("code")
 								cmbVendor.setData("vendor")
 								cmbHome.setData("home")
 								textDescription.setData("description")
 								textNumberIMB.setData("numberIMB")
 								textEstimateWorkDays.setData("estimateWorkDays")
-								Object[] tv = [textConstructionType,cmbVendor,cmbHome,textDescription,textNumberIMB,textEstimateWorkDays]
+								textAmountDeposit.setData("amountDeposit")
+								textStartDate.setData("startDate")
+								Object[] tv = [textConstructionType,textCode,cmbVendor,cmbHome,textDescription,textNumberIMB,textEstimateWorkDays,textAmountDeposit,textStartDate]
 								generalFunction.setErrorUI(tv,object)
 							}
 							else
@@ -439,6 +454,75 @@ class MasterPermit extends VerticalLayout{
 						Notification.Type.ERROR_MESSAGE);
 				}
 	}
+	//	===========================================
+	//	WINDOW CLEAR
+	//	===========================================
+
+	//@RequiresPermissions("Master:Item:Clear")
+	private void windowClear(String caption) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Clear)) {
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
+							object = Grails.get(PermitService).clearObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
+						} else {
+
+						}
+					}
+				})
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Clear Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
+	}
+	//	===========================================
+	//	WINDOW UNCLEAR
+	//	===========================================
+
+	//@RequiresPermissions("Master:Item:Delete")
+	private void windowUnclear(String caption) {
+				if (currentUser.isPermitted(Title + Constant.AccessType.Unclear)) {
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+								,username:getSession().getAttribute("user")]
+							object = Grails.get(PermitService).unClearObject(object)
+							if (object.errors.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								initTable()
+							}
+						} else {
+
+						}
+					}
+				})
+				} else {
+					Notification.show("Access Denied\n",
+						"Anda tidak memiliki izin untuk Unclear Record",
+						Notification.Type.ERROR_MESSAGE);
+				}
+	}
+
 	//	========================================
 	//WINDOW EDIT
 	//	========================================
@@ -454,6 +538,10 @@ class MasterPermit extends VerticalLayout{
 		textId.setPropertyDataSource(item.getItemProperty("id"))
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
+		textCode = new TextField("Code:");
+		textCode.setPropertyDataSource(item.getItemProperty("code"))
+		textCode.setReadOnly(true)
+		layout.addComponent(textCode)
 		textConstructionType = new TextField("Construction Type:");
 		textConstructionType.setPropertyDataSource(item.getItemProperty("constructionType"))
 		textConstructionType.setBuffered(true)
@@ -485,15 +573,25 @@ class MasterPermit extends VerticalLayout{
 		textDescription.setImmediate(false)
 		layout.addComponent(textDescription)
 		textNumberIMB = new TextField("Number IMB:");
-		textNumberIMB.setValue(item.getItemProperty("numberIMB"))
+		textNumberIMB.setPropertyDataSource(item.getItemProperty("numberIMB"))
 		textNumberIMB.setBuffered(true)
 		textNumberIMB.setImmediate(false)
 		layout.addComponent(textNumberIMB)
 		textEstimateWorkDays = new TextField("Estimate Work Days:");
-		textEstimateWorkDays.setPropertyDataSource(item.getItemProperty("estimateWorkDays").toString())
+		textEstimateWorkDays.setValue(item.getItemProperty("estimateWorkDays").toString())
 		textEstimateWorkDays.setBuffered(true)
 		textEstimateWorkDays.setImmediate(false)
 		layout.addComponent(textEstimateWorkDays)
+		textAmountDeposit = new TextField("Amount Deposit:");
+		textAmountDeposit.setValue(item.getItemProperty("amountDeposit").toString())
+		textAmountDeposit.setBuffered(true)
+		textAmountDeposit.setImmediate(false)
+		layout.addComponent(textAmountDeposit)
+		textStartDate = new DateField("Start Date:");
+		textStartDate.setPropertyDataSource(item.getItemProperty("startDate"))
+		textStartDate.setBuffered(true)
+		textStartDate.setImmediate(false)
+		layout.addComponent(textStartDate)
 		def horizontal = new HorizontalLayout()
 		layout.addComponent(horizontal)
 		horizontal.addComponent(createSaveButton())
@@ -521,6 +619,9 @@ class MasterPermit extends VerticalLayout{
 		textId = new TextField("Id:");
 		textId.setReadOnly(true)
 		layout.addComponent(textId)
+		textCode = new TextField("Code:");
+		textCode.setReadOnly(true)
+		layout.addComponent(textCode)
 		textConstructionType = new TextField("Construction Type:")
 		layout.addComponent(textConstructionType)
 		cmbVendor = new ComboBox("Vendor:")
@@ -543,6 +644,10 @@ class MasterPermit extends VerticalLayout{
 		layout.addComponent(textNumberIMB)
 		textEstimateWorkDays = new TextField("Estimate Work Days:")
 		layout.addComponent(textEstimateWorkDays)
+		textAmountDeposit = new TextField("Amount Deposit:")
+		layout.addComponent(textAmountDeposit)
+		textStartDate = new DateField("Start Date:")
+		layout.addComponent(textStartDate)
 		def horizontal = new HorizontalLayout()
 		layout.addComponent(horizontal)
 		horizontal.addComponent(createSaveButton())
@@ -689,7 +794,7 @@ class MasterPermit extends VerticalLayout{
 		tableContainer.addNestedContainerProperty("home.name")
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("vendor.name","Vendor name")
-		table.visibleColumns = ["id","constructionType","vendor.name","home.name","description","numberIMB","estimateWorkDays","isConfirmed","confirmationDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"
+		table.visibleColumns = ["id","constructionType","code","vendor.name","home.name","description","numberIMB","estimateWorkDays","amountDeposit","startDate","isConfirmed","confirmationDate","isCleared","clearanceDate","dateCreated","lastUpdated","isDeleted","createdBy.username","updatedBy.username","confirmedBy.username"
 		]
 		table.setSelectable(true)
 		table.setImmediate(false)
@@ -746,114 +851,114 @@ class MasterPermit extends VerticalLayout{
 //		tableDetail.setSizeFull()
 //		menuBarDetail.setVisible(true)
 //	}
-//	private void windowPrint(String caption){
-//		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
-//				new ConfirmDialog.Listener() {
-//					public void onClose(ConfirmDialog dialog) {
-//						if (dialog.isConfirmed()) {
-//							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
-//							object = Grails.get(PaymentRequestService).printObject(object)
-//							if (object.hasErrors())
-//							{
-//								Object[] tv = [textId]
-//								generalFunction.setErrorUI(tv,object)
-//							}
-//							else
-//							{
-//								final Map map = new HashMap();
-//								StreamResource.StreamSource source = new StreamResource.StreamSource() {
-//											public InputStream getStream() {
-//												byte[] b = null;
-//												try {
-//													DataBeanMaker dataBeanMaker = new DataBeanMaker();
-//													object = Grails.get(PaymentRequestDetailService).getList(object.id)
-//													ArrayList dataBeanList = dataBeanMaker.getDataBeanList(object);
-//													JRBeanCollectionDataSource beanColDataSource = new
-//															JRBeanCollectionDataSource(dataBeanList);
-//													Map parameters = new HashMap();
-//													b = JasperRunManager.runReportToPdf(getClass().
-//															getClassLoader().getResourceAsStream("reports/PaymentRequest.jasper"),
-//															map,beanColDataSource);
-//												} catch (JRException ex) {
-//													ex.printStackTrace();
-//												}
-//
-//												return new ByteArrayInputStream(b);
-//											}
-//										};
-//								Date curDate = new Date()
-//								SimpleDateFormat format = new SimpleDateFormat("yyMMddhhMMss");
-//								String now = format.format(curDate)
-//								StreamResource resource = new StreamResource(source, "PaymentRequest${now}.pdf");
-//								resource.setMIMEType("application/pdf");
-//								BrowserFrame browser = new BrowserFrame("Browser");
-//								browser.setWidth("600px");
-//								browser.setHeight("400px");
-//								VerticalLayout v = new VerticalLayout();
-//								Embedded e = new Embedded("", resource);
-//								e.setSizeFull();
-//								e.setHeight("600px")
-//								e.setType(Embedded.TYPE_BROWSER)
-//								v.addComponent(e);
-//								Window w = new Window()
-//								w.setContent(v);
-//								w.setWindowMode(WindowMode.MAXIMIZED)
-//								UI.getCurrent().addWindow(w);
-//
-//							}
-//						} else {
-//
-//						}
-//					}
-//				})
-//
-//	}
-//
-//
-//	private class DataBeanMaker {
-//		public ArrayList getDataBeanList(def object) {
-//			ArrayList<PaymentRequestReportModel> dataBeanList = new ArrayList<PaymentRequestReportModel>();
-//			for(data in object)
-//			{
-//				dataBeanList.add(produce(data.paymentRequest.code,data.paymentRequest.requestDate,
-//						data.paymentRequest.description, data.paymentRequest.dueDate, data.id.toInteger(),
-//						data.description,
-//						data.amount, data.paymentRequest.amount, data.paymentRequest.vendor.name, data.paymentRequest.vendor.description));
-//			}
-//			return dataBeanList
-//		}
-//
-//		private PaymentRequestReportModel produce(
-//				String code,
-//				Date requestDate,
-//				String description,
-//				Date dueDate,
-//				Integer idDetail,
-//				String descriptionDetail,
-//				Double amountDetail,
-//				Double totalAmount,
-//				String vendorName,
-//				String vendorDescription
-//		) {
-//
-//			PaymentRequestReportModel dataBean = new PaymentRequestReportModel();
-//
-//			dataBean.setCode(code);
-//			dataBean.setRequestDate(requestDate)
-//			dataBean.setDescription(description)
-//			dataBean.setDueDate(dueDate)
-//			dataBean.setIdDetail(idDetail)
-//			dataBean.setDescriptionDetail(descriptionDetail)
-//			dataBean.setAmountDetail(amountDetail)
-//			dataBean.setTotalAmount(totalAmount)
-//			dataBean.setVendorName(vendorName)
-//			dataBean.setVendorDescription(vendorDescription)
-//
-//			return dataBean;
-//		}
-//	}
-//
-//
+	private void windowPrint(String caption){
+		ConfirmDialog.show(this.getUI(), caption + " ID:" + tableContainer.getItem(table.getValue()).getItemProperty("id") + " ? ",
+				new ConfirmDialog.Listener() {
+					public void onClose(ConfirmDialog dialog) {
+						if (dialog.isConfirmed()) {
+							def object = [id:tableContainer.getItem(table.getValue()).getItemProperty("id").toString()]
+							object = Grails.get(PermitService).printObject(object)
+							if (object.hasErrors())
+							{
+								Object[] tv = [textId]
+								generalFunction.setErrorUI(tv,object)
+							}
+							else
+							{
+								final Map map = new HashMap();
+								StreamResource.StreamSource source = new StreamResource.StreamSource() {
+											public InputStream getStream() {
+												byte[] b = null;
+												try {
+													DataBeanMaker dataBeanMaker = new DataBeanMaker();
+													object = Grails.get(PermitService).getList()
+													ArrayList dataBeanList = dataBeanMaker.getDataBeanList(object);
+													JRBeanCollectionDataSource beanColDataSource = new
+															JRBeanCollectionDataSource(dataBeanList);
+													Map parameters = new HashMap();
+													b = JasperRunManager.runReportToPdf(getClass().
+															getClassLoader().getResourceAsStream("reports/Permit.jasper"),
+															map,beanColDataSource);
+												} catch (JRException ex) {
+													ex.printStackTrace();
+												}
+
+												return new ByteArrayInputStream(b);
+											}
+										};
+								Date curDate = new Date()
+								SimpleDateFormat format = new SimpleDateFormat("yyMMddhhMMss");
+								String now = format.format(curDate)
+								StreamResource resource = new StreamResource(source, "Permit${now}.pdf");
+								resource.setMIMEType("application/pdf");
+								BrowserFrame browser = new BrowserFrame("Browser");
+								browser.setWidth("600px");
+								browser.setHeight("400px");
+								VerticalLayout v = new VerticalLayout();
+								Embedded e = new Embedded("", resource);
+								e.setSizeFull();
+								e.setHeight("600px")
+								e.setType(Embedded.TYPE_BROWSER)
+								v.addComponent(e);
+								Window w = new Window()
+								w.setContent(v);
+								w.setWindowMode(WindowMode.MAXIMIZED)
+								UI.getCurrent().addWindow(w);
+
+							}
+						} else {
+
+						}
+					}
+				})
+
+	}
+
+
+	private class DataBeanMaker {
+		public ArrayList getDataBeanList(def object) {
+			ArrayList<PermitReportModel> dataBeanList = new ArrayList<PermitReportModel>();
+			for(data in object)
+			{
+				dataBeanList.add(produce(data.code,data.constructionType,
+						data.home.name, data.home.address, data.numberIMB,
+						data.description,
+						data.startDate, data.estimateWorkDays, data.amountDeposit, data.vendor.name));
+			}
+			return dataBeanList
+		}
+
+		private PermitReportModel produce(
+				String code,
+				String constructionType,
+				String name,
+				String address,
+				String imbNo,
+				String description,
+				Date startDate,
+				Integer estimateWorkDays,
+				Double depositAmount,
+				String vendorName
+		) {
+
+			PermitReportModel dataBean = new PermitReportModel();
+
+			dataBean.setCode(code);
+			dataBean.setConstructionType(constructionType)
+			dataBean.setName(name)
+			dataBean.setAddress(address)
+			dataBean.setImbNo(imbNo)
+			dataBean.setDescription(description)
+			dataBean.setStartDate(startDate)
+			dataBean.setEstimateWorkDays(estimateWorkDays)
+			dataBean.setDepositAmount(depositAmount)
+			dataBean.setVendorName(vendorName)
+
+			return dataBean;
+		}
+	}
+
+
 
 }
 

@@ -4,11 +4,14 @@ import java.util.Date;
 
 class Permit {
 	String constructionType
+	String code
 	Vendor vendor
 	Home home
 	String description
 	String numberIMB
 	Integer estimateWorkDays
+	Double amountDeposit
+	Date startDate
 	Boolean isConfirmed
 	Date confirmationDate
 	Boolean isCleared
@@ -29,5 +32,6 @@ class Permit {
 		createdBy(nullable : true)
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
+		code(nullable:true)
     }
 }

@@ -15,6 +15,13 @@ class ClaimValidationService {
 		}
 		return object
 	}
+	def isNotConfirmed(def object){
+		if (object.isConfirmed == false)
+		{
+			object.errors.rejectValue(null,'null','Belum terconfirm')
+		}
+		return object
+	}
 	def isDeleted(def object){
 		if (object.isDeleted == true)
 		{
@@ -77,6 +84,12 @@ class ClaimValidationService {
 		return object
 	}
 	def unConfirmObjectValidation(object)
+	{
+		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
+		return object
+	}
+	def printObjectValidation(object)
 	{
 		object = isNotConfirmed(object)
 		if (object.errors.hasErrors()) return object
