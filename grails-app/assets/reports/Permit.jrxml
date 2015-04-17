@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 6.0.3  -->
+<!-- 2015-04-16T13:03:36 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Permit" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a6971320-1a31-46b4-89db-e0db8ef7fea7">
+	<queryString language="SQL">
+		<![CDATA[]]>
+	</queryString>
+	<field name="code" class="java.lang.String"/>
+	<field name="constructionType" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="imbNo" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="startDate" class="java.util.Date"/>
+	<field name="estimateWorkDays" class="java.lang.Integer"/>
+	<field name="depositAmount" class="java.lang.Double"/>
+	<field name="vendorName" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="60" splitType="Stretch">
+			<staticText>
+				<reportElement x="240" y="0" width="100" height="30" uuid="1021f88a-d938-42df-9d70-d300dec961d7"/>
+				<textElement>
+					<font size="18"/>
+				</textElement>
+				<text><![CDATA[PERMIT]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="183" splitType="Stretch">
+			<staticText>
+				<reportElement x="20" y="0" width="100" height="20" uuid="6abcc172-66e3-47f6-8ebd-6413328b5ac8"/>
+				<text><![CDATA[Code :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="20" width="100" height="20" uuid="d09c6808-9d46-4abb-ab29-cd4db547904f"/>
+				<text><![CDATA[Construction Type :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="40" width="100" height="20" uuid="c5d9e263-583a-4641-8537-96bbd2666205"/>
+				<text><![CDATA[Home :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="80" width="100" height="20" uuid="00463af5-6c7b-4e9f-b70b-f62e4993557c"/>
+				<text><![CDATA[IMB No :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="100" width="100" height="20" uuid="c0f69f74-76b8-4ff4-9ff8-68bfaab57e0c"/>
+				<text><![CDATA[Description :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="120" width="100" height="20" uuid="81dd15a0-1bc6-4b9c-b34c-6f40d41b8d70"/>
+				<text><![CDATA[Start Date :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="20" y="140" width="100" height="20" uuid="c26e5633-963e-4578-a7fd-918595a8c065"/>
+				<text><![CDATA[Estimate Work Days :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="290" y="0" width="100" height="20" uuid="f58cddce-0d32-41e3-8fdd-dd03defc2cb7"/>
+				<text><![CDATA[Vendor :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="120" y="0" width="100" height="20" uuid="6411c283-431c-4d47-8696-681fa8505a8e"/>
+				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="20" width="100" height="20" uuid="54cb236b-10b4-4a26-b2a4-3870b8d73497"/>
+				<textFieldExpression><![CDATA[$F{constructionType}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="40" width="100" height="40" uuid="07d0225a-37ed-4578-8d4e-243a50558b82"/>
+				<textFieldExpression><![CDATA[$F{name} + "\n" + $F{address}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="80" width="100" height="20" uuid="534af4f2-1973-4de1-8121-d108ff32d666"/>
+				<textFieldExpression><![CDATA[$F{imbNo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="100" width="100" height="20" uuid="bb61418b-a3fb-47e8-bda6-b9ee4db1fec7"/>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="120" width="100" height="20" uuid="8821a8d1-63f4-46bf-bffe-e34b6cdd0633"/>
+				<textFieldExpression><![CDATA[$F{startDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="140" width="100" height="20" uuid="dfd6e498-2729-4f65-b364-106c855288ad"/>
+				<textFieldExpression><![CDATA[$F{estimateWorkDays}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="160" width="100" height="20" uuid="b105b652-0266-4c1a-be06-17349ba27bd4"/>
+				<textFieldExpression><![CDATA[$F{depositAmount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="390" y="0" width="100" height="20" uuid="f1cd910c-4e79-4981-b17f-43303fae8b7d"/>
+				<textFieldExpression><![CDATA[$F{vendorName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="20" y="160" width="100" height="20" uuid="22fc5e7e-f9f8-41a3-8f40-c21a69fc5694"/>
+				<text><![CDATA[Deposit Amount :]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

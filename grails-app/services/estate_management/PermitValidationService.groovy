@@ -25,21 +25,21 @@ class PermitValidationService {
 	def isNotConfirmed(def object){
 		if (object.isConfirmed == false)
 		{
-			object.errors.rejectValue(null,'null','Belum diconfirm tidak boleh diclear/unclear')
+			object.errors.rejectValue(null,'null','Belum di confirm')
 		}
 		return object
 	}
 	def isCleared(def object){
 		if (object.isCleared == true)
 		{
-			object.errors.rejectValue(null,'null','Belum diunclear tidak boleh di unconfirm')
+			object.errors.rejectValue(null,'null','Sudah di clear')
 		}
 		return object
 	}
 	def isNotCleared(def object){
 		if (object.isCleared == false)
 		{
-			object.errors.rejectValue(null,'null','Belum clear')
+			object.errors.rejectValue(null,'null','Belum di clear')
 		}
 		return object
 	}
@@ -118,15 +118,23 @@ class PermitValidationService {
 	
 	def clearObjectValidation(object)
 	{
+		object = isCleared(object)
+		if (object.errors.hasErrors()) return object
 		object = isNotConfirmed(object)
 		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def unClearObjectValidation(object)
 	{
+		object = isNotCleared(object)
+		if (object.errors.hasErrors()) return object
+//		object = isNotConfimed(object)
+		return object
+	}
+	def printObjectValidation(object)
+	{
 		object = isNotConfirmed(object)
 		if (object.errors.hasErrors()) return object
-		object = isNotCleared(object)
 		return object
 	}
 }

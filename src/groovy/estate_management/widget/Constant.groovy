@@ -50,6 +50,8 @@ public final class Constant {
 		InvoiceClearance("InvoiceClearance"),
 		
 		MaintenanceFee("MaintenanceFee"),
+		Permit("Permit"),
+		Claim("Claim"),
 		
 		Complaint("Complaint"),
 		HomeAssignment("HomeAssignment"),

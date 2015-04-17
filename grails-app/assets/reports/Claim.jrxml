@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.0.3.final using JasperReports Library version 6.0.3  -->
+<!-- 2015-04-16T13:49:35 -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Claim" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a9055d4c-85ba-4c9e-8f6d-0097f72000e8">
+	<queryString language="SQL">
+		<![CDATA[]]>
+	</queryString>
+	<field name="code" class="java.lang.String"/>
+	<field name="permitCode" class="java.lang.String"/>
+	<field name="constructionType" class="java.lang.String"/>
+	<field name="vendorName" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="amount" class="java.lang.Double"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="claimDate" class="java.util.Date"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="65" splitType="Stretch">
+			<staticText>
+				<reportElement x="250" y="10" width="100" height="30" uuid="02decf41-75fb-4590-9adc-bcd835a661ce"/>
+				<textElement>
+					<font size="18"/>
+				</textElement>
+				<text><![CDATA[CLAIM]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="187" splitType="Stretch">
+			<staticText>
+				<reportElement x="30" y="0" width="100" height="20" uuid="8b1ce24f-fb51-41b1-82da-b75d137fe663"/>
+				<text><![CDATA[Code :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="30" y="40" width="100" height="20" uuid="e5d5ea97-c5d6-4ab8-8dae-2f345da29b7f"/>
+				<text><![CDATA[Construction Type :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="30" y="60" width="100" height="20" uuid="f421a589-ed38-497b-8cfa-f7b8a0eb733d"/>
+				<text><![CDATA[Vendor Name :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="30" y="80" width="100" height="20" uuid="ff4bdded-722e-4a62-a42f-41f4e8336454"/>
+				<text><![CDATA[To Home :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="30" y="120" width="100" height="20" uuid="37979b84-4015-48cb-b773-81b75dc38ba3"/>
+				<text><![CDATA[Amount :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="30" y="140" width="100" height="20" uuid="b871bb2e-6489-406a-8a75-5da7c54089ec"/>
+				<text><![CDATA[Description :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="320" y="0" width="100" height="20" uuid="9aa9d81e-3f02-4d04-9feb-71747002984c"/>
+				<text><![CDATA[Date :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="130" y="0" width="100" height="20" uuid="ebc86548-605e-49e3-909f-df919c4f0c08"/>
+				<textFieldExpression><![CDATA[$F{code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="20" width="100" height="20" uuid="94786465-b785-4b73-8378-2eb8c96b6823"/>
+				<textFieldExpression><![CDATA[$F{permitCode}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="40" width="100" height="20" uuid="51e29164-c559-49fe-8154-c51ccb2fb06c"/>
+				<textFieldExpression><![CDATA[$F{constructionType}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="60" width="100" height="20" uuid="5ce612a9-2be8-4bd4-b5f0-a74ece5abf99"/>
+				<textFieldExpression><![CDATA[$F{vendorName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="120" width="100" height="20" uuid="049b5277-3c0c-4b11-920f-bea9d82b0320"/>
+				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="130" y="140" width="100" height="20" uuid="e88ecdb7-3846-435c-83a5-3fc9cf50a4ae"/>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="420" y="0" width="100" height="20" uuid="c1546cbe-591f-4cf8-a5e4-9cf0d51b543d"/>
+				<textFieldExpression><![CDATA[$F{claimDate}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="30" y="20" width="100" height="20" uuid="fed03a07-4a2c-475a-a75c-e311c1dab73e"/>
+				<text><![CDATA[From Permit Code :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="130" y="80" width="100" height="40" uuid="b3d9aa2a-d7bc-463e-8563-b79487b4f632"/>
+				<textFieldExpression><![CDATA[$F{name} + "\n" + $F{address}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

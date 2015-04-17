@@ -219,6 +219,9 @@ public class MyUI extends UI{
 					case "Permit":
 						panelContent.addComponent(new MasterPermit())
 						break
+					case "Claim":
+						panelContent.addComponent(new MasterClaim())
+						break
 				}
 			}
 		}
