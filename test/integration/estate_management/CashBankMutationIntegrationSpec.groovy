@@ -1,33 +1,54 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.test.spock.IntegrationSpec
+import spock.lang.Shared
 
 class CashBankMutationIntegrationSpec extends IntegrationSpec {
 	def cashBankService
 	def cashBankMutationService
+	def userService
 
-    def setup() {
-    }
+	@Shared
+	def shiroUser
+	def cashBank
+	def cashBank2
 
-    def cleanup() {
-    }
+	def setup() {
+		shiroUser = new ShiroUser()
+		shiroUser.username = "admin1234"
+		shiroUser.passwordHash = "sysadmin"
+		shiroUser = userService.createObject(shiroUser)
 
-    void "Test Create New Cash Bank Mutation"() {
-		setup:'setting new Cash Bank Mutation'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
+		cashBank = [
+			name: "newName",
+			description: "newDescription",
+			amount:1000000,
+			isBank: true,
+			createdBy:shiroUser
+			]
+		
 		cashBank = cashBankService.createObject(cashBank)
+		
+		cashBank2 = [
+			name: "updateName",
+			description: "newDescription",
+			amount:1000000,
+			isBank: true,
+			createdBy:shiroUser
+			]
+		cashBank2 = cashBankService.createObject(cashBank2)
+	}
 
-		and: 'setting new Cash Bank Mutation'
+	def cleanup() {
+	}
+
+	void "Test Create New Cash Bank Mutation"() {
+		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
-			targetCashBank:cashBank,
+			targetCashBank:cashBank2,
 			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
 		]
 
 		when: 'createObject is called'
@@ -35,26 +56,17 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 
 		then: 'check has errors'
 		cashBankMutation.hasErrors() == false
+		cashBankMutation.id != null
 		cashBankMutation.isDeleted == false
 
-    }
+	}
 	void "Test Create Cash Bank Mutation Validation source Cash bank Not Null"(){
-		setup: 'setting new Cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
-
-		and: 'setting new Cash Bank Mutation'
+		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:null,
 			targetCashBank:cashBank,
 			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)		]
+		]
 
 		when:'createObject is called'
 		cashBankMutation = cashBankMutationService.createObject(cashBankMutation)
@@ -64,22 +76,12 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getFieldError().defaultMessage
 	}
 	void "Test Create Cash Bank Mutation Validation target Cash bank Not Null"(){
-		setup: 'setting new Cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
-
-		and: 'setting new Cash Bank Mutation'
+		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
 			targetCashBank:null,
 			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)		]
+		]
 
 		when:'createObject is called'
 		cashBankMutation = cashBankMutationService.createObject(cashBankMutation)
@@ -89,22 +91,12 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getFieldError().defaultMessage
 	}
 	void "Test Create Cash Bank Mutation Validation Amount Not Null"(){
-		setup: 'setting new Cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
-
-		and: 'setting new Cash Bank Mutation'
+		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
 			targetCashBank:cashBank,
 			amount:null,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)		]
+		]
 
 		when:'createObject is called'
 		cashBankMutation = cashBankMutationService.createObject(cashBankMutation)
@@ -113,24 +105,13 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		cashBankMutation.hasErrors() == true
 		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getFieldError().defaultMessage
 	}
-	void "Test Create Cash Bank Mutation Validation code Not Null"(){
-		setup: 'setting new Cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
-
-		and: 'setting new Cash Bank Mutation'
+	void "Test Create Cash Bank Mutation Validation Source And Target Cannot Same"(){
+		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
 			targetCashBank:cashBank,
 			amount:1000,
-			code:"",
-			confirmationDate:new Date(2015,3,27)		
-			]
+		]
 
 		when:'createObject is called'
 		cashBankMutation = cashBankMutationService.createObject(cashBankMutation)
@@ -140,21 +121,11 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getFieldError().defaultMessage
 	}
 	void "Test Update Cash Bank Mutation"(){
-		setup: 'setting new CashBank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Cash Bank Mutation'
+		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
-			targetCashBank:cashBank,
+			targetCashBank:cashBank2,
 			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
 		]
 		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
 
@@ -162,10 +133,8 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		def cashBankMutation2 = [
 			id: cashBankMutation.id,
 			sourceCashBank:cashBank,
-			targetCashBank:cashBank,
-			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
+			targetCashBank:cashBank2,
+			amount:"2000",
 		]
 
 		when:'updateObject is called'
@@ -176,37 +145,23 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		cashBankMutation.sourceCashBank == cashBankMutation.sourceCashBank
 		cashBankMutation.targetCashBank == cashBankMutation.targetCashBank
 		cashBankMutation.amount == cashBankMutation.amount
-		cashBankMutation.code == cashBankMutation.code
-		cashBankMutation.confirmationDate == cashBankMutation.confirmationDate
 	}
 	void "Test Update CashBank Mutation Validation source cash Bank Not Null"(){
-		setup: 'setting new CashBank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
-
-		and: 'setting new Cash Bank Mutation'
+		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
-			targetCashBank:cashBank,
+			targetCashBank:cashBank2,
 			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
 		]
 		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
+		println cashBankMutation as JSON
 
 		and:'setting data for Update'
 		def cashBankMutation2 = [
 			id: cashBankMutation.id,
 			sourceCashBank:null,
 			targetCashBank:cashBank,
-			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
+			amount:"2000",
 		]
 
 		when:'updateObject is called'
@@ -217,22 +172,11 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getFieldError().defaultMessage
 	}
 	void "Test Update CashBank Mutation Validation target cash Bank Not Null"(){
-		setup: 'setting new CashBank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
-
-		and: 'setting new Cash Bank Mutation'
+		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
-			targetCashBank:cashBank,
+			targetCashBank:cashBank2,
 			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
 		]
 		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
 
@@ -241,9 +185,7 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 			id: cashBankMutation.id,
 			sourceCashBank:cashBank,
 			targetCashBank:null,
-			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
+			amount:"1000",
 		]
 
 		when:'updateObject is called'
@@ -254,22 +196,11 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getFieldError().defaultMessage
 	}
 	void "Test Update CashBank Mutation Validation Amount Not Null"(){
-		setup: 'setting new CashBank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
-
-		and: 'setting new Cash Bank Mutation'
+		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
-			targetCashBank:cashBank,
+			targetCashBank:cashBank2,
 			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
 		]
 		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
 
@@ -279,8 +210,6 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 			sourceCashBank:cashBank,
 			targetCashBank:cashBank,
 			amount:null,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
 		]
 
 		when:'updateObject is called'
@@ -291,23 +220,12 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getFieldError().defaultMessage
 	}
 
-	void "Test Update CashBank Mutation Validation Code Not Null"(){
-		setup: 'setting new CashBank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
-
-		and: 'setting new Cash Bank Mutation'
+	void "Test Update CashBank Mutation Validation Source And Target Cannot Same"(){
+		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
-			targetCashBank:cashBank,
+			targetCashBank:cashBank2,
 			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
 		]
 		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
 
@@ -316,9 +234,7 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 			id: cashBankMutation.id,
 			sourceCashBank:cashBank,
 			targetCashBank:cashBank,
-			amount:1000,
-			code:"",
-			confirmationDate:new Date(2015,3,27)
+			amount:"1000",
 		]
 
 		when:'updateObject is called'
@@ -330,82 +246,71 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 	}
 	void "Test SoftDelete Cash Bank Mutation"() {
 		setup: 'setting new Cash Bank Mutation'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
-
-		and: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
-			targetCashBank:cashBank,
+			targetCashBank:cashBank2,
 			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
 		]
 		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
 
 		when:'softDeleteObject is called'
 		cashBankMutation = cashBankMutationService.softDeletedObject(cashBankMutation)
-		
+
 		then:'check has errors'
 		cashBankMutation.hasErrors() == false
 		cashBankMutation.isDeleted == true
 	}
+	void "Test SoftDelete Cash Bank Mutation Validation Is Confirmed"() {
+		setup: 'setting new Cash Bank Mutation'
+		def cashBankMutation = [
+			sourceCashBank:cashBank,
+			targetCashBank:cashBank2,
+			amount:500000,
+		]
+		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
+
+		def confirm = [
+			id:cashBankMutation.id,
+			username:shiroUser
+			]
+		cashBankMutation = cashBankMutationService.confirmObject(confirm)
+		
+		when:'softDeleteObject is called'
+		cashBankMutation = cashBankMutationService.softDeletedObject(cashBankMutation)
+
+		then:'check has errors'
+		cashBankMutation.hasErrors() == true
+		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getAllErrors().defaultMessage
+	}
 
 	void "Test Confirm Cash Bank Mutation"() {
 		setup: 'setting new Cash Bank Mutation'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
-
-		and: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
 			targetCashBank:cashBank,
 			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
 		]
 		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
 
 		when:'confirmObject is called'
 		cashBankMutation = cashBankMutationService.confirmObject(cashBankMutation)
-		
+
 		then:'check has errors'
 		cashBankMutation.hasErrors() == false
 		cashBankMutation.isConfirmed == true
 	}
 	void "Test unConfirm Cash Bank Mutation"() {
 		setup: 'setting new Cash Bank Mutation'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
-
-		and: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
 			targetCashBank:cashBank,
-			amount:1000,
-			code:"newCode",
-			confirmationDate:new Date(2015,3,27)
+			amount:500,
 		]
 		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
 
 		when:'softDeleteObject is called'
 		cashBankMutation = cashBankMutationService.unConfirmObject(cashBankMutation)
-		
+
 		then:'check has errors'
 		cashBankMutation.hasErrors() == false
 		cashBankMutation.isConfirmed == false

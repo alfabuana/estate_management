@@ -484,10 +484,10 @@ class InvoiceIntegrationSpec extends IntegrationSpec {
 
 		when:'Confirm is called'
 		invoice = invoiceService.confirmObject(invoice)
-
 		then:'check has errors'
 		invoice.hasErrors() == false
 		invoice.isConfirmed == true
+		
 	}
 	void "Test unConfirm invoice"() {
 		setup: 'setting new User'
@@ -508,6 +508,7 @@ class InvoiceIntegrationSpec extends IntegrationSpec {
 		invoice = invoiceService.createObject(invoice)
 
 		when:'Confirm is called'
+		invoice = invoiceService.confirmObject(invoice)
 		invoice = invoiceService.unConfirmObject(invoice)
 
 		then:'check has errors'
