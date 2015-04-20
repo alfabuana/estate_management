@@ -14,5 +14,6 @@ class ComplaintDetail {
     static constraints = {
 		createdBy(nullable : true)
 		updatedBy(nullable : true)
+		complaint(nullable:true)
     }
 }

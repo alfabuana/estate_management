@@ -412,7 +412,6 @@ class CashBankAdjustmentIntegrationSpec extends IntegrationSpec {
 			isBank: true,
 			createdBy:ShiroUser]
 		cashBank = cashBankService.createObject(cashBank)
-		println cashBank.id
 
 		and: 'setting new Cash Bank Adjustment'
 		def cashBankAdjustment = [

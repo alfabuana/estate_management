@@ -1,33 +1,36 @@
 package estate_management
 
 import grails.test.spock.IntegrationSpec
+import spock.lang.Shared
 
 class HomeDetailIntegrationSpec extends IntegrationSpec {
 	def homeService
 	def userService
 	def homeDetailService
+	
+	@Shared
+	def shiroUser
+	def home
 
 	def setup() {
+		shiroUser = new ShiroUser()
+		shiroUser.username = "admin1234"
+		shiroUser.passwordHash = "sysadmin"
+		shiroUser = userService.createObject(shiroUser)
+		
+		home = [
+			name:"newName",
+			address:"newAddress",
+			createdBy:shiroUser
+			]
+		home = homeService.createObject(home)
 	}
 
 	def cleanup() {
 	}
 
 	void "Test Create New Home Detail"() {
-		setup: 'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-		println home.id
-
-		and: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Home Detail'
+		setup: 'setting new Home Detail'
 		def homeDetail = [
 			home:home,
 			username:shiroUser
@@ -41,20 +44,7 @@ class HomeDetailIntegrationSpec extends IntegrationSpec {
 		homeDetail.isDeleted == false
 	}
 	void "Test Create Home Detail Validation Home Not Null"(){
-		setup: 'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-		println home.id
-
-		and: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Home Detail'
+		setup: 'setting new Home Detail'
 		def homeDetail = [
 			home:"",
 			username:shiroUser
@@ -68,20 +58,7 @@ class HomeDetailIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + homeDetail.errors.getFieldError().defaultMessage
 	}
 	void "Test Create Home Detail Validation Username Not Null"(){
-		setup: 'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-		println home.id
-
-		and: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Home Detail'
+		setup: 'setting new Home Detail'
 		def homeDetail = [
 			home:home,
 			username:""
@@ -96,20 +73,7 @@ class HomeDetailIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test Update New Home Detail"(){
-		setup: 'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-		println home.id
-
-		and: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Home Detail'
+		setup: 'setting new Home Detail'
 		def homeDetail = [
 			home:home,
 			username:shiroUser
@@ -132,20 +96,7 @@ class HomeDetailIntegrationSpec extends IntegrationSpec {
 		homeDetail.username == homeDetail.username
 	}
 	void "Test Update Validation Home Not Null"(){
-		setup: 'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-		println home.id
-
-		and: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Home Detail'
+		setup: 'setting new Home Detail'
 		def homeDetail = [
 			home:home,
 			username:shiroUser
@@ -168,20 +119,7 @@ class HomeDetailIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test Update Validation Username Not Null"(){
-		setup: 'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-		println home.id
-
-		and: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Home Detail'
+		setup: 'setting new Home Detail'
 		def homeDetail = [
 			home:home,
 			username:shiroUser
@@ -204,20 +142,7 @@ class HomeDetailIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test SoftDelete Home Detail"() {
-		setup: 'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-		println home.id
-
-		and: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Home Detail'
+		setup: 'setting new Home Detail'
 		def homeDetail = [
 			home:home,
 			username:shiroUser
@@ -231,7 +156,22 @@ class HomeDetailIntegrationSpec extends IntegrationSpec {
 		homeDetail.hasErrors() == false
 		homeDetail.isDeleted == true
 	}
+	void "Test SoftDelete Home Detail Validation Is Deleted"() {
+		setup: 'setting new Home Detail'
+		def homeDetail = [
+			home:home,
+			username:shiroUser
+		]
+		homeDetail = homeDetailService.createObject(homeDetail)
+		homeDetail = homeDetailService.softDeletedObject(homeDetail)
 
+		when:'createObject is called'
+		homeDetail = homeDetailService.softDeletedObject(homeDetail)
+		
+		then:'check has errors'
+		homeDetail.hasErrors() == true
+		println "Validasi sukses dengan error message : " + homeDetail.errors.getAllErrors().defaultMessage
+	}
 
 
 

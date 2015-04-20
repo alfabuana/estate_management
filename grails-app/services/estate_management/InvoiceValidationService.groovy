@@ -99,17 +99,9 @@ class InvoiceValidationService {
 	}
 	def createObjectValidation(def object)
 	{
-//		object = usernameNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = codeNotNull(object)
-//		if (object.errors.hasErrors()) return object
 		object = invoiceDateNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
-		if (object.errors.hasErrors()) return object
-//		object = dueDateNotNull(object)
-//		if (object.errors.hasErrors()) return object
-		object = totalAmountNotNull(object)
+//		object = totalAmountNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -118,11 +110,7 @@ class InvoiceValidationService {
 		if (object.errors.hasErrors()) return object
 		object = invoiceDateNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
-		if (object.errors.hasErrors()) return object
-//		object = dueDateNotNull(object)
-//		if (object.errors.hasErrors()) return object
-		object = totalAmountNotNull(object)
+//		object = totalAmountNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)

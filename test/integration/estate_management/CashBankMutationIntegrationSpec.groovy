@@ -8,11 +8,13 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 	def cashBankService
 	def cashBankMutationService
 	def userService
+	def cashBankAdjustmentService
 
 	@Shared
 	def shiroUser
 	def cashBank
 	def cashBank2
+	def cashBankAdjustment
 
 	def setup() {
 		shiroUser = new ShiroUser()
@@ -23,20 +25,35 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		cashBank = [
 			name: "newName",
 			description: "newDescription",
-			amount:1000000,
+			amount:1000000000,
 			isBank: true,
 			createdBy:shiroUser
-			]
-		
+		]
+
 		cashBank = cashBankService.createObject(cashBank)
-		
+
+		cashBankAdjustment = [
+			cashBank:cashBank,
+			adjustmentDate:new Date (2015,3,26),
+			amount:1000000000,
+			code:"newCode",
+
+		]
+		cashBankAdjustment= cashBankAdjustmentService.createObject(cashBankAdjustment)
+
+		def confirm = [
+			id:cashBankAdjustment.id,
+			username:shiroUser
+		]
+		cashBankAdjustment = cashBankAdjustmentService.confirmObject(confirm)
+
 		cashBank2 = [
 			name: "updateName",
 			description: "newDescription",
 			amount:1000000,
 			isBank: true,
 			createdBy:shiroUser
-			]
+		]
 		cashBank2 = cashBankService.createObject(cashBank2)
 	}
 
@@ -154,7 +171,6 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 			amount:1000,
 		]
 		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
-		println cashBankMutation as JSON
 
 		and:'setting data for Update'
 		def cashBankMutation2 = [
@@ -272,9 +288,28 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		def confirm = [
 			id:cashBankMutation.id,
 			username:shiroUser
-			]
+		]
 		cashBankMutation = cashBankMutationService.confirmObject(confirm)
-		
+
+		when:'softDeleteObject is called'
+		cashBankMutation = cashBankMutationService.softDeletedObject(cashBankMutation)
+
+		then:'check has errors'
+		cashBankMutation.hasErrors() == true
+		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getAllErrors().defaultMessage
+	}
+	
+	void "Test SoftDelete Cash Bank Mutation Validation Is Deleted"() {
+		setup: 'setting new Cash Bank Mutation'
+		def cashBankMutation = [
+			sourceCashBank:cashBank,
+			targetCashBank:cashBank2,
+			amount:500000,
+		]
+		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
+
+		cashBankMutation = cashBankMutationService.softDeletedObject(cashBankMutation)
+
 		when:'softDeleteObject is called'
 		cashBankMutation = cashBankMutationService.softDeletedObject(cashBankMutation)
 
@@ -287,32 +322,102 @@ class CashBankMutationIntegrationSpec extends IntegrationSpec {
 		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
-			targetCashBank:cashBank,
+			targetCashBank:cashBank2,
 			amount:1000,
 		]
 		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
-
+		def confirm = [
+			id:cashBankMutation.id,
+			username:shiroUser
+			]
 		when:'confirmObject is called'
-		cashBankMutation = cashBankMutationService.confirmObject(cashBankMutation)
+		cashBankMutation = cashBankMutationService.confirmObject(confirm)
 
 		then:'check has errors'
 		cashBankMutation.hasErrors() == false
 		cashBankMutation.isConfirmed == true
+		
+	}
+	
+	void "Test Confirm Cash Bank Mutation Validation Is Confirmed"() {
+		setup: 'setting new Cash Bank Mutation'
+		def cashBankMutation = [
+			sourceCashBank:cashBank,
+			targetCashBank:cashBank2,
+			amount:1000,
+		]
+		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
+		def confirm = [
+			id:cashBankMutation.id,
+			username:shiroUser
+			]
+		cashBankMutation = cashBankMutationService.confirmObject(confirm)
+		when:'confirmObject is called'
+		cashBankMutation = cashBankMutationService.confirmObject(confirm)
+
+		then:'check has errors'
+		cashBankMutation.hasErrors() == true
+		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getAllErrors().defaultMessage
+	}
+	
+	void "Test Confirm Cash Bank Mutation Validation Source Amount Lower Than Amount"() {
+		setup: 'setting new Cash Bank Mutation'
+		def cashBankMutation = [
+			sourceCashBank:cashBank2,
+			targetCashBank:cashBank,
+			amount:1000,
+		]
+		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
+		def confirm = [
+			id:cashBankMutation.id,
+			username:shiroUser
+			]
+		
+		when:'confirmObject is called'
+		cashBankMutation = cashBankMutationService.confirmObject(confirm)
+
+		then:'check has errors'
+		cashBankMutation.hasErrors() == true
+		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getAllErrors().defaultMessage
 	}
 	void "Test unConfirm Cash Bank Mutation"() {
 		setup: 'setting new Cash Bank Mutation'
 		def cashBankMutation = [
 			sourceCashBank:cashBank,
-			targetCashBank:cashBank,
+			targetCashBank:cashBank2,
 			amount:500,
 		]
 		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
-
+		def confirm = [
+			id:cashBankMutation.id,
+			username:shiroUser
+			]
+		cashBankMutation = cashBankMutationService.confirmObject(confirm)
 		when:'softDeleteObject is called'
-		cashBankMutation = cashBankMutationService.unConfirmObject(cashBankMutation)
+		cashBankMutation = cashBankMutationService.unConfirmObject(confirm)
 
 		then:'check has errors'
 		cashBankMutation.hasErrors() == false
 		cashBankMutation.isConfirmed == false
+	}
+	
+	void "Test unConfirm Cash Bank Mutation Validation Is Not Confirmed"() {
+		setup: 'setting new Cash Bank Mutation'
+		def cashBankMutation = [
+			sourceCashBank:cashBank,
+			targetCashBank:cashBank2,
+			amount:500,
+		]
+		cashBankMutation= cashBankMutationService.createObject(cashBankMutation)
+		def confirm = [
+			id:cashBankMutation.id,
+			username:shiroUser
+			]
+		when:'softDeleteObject is called'
+		cashBankMutation = cashBankMutationService.unConfirmObject(confirm)
+
+		then:'check has errors'
+		cashBankMutation.hasErrors() == true
+		println "Validasi sukses dengan error message : " + cashBankMutation.errors.getAllErrors().defaultMessage
 	}
 }

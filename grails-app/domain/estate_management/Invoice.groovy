@@ -35,5 +35,6 @@ class Invoice {
 		code(nullable:true)
 		clearDate(nullable:true)
 		maintenance(nullable:true)
+		description(nullable:true)
     }
 }

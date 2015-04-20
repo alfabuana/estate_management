@@ -25,14 +25,14 @@ class ComplaintValidationService {
 	def isNotConfirmed(def object){
 		if (object.isConfirmed == false)
 		{
-			object.errors.rejectValue(null,'null','Belum diconfirm tidak boleh diclear/unclear')
+			object.errors.rejectValue(null,'null','Belum diconfirm')
 		}
 		return object
 	}
 	def isCleared(def object){
 		if (object.isCleared == true)
 		{
-			object.errors.rejectValue(null,'null','Belum diunclear tidak boleh di unconfirm')
+			object.errors.rejectValue(null,'null','Sudah diclear')
 		}
 		return object
 	}
@@ -77,8 +77,8 @@ class ComplaintValidationService {
 		if (object.errors.hasErrors()) return object
 		object = homeNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = descriptionNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = titleNotNull(object)
 		return object
 	}
@@ -90,8 +90,8 @@ class ComplaintValidationService {
 		if (object.errors.hasErrors()) return object
 		object = homeNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = descriptionNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object = titleNotNull(object)
 		return object
 	}
@@ -110,9 +110,9 @@ class ComplaintValidationService {
 	}
 	def unConfirmObjectValidation(object)
 	{
-		object = isCleared(object)
-		if (object.errors.hasErrors()) return object
 		object = isNotConfirmed(object)
+		if (object.errors.hasErrors()) return object
+		object = isCleared(object)
 		return object
 	}
 	

@@ -59,6 +59,7 @@ class ComplaintDetailService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 
 	}
 }
