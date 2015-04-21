@@ -1,5 +1,6 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 import java.text.SimpleDateFormat
 

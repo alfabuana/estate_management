@@ -25,7 +25,7 @@ class InvoiceDetailValidationService {
 	def invoiceNotNull(def object){
 		if (object.invoice == null || object.invoice == "")
 		{
-			object.errors.rejectValue('invoice','null','Invoice tidak boleh kosong')
+			object.errors.rejectValue('invoice','null','invoice tidak boleh kosong')
 		}
 		return object
 	}
@@ -54,26 +54,14 @@ class InvoiceDetailValidationService {
 	{
 		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
-		object = invoiceNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
 	{
 		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
-		object = invoiceNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = codeNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)

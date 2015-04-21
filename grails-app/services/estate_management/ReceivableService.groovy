@@ -13,6 +13,15 @@ class ReceivableService {
 	def getObjectById(def object){
 		return Receivable.get(object)
 	}
+	
+	def getObjectBySource(def source,def sourceId,def sourceDetailId){
+		return Receivable.find{
+			receivableSource == source &&
+			receivableSourceId == sourceId &&
+			receivableSourceDetailId == sourceDetailId
+		}
+	}
+	
 	def getList(){
 		return Receivable.getAll()
 	}

@@ -60,11 +60,7 @@ class MaintenanceValidationService {
 	}
 	def createObjectValidation(def object)
 	{
-		object = descriptionNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = codeNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = maintenanceDateNotNull(object)
 		return object
@@ -73,11 +69,7 @@ class MaintenanceValidationService {
 	{
 		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = amountNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = codeNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = maintenanceDateNotNull(object)
 		return object

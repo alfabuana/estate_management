@@ -23,5 +23,6 @@ class InvoicePaid {
 		createdBy(nullable : true)
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
+		description(nullable:true)
     }
 }

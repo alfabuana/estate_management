@@ -30,7 +30,7 @@ class InvoiceValidationService {
 		return object
 	}
 	def hasDetail(def object){
-		if(object.invoiceDetails.size() == 0)
+		if(object.invoiceDetails == null || object.invoiceDetails.findAll{ it.isDeleted == false }.size() == 0)
 		{
 			object.errors.rejectValue(null,'null','Harus memiliki detail')
 		}

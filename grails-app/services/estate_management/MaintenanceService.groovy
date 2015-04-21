@@ -1,6 +1,7 @@
 package estate_management
 
 import grails.converters.JSON
+import org.apache.commons.lang3.math.NumberUtils
 import grails.transaction.Transactional
 import java.text.SimpleDateFormat
 
@@ -44,11 +45,15 @@ class MaintenanceService {
 	}
 	def updateObject(def object){
 		def valObject = Maintenance.read(object.id)
-		valObject.description = object.description
-		valObject.amount = Double.parseDouble(object.amount)
-		valObject.code = object.code
+		if (NumberUtils.isNumber(object.amount) ==  true)
+		{
+			valObject.amount = Double.parseDouble(object.amount)
+		}
+		else
+		{ 
+			valObject.amount = null
+		}
 		valObject.maintenanceDate = object.maintenanceDate
-		valObject.dueDate = object.dueDate
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = maintenanceValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)
