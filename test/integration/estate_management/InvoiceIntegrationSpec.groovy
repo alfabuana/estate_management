@@ -167,7 +167,7 @@ class InvoiceIntegrationSpec extends IntegrationSpec {
 		
 		def confirm = [
 			id:invoice.id,
-			username:shiroUser
+			username:shiroUser.username
 			]
 		invoice = invoiceService.confirmObject(confirm)
 		

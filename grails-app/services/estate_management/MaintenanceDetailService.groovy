@@ -34,7 +34,6 @@ class MaintenanceDetailService {
 	def updateObject(def object){
 		def valObject = MaintenanceDetail.read(object.id)
 //		valObject.complaint = object.complaint
-		valObject.maintenance = object.maintenance
 		valObject.user = object.user
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = maintenanceDetailValidationService.updateObjectValidation(valObject)
@@ -57,6 +56,6 @@ class MaintenanceDetailService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
-
+		return newObject
 	}
 }

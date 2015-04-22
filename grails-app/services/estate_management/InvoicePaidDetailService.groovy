@@ -55,6 +55,7 @@ class InvoicePaidDetailService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 
 	}
 }

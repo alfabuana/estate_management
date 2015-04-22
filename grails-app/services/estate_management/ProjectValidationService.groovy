@@ -75,9 +75,6 @@ class ProjectValidationService {
 	{
 		object = titleNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = amountDisagreeNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -85,10 +82,6 @@ class ProjectValidationService {
 		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
 		object = titleNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = amountDisagreeNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)
@@ -116,12 +109,13 @@ class ProjectValidationService {
 	{
 		object = isNotConfirmed(object)
 		if (object.errors.hasErrors()) return object
+		object = isFinished(object)
 		return object
 	}
 	def unFinishObjectValidation(object)
 	{
-//		object = isConfirmed(object)
-//		if (object.errors.hasErrors()) return object
+		object = isNotFinish(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 }

@@ -31,7 +31,8 @@ class PaymentRequestDetailService {
 		return PaymentRequestDetail.findAll("from PaymentRequestDetail as b where b.paymentRequest.id=? and b.isDeleted =false",[a])
 	}
 	def createObject(object){
-		object.paymentRequest = PaymentRequest.get(object.paymentRequestId)
+		PaymentRequest paymentRequest = PaymentRequest.get(object.paymentRequestId)
+		object.paymentRequest = paymentRequest
 		object.isDeleted = false
 		object.isConfirmed = false
 		object.createdBy = userService.getObjectByUserName(object.username)
@@ -39,6 +40,7 @@ class PaymentRequestDetailService {
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			paymentRequest.addToPaymentRequestDetails(object)
 			paymentRequestService.calculateTotal(object.paymentRequest.id)
 			object.code = createCode(object)
 			object = object.save()

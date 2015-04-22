@@ -90,6 +90,7 @@ class ReceiptVoucherDetailService {
 			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
+		return newObject
 	}
 	def unConfirmObject(def object){
 		def newObject = ReceiptVoucherDetail.get(object.id)
@@ -101,5 +102,6 @@ class ReceiptVoucherDetailService {
 			newObject.confirmedBy = null
 			newObject.save()
 		}
+		return newObject
 	}
 }

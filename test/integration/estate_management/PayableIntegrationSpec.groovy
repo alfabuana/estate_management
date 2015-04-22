@@ -1,29 +1,33 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.test.spock.IntegrationSpec
+import spock.lang.Shared
+
 
 class PayableIntegrationSpec extends IntegrationSpec {
 	def userService
 	def payableService
+	
+	@Shared
+	def shiroUser
 
     def setup() {
+		shiroUser = new ShiroUser()
+		shiroUser.username = "admin1234"
+		shiroUser.passwordHash = "sysadmin"
+		shiroUser = userService.createObject(shiroUser)
     }
 
     def cleanup() {
     }
 
     void "Test Create New payable"() {
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
 			username:shiroUser,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -34,23 +38,18 @@ class PayableIntegrationSpec extends IntegrationSpec {
 
 		when : 'createObject is called'
 		payable = payableService.createObject(payable)
+		println payable as JSON
 
 		then: 'check has errors'
 		payable.hasErrors() == false
 		payable.isDeleted == false
 	}
 	void "Test Create payable Validation Username Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:null,
+			user:null,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -67,17 +66,11 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + payable.errors.getFieldError().defaultMessage
 	}
 	void "Test Create payable Validation payable Source Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -94,17 +87,11 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + payable.errors.getFieldError().defaultMessage
 	}
 	void "Test Create payable Validation payable Source Id Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
-			payableSourceId:null,
+			payableSourceId:"",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -121,17 +108,11 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + payable.errors.getFieldError().defaultMessage
 	}
 	void "Test Create payable Validation payable Source Detail Id Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:null,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -148,17 +129,11 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + payable.errors.getFieldError().defaultMessage
 	}
 	void "Test Create payable Validation code Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"",
 			dueDate:new Date (2015,3,26),
@@ -175,17 +150,11 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + payable.errors.getFieldError().defaultMessage
 	}
 	void "Test Create payable Validation Due Date Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:null,
@@ -202,17 +171,11 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + payable.errors.getFieldError().defaultMessage
 	}
 	void "Test Create payable Validation Amount Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -229,17 +192,11 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + payable.errors.getFieldError().defaultMessage
 	}
 	void "Test Create payable Validation Remaining Amount Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -256,17 +213,11 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + payable.errors.getFieldError().defaultMessage
 	}
 	void "Test Create payable Validation Pending Clearance Amount Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -283,17 +234,11 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + payable.errors.getFieldError().defaultMessage
 	}
 		void "Test Update New payable"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -307,9 +252,9 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		and:'setting data for Update'
 		def payable2 = [
 			id: payable.id,
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -323,7 +268,7 @@ class PayableIntegrationSpec extends IntegrationSpec {
 
 		then:'check has errors'
 		payable.hasErrors() == false
-		payable.username == payable.username
+		payable.user == payable.user
 		payable.payableSource == payable.payableSource
 		payable.payableSourceId == payable.payableSourceId
 		payable.payableSourceDetailId == payable.payableSourceDetailId
@@ -334,17 +279,11 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		payable.pendingClearanceAmount == payable.pendingClearanceAmount
 	}
 	void "Test Update payable Validation username Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -358,9 +297,9 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		and:'setting data for Update'
 		def payable2 = [
 			id: payable.id,
-			username:null,
+			user:null,
 			payableSource:"newpayableSource",
-			payableSourceId:1,
+			payableSourceId:"1",
 			payableSourceDetailId:2,
 			code:"newCode",
 			dueDate:new Date (2015,3,26),
@@ -378,15 +317,9 @@ class PayableIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test Update payable Validation payable Source Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -402,7 +335,7 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		and:'setting data for Update'
 		def payable2 = [
 			id: payable.id,
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -422,15 +355,9 @@ class PayableIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test Update payable Validation payable Source Id Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -446,7 +373,7 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		and:'setting data for Update'
 		def payable2 = [
 			id: payable.id,
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:null,
 			payableSourceDetailId:2,
@@ -466,15 +393,9 @@ class PayableIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test Update payable Validation payable Source Detail Id Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -490,7 +411,7 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		and:'setting data for Update'
 		def payable2 = [
 			id: payable.id,
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:null,
@@ -510,15 +431,9 @@ class PayableIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test Update payable Validation code Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -534,7 +449,7 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		and:'setting data for Update'
 		def payable2 = [
 			id: payable.id,
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -554,15 +469,9 @@ class PayableIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test Update payable Validation due Date Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -578,7 +487,7 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		and:'setting data for Update'
 		def payable2 = [
 			id: payable.id,
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -598,15 +507,9 @@ class PayableIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test Update payable Validation amount Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -622,7 +525,7 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		and:'setting data for Update'
 		def payable2 = [
 			id: payable.id,
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -642,15 +545,9 @@ class PayableIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test Update payable Validation remaining amount Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -666,7 +563,7 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		and:'setting data for Update'
 		def payable2 = [
 			id: payable.id,
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -686,15 +583,9 @@ class PayableIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test Update payable Validation Pending Clearance Amount Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -710,7 +601,7 @@ class PayableIntegrationSpec extends IntegrationSpec {
 		and:'setting data for Update'
 		def payable2 = [
 			id: payable.id,
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,
@@ -730,15 +621,9 @@ class PayableIntegrationSpec extends IntegrationSpec {
 
 	}
 		void "Test SoftDelete payable"() {
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new payable'
+		setup: 'setting new payable'
 		def payable = [
-			username:shiroUser,
+			user:shiroUser.username,
 			payableSource:"newpayableSource",
 			payableSourceId:1,
 			payableSourceDetailId:2,

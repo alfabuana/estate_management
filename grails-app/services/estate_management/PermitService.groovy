@@ -1,6 +1,7 @@
 package estate_management
 
 import grails.converters.JSON
+import org.apache.commons.lang3.math.NumberUtils
 import grails.transaction.Transactional
 import java.text.SimpleDateFormat
 
@@ -54,8 +55,23 @@ class PermitService {
 		valObject.home = object.home
 		valObject.description = object.description
 		valObject.numberIMB = object.numberIMB
-		valObject.amountDeposit = Double.parseDouble(object.amountDeposit)
-		valObject.estimateWorkDays = Integer.parseInt(object.estimateWorkDays)
+		if (NumberUtils.isNumber(object.amountDeposit) ==  true)
+		{
+			valObject.amountDeposit = Double.parseDouble(object.amountDeposit)
+		}
+		else
+		{ 
+			valObject.amountDeposit = null
+		}
+		if (NumberUtils.isNumber(object.estimateWorkDays) ==  true)
+		{
+			valObject.estimateWorkDays = Integer.parseInt(object.estimateWorkDays)
+		}
+		else
+		{
+			valObject.estimateWorkDays = null
+		}
+		
 		valObject.startDate = object.startDate
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = permitValidationService.updateObjectValidation(valObject)

@@ -32,7 +32,7 @@ class PaymentRequestValidationService {
 	}
 
 	def hasDetail(def object){
-		if(object.paymentRequestDetails.size() == 0)
+		if(object.paymentRequestDetails == null || object.paymentRequestDetails.findAll{ it.isDeleted == false }.size() == 0)
 		{
 			object.errors.rejectValue(null,'null','Harus memiliki detail')
 		}
@@ -49,7 +49,6 @@ class PaymentRequestValidationService {
 						payable.payableSourceDetailId == detail.id &&
 						isDeleted == false
 			}
-			print paymentVoucherDetail as JSON
 			if (paymentVoucherDetail != null)
 			{
 				object.errors.rejectValue(null,'null','PaymentRequest sudah di buat PaymentVoucher')
@@ -66,17 +65,17 @@ class PaymentRequestValidationService {
 		}
 		return object
 	}
-	def descriptionNotNull(def object){
-		if (object.description == null || object.description == "")
+	def vendorNotNull(def object){
+		if (object.vendor == null || object.vendor == "")
 		{
-			object.errors.rejectValue('description','null','Description tidak boleh kosong')
+			object.errors.rejectValue('vendor','null','vendor tidak boleh kosong')
 		}
 		return object
 	}
-	def codeNotNull(def object){
-		if (object.code == null || object.code == "")
+	def projectNotNull(def object){
+		if (object.project == null || object.project == "")
 		{
-			object.errors.rejectValue('code','null','Kode tidak boleh kosong')
+			object.errors.rejectValue('project','null','project tidak boleh kosong')
 		}
 		return object
 	}
@@ -104,12 +103,10 @@ class PaymentRequestValidationService {
 	}
 	def createObjectValidation(def object)
 	{
-//		object = usernameNotNull(object)
-//		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
+		object  = vendorNotNull(object)
 		if (object.errors.hasErrors()) return object
-//		object  = codeNotNull(object)
-//		if (object.errors.hasErrors()) return object
+		object  = projectNotNull(object)
+		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object  = requestDateNotNull(object)
@@ -121,10 +118,10 @@ class PaymentRequestValidationService {
 	{
 		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
+		object  = vendorNotNull(object)
 		if (object.errors.hasErrors()) return object
-//		object  = codeNotNull(object)
-//		if (object.errors.hasErrors()) return object
+		object  = projectNotNull(object)
+		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object  = requestDateNotNull(object)
