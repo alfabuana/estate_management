@@ -55,6 +55,7 @@ class ProjectDetailService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 
 	}
 }

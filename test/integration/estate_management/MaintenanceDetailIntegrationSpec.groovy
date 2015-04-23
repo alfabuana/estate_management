@@ -41,7 +41,6 @@ class MaintenanceDetailIntegrationSpec extends IntegrationSpec {
 		
 		when:'create is called'
 		maintenanceDetail = maintenanceDetailService.createObject(maintenanceDetail)
-		println maintenanceDetail as JSON
 		
 		then:'check error'
 		maintenanceDetail.hasErrors() == false

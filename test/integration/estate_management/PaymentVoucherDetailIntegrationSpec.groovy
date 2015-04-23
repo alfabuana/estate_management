@@ -1,421 +1,170 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.test.spock.IntegrationSpec
+import spock.lang.Shared
 
 class PaymentVoucherDetailIntegrationSpec extends IntegrationSpec {
 	def userService
 	def cashBankService
 	def paymentVoucherService
+	def vendorService
+	def projectService
 	def payableService
+	def paymentRequestService
+	def paymentRequestDetailService
 	def paymentVoucherDetailService
+	def cashBankAdjustmentService
+	
+	@Shared
+	def shiroUser
+	def cashBank
+	def vendor
+	def project
+	def paymentRequest
+	def paymentRequestDetails
+	def confirmPaymentRequest
+	def cashBankAdjustment
+	def confirmCashBankAdjustment
+	def paymentVoucher
 
     def setup() {
+		shiroUser = new ShiroUser()
+		shiroUser.username = "admin1234"
+		shiroUser.passwordHash = "sysadmin"
+		shiroUser = userService.createObject(shiroUser)
+		
+		cashBank = [
+			name:"newName",
+			isBank: true,
+			username:shiroUser.username]
+		cashBank = cashBankService.createObject(cashBank)
+		
+		cashBankAdjustment = [
+			cashBank:cashBank,
+			adjustmentDate:new Date (2015,3,26),
+			amount:1000,
+			code:"newCode"
+		]
+		cashBankAdjustment = cashBankAdjustmentService.createObject(cashBankAdjustment)
+		
+		confirmCashBankAdjustment = [
+			id:cashBankAdjustment.id,
+			username:shiroUser.username
+			]
+		cashBankAdjustment = cashBankAdjustmentService.confirmObject(confirmCashBankAdjustment)
+		
+		vendor = [
+			name:"vendor1"]
+		vendor = vendorService.createObject(vendor)
+		
+		project = [
+			title:"project1"]
+		project = projectService.createObject(project)
+		
+		paymentRequest = [
+			username:shiroUser.username,
+			vendor:vendor.id,
+			project:project.id,
+			dueDate:new Date (2015,3,26),
+			requestDate: new Date (2015,3,28)
+		]
+		paymentRequest = paymentRequestService.createObject(paymentRequest)
+		
+		paymentRequestDetails = [
+			paymentRequestId:paymentRequest.id,
+			amount:500]
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails)
+		
+		confirmPaymentRequest = [
+			id:paymentRequest.id,
+			username:shiroUser.username
+			]
+		paymentRequest = paymentRequestService.confirmObject(confirmPaymentRequest)
+		
+		paymentVoucher = [
+			username:shiroUser.username,
+			user:shiroUser,
+			cashBank:cashBank,
+			paymentDate:new Date(2015,3,27)
+		]
+		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
     }
 
     def cleanup() {
     }
 
     void "Test Create New Payment Voucher Detail"() {
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
+		setup: 'setting new Payment Voucher Detail'
 		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
+			paymentVoucherId:paymentVoucher.id,
+			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
+			username:shiroUser.username,
 			]
 		when : 'createObject is called'
 		paymentVoucherDetail = paymentVoucherDetailService.createObject(paymentVoucherDetail)
+		println paymentVoucherDetail as JSON
 
 		then: 'check has errors'
 		paymentVoucherDetail.hasErrors() == false
 		paymentVoucherDetail.isDeleted == false
 	}
-	void "Test Create Payment Voucher Detail Validation paymentVoucher Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
-		def paymentVoucherDetail = [
-			paymentVoucher:null,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
-			]
-		
-		when:'createObject is called'
-		paymentVoucherDetail = paymentVoucherService.createObject(paymentVoucherDetail)
-
-		then:'check has errors'
-		paymentVoucherDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getFieldError().defaultMessage
-	}
 	void "Test Create Payment Voucher Detail Validation payable Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
+		setup: 'setting new Payment Voucher Detail'
 		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:null,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
+			paymentVoucherId:paymentVoucher.id,
+			payable:null
 			]
 		
 		when:'createObject is called'
-		paymentVoucherDetail = paymentVoucherService.createObject(paymentVoucherDetail)
+		paymentVoucherDetail = paymentVoucherDetailService.createObject(paymentVoucherDetail)
 
 		then:'check has errors'
 		paymentVoucherDetail.hasErrors() == true
 		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getFieldError().defaultMessage
 	}
 	
-	void "Test Create Payment Voucher Detail Validation Code Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
+	void "Test Create Payment Voucher Detail Validation Is Confirmed"(){
+		setup: 'setting new Payment Voucher Detail'
 		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"",
-			amount:1000,
-			description:"newDescription"
+			paymentVoucherId:paymentVoucher.id,
+			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
+			]
+		paymentVoucherDetail = paymentVoucherDetailService.createObject(paymentVoucherDetail)
+		
+		def confirm = [
+			id:paymentVoucher.id,
+			username:shiroUser.username
+			]
+		paymentVoucher = paymentVoucherService.confirmObject(confirm)
+		println paymentVoucher as JSON
+		
+		def paymentVoucherDetail2 = [
+			paymentVoucherId:paymentVoucher.id,
+			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
 			]
 		
 		when:'createObject is called'
-		paymentVoucherDetail = paymentVoucherService.createObject(paymentVoucherDetail)
+		paymentVoucherDetail = paymentVoucherDetailService.createObject(paymentVoucherDetail2)
+		println paymentVoucherDetail as JSON
 
 		then:'check has errors'
 		paymentVoucherDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getFieldError().defaultMessage
-	}
-	void "Test Create Payment Voucher Detail Validation amount Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
-		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:null,
-			description:"newDescription"
-			]
-		
-		when:'createObject is called'
-		paymentVoucherDetail = paymentVoucherService.createObject(paymentVoucherDetail)
-
-		then:'check has errors'
-		paymentVoucherDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getFieldError().defaultMessage
-	}
-	void "Test Create Payment Voucher Detail Validation description Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
-		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:""
-			]
-		
-		when:'createObject is called'
-		paymentVoucherDetail = paymentVoucherService.createObject(paymentVoucherDetail)
-
-		then:'check has errors'
-		paymentVoucherDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getFieldError().defaultMessage
+		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getAllErrors().defaultMessage
 	}
 	void "Test Update New Payment Voucher Detail"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
+		setup: 'setting new Payment Voucher Detail'
 		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
+			paymentVoucherId:paymentVoucher.id,
+			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
 			]
 		paymentVoucherDetail= paymentVoucherDetailService.createObject(paymentVoucherDetail)
 
 		and:'setting data for Update'
 		def paymentVoucherDetail2 = [
 			id: paymentVoucherDetail.id,
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"updateCode",
-			amount:2000,
-			description:"updateDescription"
+			paymentVoucherId:paymentVoucher.id,
+			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
 			]
 
 		when:'updateObject is called'
@@ -425,138 +174,21 @@ class PaymentVoucherDetailIntegrationSpec extends IntegrationSpec {
 		paymentVoucherDetail.hasErrors() == false
 		paymentVoucherDetail.paymentVoucher == paymentVoucherDetail.paymentVoucher
 		paymentVoucherDetail.payable == paymentVoucherDetail.payable
-		paymentVoucherDetail.code == paymentVoucherDetail.code
 		paymentVoucherDetail.amount == paymentVoucherDetail.amount
-		paymentVoucherDetail.description == paymentVoucherDetail.description
-	}
-	void "Test Update Payment Voucher Detail Validation Payment Voucher Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
-		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
-			]
-		paymentVoucherDetail= paymentVoucherDetailService.createObject(paymentVoucherDetail)
-
-		and:'setting data for Update'
-		def paymentVoucherDetail2 = [
-			id: paymentVoucherDetail.id,
-			paymentVoucher:null,
-			payable:payable,
-			code:"updateCode",
-			amount:2000,
-			description:"updateDescription"
-			]
-
-		when:'updateObject is called'
-		paymentVoucherDetail = paymentVoucherDetailService.updateObject(paymentVoucherDetail2)
-
-		then:'check has errors'
-		paymentVoucherDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getFieldError().defaultMessage
-
 	}
 	void "Test Update Payment Voucher Detail Validation Payable Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
+		setup: 'setting new Payment Voucher Detail'
 		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
+			paymentVoucherId:paymentVoucher.id,
+			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
 			]
 		paymentVoucherDetail= paymentVoucherDetailService.createObject(paymentVoucherDetail)
 
 		and:'setting data for Update'
 		def paymentVoucherDetail2 = [
 			id: paymentVoucherDetail.id,
-			paymentVoucher:paymentVoucher,
+			paymentVoucherId:paymentVoucher.id,
 			payable:null,
-			code:"updateCode",
-			amount:2000,
-			description:"updateDescription"
 			]
 
 		when:'updateObject is called'
@@ -567,263 +199,43 @@ class PaymentVoucherDetailIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getFieldError().defaultMessage
 
 	}
-	void "Test Update Payment Voucher Detail Validation Code Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
+	
+	void "Test Update Payment Voucher Detail Validation Is Confirmed"(){
+		setup: 'setting new Payment Voucher Detail'
 		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
+			paymentVoucherId:paymentVoucher.id,
+			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
 			]
-		paymentVoucherDetail= paymentVoucherDetailService.createObject(paymentVoucherDetail)
-
-		and:'setting data for Update'
+		paymentVoucherDetail = paymentVoucherDetailService.createObject(paymentVoucherDetail)
+		println paymentVoucherDetail as JSON
+		
+		def confirm = [
+			id:paymentVoucher.id,
+			username:shiroUser.username
+			]
+		paymentVoucher = paymentVoucherService.confirmObject(confirm)
+		println paymentVoucher as JSON
+		
 		def paymentVoucherDetail2 = [
-			id: paymentVoucherDetail.id,
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"",
-			amount:2000,
-			description:"updateDescription"
+			id:paymentVoucherDetail.id,
+			paymentVoucherId:paymentVoucher.id,
+			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
 			]
-
-		when:'updateObject is called'
+		
+		when:'createObject is called'
 		paymentVoucherDetail = paymentVoucherDetailService.updateObject(paymentVoucherDetail2)
+		println paymentVoucherDetail as JSON
 
 		then:'check has errors'
 		paymentVoucherDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getFieldError().defaultMessage
-
-	}
-	void "Test Update Payment Voucher Detail Validation amount Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
-		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
-			]
-		paymentVoucherDetail= paymentVoucherDetailService.createObject(paymentVoucherDetail)
-
-		and:'setting data for Update'
-		def paymentVoucherDetail2 = [
-			id: paymentVoucherDetail.id,
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"updateCode",
-			amount:null,
-			description:"updateDescription"
-			]
-
-		when:'updateObject is called'
-		paymentVoucherDetail = paymentVoucherDetailService.updateObject(paymentVoucherDetail2)
-
-		then:'check has errors'
-		paymentVoucherDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getFieldError().defaultMessage
-
-	}
-
-	void "Test Update Payment Voucher Detail Validation Payment Description Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
-		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
-			]
-		paymentVoucherDetail= paymentVoucherDetailService.createObject(paymentVoucherDetail)
-
-		and:'setting data for Update'
-		def paymentVoucherDetail2 = [
-			id: paymentVoucherDetail.id,
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"updateCode",
-			amount:2000,
-			description:""
-			]
-
-		when:'updateObject is called'
-		paymentVoucherDetail = paymentVoucherDetailService.updateObject(paymentVoucherDetail2)
-
-		then:'check has errors'
-		paymentVoucherDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getFieldError().defaultMessage
-
+		println "Validasi sukses dengan error message : " + paymentVoucherDetail.errors.getAllErrors().defaultMessage
 	}
 
 	void "Test SoftDelete Payment Voucher Detail"() {
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
+		setup: 'setting new Payment Voucher Detail'
 		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
+			paymentVoucherId:paymentVoucher.id,
+			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
 			]
 		paymentVoucherDetail= paymentVoucherDetailService.createObject(paymentVoucherDetail)
 
@@ -836,113 +248,40 @@ class PaymentVoucherDetailIntegrationSpec extends IntegrationSpec {
 	}
 
 	void "Test Confirm Payment Voucher Detail"() {
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
+		setup: 'setting new Payment Voucher Detail'
 		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
+			paymentVoucherId:paymentVoucher.id,
+			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
 			]
 		paymentVoucherDetail= paymentVoucherDetailService.createObject(paymentVoucherDetail)
+		
+		def confirm = [
+			id:paymentVoucherDetail.id,
+			username:shiroUser.username
+			]
 
 		when:'createObject is called'
-		paymentVoucherDetail = paymentVoucherDetailService.confirmObject(paymentVoucherDetail)
+		paymentVoucherDetail = paymentVoucherDetailService.confirmObject(confirm)
 
 		then:'check has errors'
 		paymentVoucherDetail.hasErrors() == false
 		paymentVoucherDetail.isConfirmed == true
 	}
+	
 	void "Test unConfirm Payment Voucher Detail"() {
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new cash Bank'
-		CashBank cashBank = new CashBank()
-		cashBank.name = "newName"
-		cashBank.description = "newDescription"
-		cashBank.amount = 1000
-		cashBank.isBank = true
-		cashBank = cashBankService.createObject(cashBank)
-
-		and: 'setting new Payment Voucher'
-		def paymentVoucher = [
-			username:shiroUser,
-			cashBank:cashBank,
-			code:"newCode",
-			paymentDate:new Date(2015,3,27),
-			isGBCH:true,
-			dueDate:new Date(2015,3,27),
-			totalAmount:5000
-		]
-		paymentVoucher = paymentVoucherService.createObject(paymentVoucher)
-		
-		and: 'setting new payable'
-		def payable = [
-			username:shiroUser,
-			payableSource:"newpayableSource",
-			payableSourceId:1,
-			payableSourceDetailId:2,
-			code:"newCode",
-			dueDate:new Date (2015,3,26),
-			amount:1000,
-			remainingAmount:2000,
-			pendingClearanceAmount:3000
-		]
-		payable = payableService.createObject(payable)
-		
-		and: 'setting new Payment Voucher Detail'
+		setup: 'setting new Payment Voucher Detail'
 		def paymentVoucherDetail = [
-			paymentVoucher:paymentVoucher,
-			payable:payable,
-			code:"newCode",
-			amount:1000,
-			description:"newDescription"
+			paymentVoucherId:paymentVoucher.id,
+			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
 			]
 		paymentVoucherDetail= paymentVoucherDetailService.createObject(paymentVoucherDetail)
+		
+		def confirm = [
+			id:paymentVoucherDetail.id,
+			username:shiroUser.username
+			]
+
+		paymentVoucherDetail = paymentVoucherDetailService.confirmObject(confirm)
 
 		when:'createObject is called'
 		paymentVoucherDetail = paymentVoucherDetailService.unConfirmObject(paymentVoucherDetail)

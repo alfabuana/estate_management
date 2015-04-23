@@ -49,7 +49,7 @@ class ClaimService {
 			valObject.amount = Double.parseDouble(object.amount)
 		}
 		else
-		{
+		{ 
 			valObject.amount = null
 		}
 		valObject.claimDate = object.claimDate

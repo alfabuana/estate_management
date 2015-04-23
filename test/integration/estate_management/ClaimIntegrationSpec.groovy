@@ -125,12 +125,12 @@ class ClaimIntegrationSpec extends IntegrationSpec {
 		def claim2 = [
 			id:claim.id,
 			permit:permit,
-			amount:6000,
+			amount:"6000",
 			claimDate:new Date(2015,4,22)
 			]
 	
 		when:'update is called'
-		claim = claimService.updateObject(claim)
+		claim = claimService.updateObject(claim2)
 		println claim as JSON
 		
 		then:'check error'
@@ -158,7 +158,7 @@ class ClaimIntegrationSpec extends IntegrationSpec {
 			]
 	
 		when:'update is called'
-		claim = claimService.updateObject(claim)
+		claim = claimService.updateObject(claim2)
 		
 		then:'check error'
 		claim.hasErrors() == true
@@ -182,7 +182,7 @@ class ClaimIntegrationSpec extends IntegrationSpec {
 			]
 	
 		when:'update is called'
-		claim = claimService.updateObject(claim)
+		claim = claimService.updateObject(claim2)
 		
 		then:'check error'
 		claim.hasErrors() == true
@@ -205,7 +205,7 @@ class ClaimIntegrationSpec extends IntegrationSpec {
 			]
 	
 		when:'update is called'
-		claim = claimService.updateObject(claim)
+		claim = claimService.updateObject(claim2)
 		
 		then:'check error'
 		claim.hasErrors() == true
@@ -235,7 +235,7 @@ class ClaimIntegrationSpec extends IntegrationSpec {
 			]
 	
 		when:'update is called'
-		claim = claimService.updateObject(claim)
+		claim = claimService.updateObject(claim2)
 		
 		then:'check error'
 		claim.hasErrors() == true

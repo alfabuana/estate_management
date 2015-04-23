@@ -53,6 +53,7 @@ class ProjectVoteService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 	}
 	
 	def agreeObject(def object){

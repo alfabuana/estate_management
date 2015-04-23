@@ -63,22 +63,14 @@ class PaymentVoucherDetailValidationService {
 	{
 		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
-		object = paymentVoucherNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = payableNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = amountNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
 	{
 		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
-		object = paymentVoucherNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = payableNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = amountNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)

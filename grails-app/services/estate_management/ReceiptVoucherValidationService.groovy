@@ -30,7 +30,7 @@ class ReceiptVoucherValidationService {
 		return object
 	}
 	def hasDetail(def object){
-		if(object.receiptVoucherDetails.size() == 0)
+		if(object.receiptVoucherDetails == null || object.receiptVoucherDetails.findAll{ it.isDeleted == false }.size() == 0)
 		{
 			object.errors.rejectValue(null,'null','Harus memiliki detail')
 		}
@@ -91,14 +91,8 @@ class ReceiptVoucherValidationService {
 		if (object.errors.hasErrors()) return object
 		object = cashBankNotNull(object)
 		if (object.errors.hasErrors()) return object
-//		object = codeNotNull(object)
-//		if (object.errors.hasErrors()) return object
 		object = receiptDateNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = isGBCHNotNull(object)
 		if (object.errors.hasErrors()) return object
-//		object = dueDateNotNull(object)
-//		if (object.errors.hasErrors()) return object
 		object = totalAmountNotNull(object)
 		return object
 	}
@@ -110,15 +104,7 @@ class ReceiptVoucherValidationService {
 		if (object.errors.hasErrors()) return object
 		object = cashBankNotNull(object)
 		if (object.errors.hasErrors()) return object
-//		object = codeNotNull(object)
-//		if (object.errors.hasErrors()) return object
 		object = receiptDateNotNull(object)
-		if (object.errors.hasErrors()) return object
-//		object = isGBCHNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = dueDateNotNull(object)
-//		if (object.errors.hasErrors()) return object
-		object = totalAmountNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)
