@@ -103,7 +103,6 @@ class PaymentVoucherDetailIntegrationSpec extends IntegrationSpec {
 			]
 		when : 'createObject is called'
 		paymentVoucherDetail = paymentVoucherDetailService.createObject(paymentVoucherDetail)
-		println paymentVoucherDetail as JSON
 
 		then: 'check has errors'
 		paymentVoucherDetail.hasErrors() == false
@@ -137,7 +136,6 @@ class PaymentVoucherDetailIntegrationSpec extends IntegrationSpec {
 			username:shiroUser.username
 			]
 		paymentVoucher = paymentVoucherService.confirmObject(confirm)
-		println paymentVoucher as JSON
 		
 		def paymentVoucherDetail2 = [
 			paymentVoucherId:paymentVoucher.id,
@@ -146,7 +144,6 @@ class PaymentVoucherDetailIntegrationSpec extends IntegrationSpec {
 		
 		when:'createObject is called'
 		paymentVoucherDetail = paymentVoucherDetailService.createObject(paymentVoucherDetail2)
-		println paymentVoucherDetail as JSON
 
 		then:'check has errors'
 		paymentVoucherDetail.hasErrors() == true
@@ -207,14 +204,12 @@ class PaymentVoucherDetailIntegrationSpec extends IntegrationSpec {
 			payable:payableService.getObjectBySource("paymentRequest", paymentRequest.id, paymentRequestDetails.id),
 			]
 		paymentVoucherDetail = paymentVoucherDetailService.createObject(paymentVoucherDetail)
-		println paymentVoucherDetail as JSON
 		
 		def confirm = [
 			id:paymentVoucher.id,
 			username:shiroUser.username
 			]
 		paymentVoucher = paymentVoucherService.confirmObject(confirm)
-		println paymentVoucher as JSON
 		
 		def paymentVoucherDetail2 = [
 			id:paymentVoucherDetail.id,
@@ -224,7 +219,6 @@ class PaymentVoucherDetailIntegrationSpec extends IntegrationSpec {
 		
 		when:'createObject is called'
 		paymentVoucherDetail = paymentVoucherDetailService.updateObject(paymentVoucherDetail2)
-		println paymentVoucherDetail as JSON
 
 		then:'check has errors'
 		paymentVoucherDetail.hasErrors() == true

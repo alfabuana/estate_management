@@ -58,5 +58,16 @@ class RoleService {
 		newObject.save()
 	}
 	
+	def addPermissions(def object){
+		def newObject = ShiroRole.get(object.id)
+		newObject.addToPermissions(object.permission)
+		newObject.save()
+	}
+	
+	def removePermissions(def object){
+		def newObject = ShiroRole.get(object.id)
+		newObject.removeFromPermissions(object.permission)
+		newObject.save()
+	}
 	
 }

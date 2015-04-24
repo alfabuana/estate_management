@@ -1,6 +1,7 @@
 package estate_management
 
 import grails.transaction.Transactional
+import org.apache.commons.lang3.math.NumberUtils
 import java.text.SimpleDateFormat
 
 @Transactional
@@ -53,7 +54,14 @@ class PaymentRequestDetailService {
 		def valObject = PaymentRequestDetail.read(object.id)
 //		valObject.paymentRequest = PaymentRequest.get(object.paymentRequestId)
 		valObject.code = object.code
-		valObject.amount = Double.parseDouble(object.amount)
+		if (NumberUtils.isNumber(object.amount) ==  true)
+		{
+			valObject.amount = Double.parseDouble(object.amount)
+		}
+		else
+		{ 
+			valObject.amount = null
+		}
 		valObject.description = object.description
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = paymentRequestDetailValidationService.updateObjectValidation(valObject)

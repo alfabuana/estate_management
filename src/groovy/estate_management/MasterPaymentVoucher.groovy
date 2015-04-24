@@ -116,7 +116,7 @@ class MasterPaymentVoucher extends VerticalLayout{
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "Payment Voucher"
+	String Title = "Finance:PaymentVoucher:"
 	//						Constant.MenuName.Item + ":";
 	private Subject currentUser
 	public MasterPaymentVoucher() {

@@ -248,7 +248,6 @@ class PermitIntegrationSpec extends IntegrationSpec {
 			startDate:new Date(2015,4,22)
 			]
 		permit = permitService.createObject(permit)
-		println permit as JSON
 		
 		def permit2 = [
 			id:permit.id,
@@ -259,7 +258,6 @@ class PermitIntegrationSpec extends IntegrationSpec {
 			amountDeposit:"500000",
 			startDate:new Date(2015,4,22)
 			]
-		println permit as JSON
 		
 		when:'update is called'
 		permit = permitService.updateObject(permit2)

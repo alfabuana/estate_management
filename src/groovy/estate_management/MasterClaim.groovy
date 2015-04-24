@@ -100,7 +100,7 @@ class MasterClaim extends VerticalLayout{
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "Claim"
+	String Title = "Maintenance:Claim:"
 	//						Constant.MenuName.Item + ":";
 	private Subject currentUser
 	public MasterClaim() {

@@ -54,7 +54,6 @@ class ProjectVoteIntegrationSpec extends IntegrationSpec {
 
 		when:'createObject is called'
 		projectVote = projectVoteService.createObject(projectVote)
-		println projectVote as JSON
 
 		then:'check has errors'
 		projectVote.hasErrors() == true

@@ -133,4 +133,47 @@ class RoleIntegrationSpec extends IntegrationSpec {
 		shiroRole.hasErrors()== false
 		shiroRole.isDeleted == true
 	}
+	
+	void "test add permission"(){
+		setup:'setting new role'
+		def shiroRole = [
+			name:"administrator"
+			]
+		shiroRole = roleService.createObject(shiroRole)
+		
+		def object = [id :shiroRole.id,
+			name:"administrator",
+			permission :"admin"]
+		
+		when:'delete is called'
+		shiroRole = roleService.addPermissions(object)
+		def shiroRolePermission = shiroRole.permissions.findAll()
+		
+		then:'check has errors'
+		shiroRole.hasErrors()== false
+		shiroRolePermission.size() > 0
+		
+	}
+	
+	void "test remove permission"(){
+		setup:'setting new role'
+		def shiroRole = [
+			name:"administrator"
+			]
+		shiroRole = roleService.createObject(shiroRole)
+		
+		def object = [id :shiroRole.id,
+			permission :"admin"]
+		
+		when:'delete is called'
+		shiroRole = roleService.addPermissions(object)
+		shiroRole = roleService.removePermissions(object)
+		def shiroRolePermission = shiroRole.permissions.findAll()
+		
+		
+		then:'check has errors'
+		shiroRole.hasErrors()== false
+		shiroRolePermission.size() == 0
+		
+	}
 }

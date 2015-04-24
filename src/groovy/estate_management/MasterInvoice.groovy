@@ -114,7 +114,7 @@ class MasterInvoice extends VerticalLayout{
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "Invoice"
+	String Title = "Finance:Invoice:"
 	//						Constant.MenuName.Item + ":";
 	private Subject currentUser
 	public MasterInvoice() {

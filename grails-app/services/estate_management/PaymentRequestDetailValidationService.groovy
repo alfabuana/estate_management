@@ -47,10 +47,6 @@ class PaymentRequestDetailValidationService {
 	{
 		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
-		object = paymentRequestNotNull(object)
-		if (object.errors.hasErrors()) return object
-//		object  = codeNotNull(object)
-//		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
 		return object
 	}
@@ -58,10 +54,6 @@ class PaymentRequestDetailValidationService {
 	{
 		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
-		object = paymentRequestNotNull(object)
-		if (object.errors.hasErrors()) return object
-//		object  = codeNotNull(object)
-//		if (object.errors.hasErrors()) return object
 		object  = amountNotNull(object)
 		return object
 	}

@@ -120,7 +120,6 @@ class ClaimIntegrationSpec extends IntegrationSpec {
 			claimDate:new Date(2015,4,22)
 			]
 		claim = claimService.createObject(claim)
-		println claim as JSON
 		
 		def claim2 = [
 			id:claim.id,
@@ -131,7 +130,6 @@ class ClaimIntegrationSpec extends IntegrationSpec {
 	
 		when:'update is called'
 		claim = claimService.updateObject(claim2)
-		println claim as JSON
 		
 		then:'check error'
 		claim.hasErrors() == false

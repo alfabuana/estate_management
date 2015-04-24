@@ -11,6 +11,7 @@ class BootStrap {
 		if(adminRole==null){
 			adminRole = new ShiroRole(name: "Administrator", isDeleted:false)
 			adminRole.addToPermissions("*:*")
+			adminRole.permissions.find()
 			//adminRole.addToPermissions("admin")
 			adminRole.save(flush:true, failOnError:true)
 		}
