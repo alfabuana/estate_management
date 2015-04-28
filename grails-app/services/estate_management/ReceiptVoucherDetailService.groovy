@@ -1,5 +1,6 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 import java.text.SimpleDateFormat
 
@@ -31,15 +32,23 @@ class ReceiptVoucherDetailService {
 		return code
 	}
 	def createObject(object){
-		object.receiptVoucher = ReceiptVoucher.get(object.receiptVoucherId)
+		ReceiptVoucher receiptVoucher = ReceiptVoucher.get(object.receiptVoucherId)
+		object.receiptVoucher = receiptVoucher
 		object.isDeleted = false
 		object.isConfirmed = false
-		object.amount = object.receivable.amount
+		if (object.receivable == null){
+			object.amount = 0
+		}
+		else
+		{
+			object.amount = object.receivable.amount
+		}
 		object.createdBy = userService.getObjectByUserName(object.username)
 		object = receiptVoucherDetailValidationService.createObjectValidation(object as ReceiptVoucherDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			receiptVoucher.addToReceiptVoucherDetails(object)
 			receiptVoucherService.calculateTotal(object.receiptVoucher.id)
 			object.code = createCode(object)
 			object = object.save()
@@ -52,7 +61,13 @@ class ReceiptVoucherDetailService {
 //		valObject.receiptVoucher = object.receiptVoucher
 		valObject.receivable = object.receivable
 		valObject.code = object.code
-		valObject.amount = object.receivable.amount
+		if (object.receivable == null){
+			object.amount = 0
+		}
+		else
+		{
+			object.amount = object.receivable.amount
+		}
 		valObject.description = object.description
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = receiptVoucherDetailValidationService.updateObjectValidation(valObject)
@@ -89,6 +104,7 @@ class ReceiptVoucherDetailService {
 			newObject.confirmedBy = userService.getObjectByUserName(object.username)
 			newObject.save()
 		}
+		return newObject
 	}
 	def unConfirmObject(def object){
 		def newObject = ReceiptVoucherDetail.get(object.id)
@@ -100,5 +116,6 @@ class ReceiptVoucherDetailService {
 			newObject.confirmedBy = null
 			newObject.save()
 		}
+		return newObject
 	}
 }

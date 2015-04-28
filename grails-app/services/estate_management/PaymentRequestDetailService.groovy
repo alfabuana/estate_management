@@ -1,6 +1,7 @@
 package estate_management
 
 import grails.transaction.Transactional
+import org.apache.commons.lang3.math.NumberUtils
 import java.text.SimpleDateFormat
 
 @Transactional
@@ -31,7 +32,8 @@ class PaymentRequestDetailService {
 		return PaymentRequestDetail.findAll("from PaymentRequestDetail as b where b.paymentRequest.id=? and b.isDeleted =false",[a])
 	}
 	def createObject(object){
-		object.paymentRequest = PaymentRequest.get(object.paymentRequestId)
+		PaymentRequest paymentRequest = PaymentRequest.get(object.paymentRequestId)
+		object.paymentRequest = paymentRequest
 		object.isDeleted = false
 		object.isConfirmed = false
 		object.createdBy = userService.getObjectByUserName(object.username)
@@ -39,6 +41,7 @@ class PaymentRequestDetailService {
 		if (object.errors.getErrorCount() == 0)
 		{
 			object =object.save()
+			paymentRequest.addToPaymentRequestDetails(object)
 			paymentRequestService.calculateTotal(object.paymentRequest.id)
 			object.code = createCode(object)
 			object = object.save()
@@ -51,7 +54,14 @@ class PaymentRequestDetailService {
 		def valObject = PaymentRequestDetail.read(object.id)
 //		valObject.paymentRequest = PaymentRequest.get(object.paymentRequestId)
 		valObject.code = object.code
-		valObject.amount = Double.parseDouble(object.amount)
+		if (NumberUtils.isNumber(object.amount) ==  true)
+		{
+			valObject.amount = Double.parseDouble(object.amount)
+		}
+		else
+		{ 
+			valObject.amount = null
+		}
 		valObject.description = object.description
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = paymentRequestDetailValidationService.updateObjectValidation(valObject)

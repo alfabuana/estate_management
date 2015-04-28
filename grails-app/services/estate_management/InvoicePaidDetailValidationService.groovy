@@ -31,16 +31,14 @@ class InvoicePaidDetailValidationService {
 	}
 	def createObjectValidation(def object)
 	{
-		object = invoicePaidNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = attachmentUrlNotNull(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def updateObjectValidation(def object)
 	{
-		object = invoicePaidNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = attachmentUrlNotNull(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def softdeleteObjectValidation(object)

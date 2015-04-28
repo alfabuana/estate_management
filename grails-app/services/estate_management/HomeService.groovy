@@ -56,5 +56,6 @@ class HomeService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 }
 }

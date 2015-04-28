@@ -75,10 +75,6 @@ class InvoicePaidValidationService {
 	{
 		object = invoiceNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = usernameNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = paidDateNotNull(object)
 		return object
 	}
@@ -87,10 +83,6 @@ class InvoicePaidValidationService {
 		object = isConfirmed(object)
 		if (object.errors.hasErrors()) return object
 		object = invoiceNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = usernameNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = paidDateNotNull(object)
 		return object

@@ -52,7 +52,7 @@ class CashBankMutationValidationService {
 		return object
 	}
 	def targetCashBankNotNull(def object){
-		if (object.targetCashBank == null || object.sourceCashBank == "")
+		if (object.targetCashBank == null || object.targetCashBank == "")
 		{
 			object.errors.rejectValue('targetCashBank','null','Target Cash Bank tidak boleh kosong')
 		}

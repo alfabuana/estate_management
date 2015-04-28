@@ -30,7 +30,7 @@ class InvoiceValidationService {
 		return object
 	}
 	def hasDetail(def object){
-		if(object.invoiceDetails.size() == 0)
+		if(object.invoiceDetails == null || object.invoiceDetails.findAll{ it.isDeleted == false }.size() == 0)
 		{
 			object.errors.rejectValue(null,'null','Harus memiliki detail')
 		}
@@ -99,17 +99,9 @@ class InvoiceValidationService {
 	}
 	def createObjectValidation(def object)
 	{
-//		object = usernameNotNull(object)
-//		if (object.errors.hasErrors()) return object
-//		object = codeNotNull(object)
-//		if (object.errors.hasErrors()) return object
 		object = invoiceDateNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
-		if (object.errors.hasErrors()) return object
-//		object = dueDateNotNull(object)
-//		if (object.errors.hasErrors()) return object
-		object = totalAmountNotNull(object)
+//		object = totalAmountNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -118,11 +110,7 @@ class InvoiceValidationService {
 		if (object.errors.hasErrors()) return object
 		object = invoiceDateNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
-		if (object.errors.hasErrors()) return object
-//		object = dueDateNotNull(object)
-//		if (object.errors.hasErrors()) return object
-		object = totalAmountNotNull(object)
+//		object = totalAmountNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)

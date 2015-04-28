@@ -110,7 +110,7 @@ class MasterReceiptVoucher extends VerticalLayout{
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "Receipt Voucher"
+	String Title = "Finance:ReceiptVoucher:"
 	//						Constant.MenuName.Item + ":";
 	private Subject currentUser
 	public MasterReceiptVoucher() {

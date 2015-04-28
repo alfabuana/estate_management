@@ -1,6 +1,7 @@
 package estate_management
 
 import grails.converters.JSON
+import org.apache.commons.lang3.math.NumberUtils
 import grails.transaction.Transactional
 import java.text.SimpleDateFormat
 
@@ -45,7 +46,14 @@ class CashBankMutationService {
 		def valObject = CashBankMutation.read(object.id)
 		valObject.sourceCashBank = object.sourceCashBank
 		valObject.targetCashBank = object.targetCashBank
-		valObject.amount = Double.parseDouble(object.amount)
+		if (NumberUtils.isNumber(object.amount) ==  true)
+		{
+			valObject.amount = Double.parseDouble(object.amount)
+		}
+		else
+		{ 
+			valObject.amount = null
+		}
 		valObject.code = object.code
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = cashBankMutationValidationService.updateObjectValidation(valObject)

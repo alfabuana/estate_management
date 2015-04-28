@@ -75,7 +75,7 @@ class MasterComplaint extends VerticalLayout{
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "Complaint"
+	String Title = "Tenant:Complaint:"
 //						Constant.MenuName.Item + ":";
 	
 	private Subject currentUser
@@ -247,7 +247,7 @@ class MasterComplaint extends VerticalLayout{
 					void buttonClick(Button.ClickEvent event) {
 						try{
 							def object = [id:textIdDetail.getValue(),
-								complaintId:textId.getValue(),
+//								complaintId:textId.getValue(),
 								attachmentUrl:textAttachmentUrlDetail.getValue(),
 								username:getSession().getAttribute("user")
 							]
@@ -652,7 +652,7 @@ class MasterComplaint extends VerticalLayout{
 		//		layout3.addComponent(textQuantity)
 		def horizontal3 = new HorizontalLayout()
 		layout3.addComponent(horizontal3)
-		horizontal3.addComponent(createSaveButton())
+		horizontal3.addComponent(createSaveDetailButton())
 		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
@@ -701,7 +701,7 @@ class MasterComplaint extends VerticalLayout{
 		//		layout3.addComponent(comb)
 		def horizontal3 = new HorizontalLayout()
 		layout3.addComponent(horizontal3)
-		horizontal3.addComponent(createSaveButton())
+		horizontal3.addComponent(createSaveDetailButton())
 		horizontal3.addComponent(createCancelButton())
 
 		getUI().addWindow(window);
@@ -775,7 +775,7 @@ table.addItemClickListener(new ItemClickEvent.ItemClickListener() {
 	 void initTableDetail() {
 		 tableDetailContainer = new BeanItemContainer<ComplaintDetail>(ComplaintDetail.class);
 		 def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
-		 def itemListDetail = Grails.get(ComplaintDetailService).getList(ind)
+		 def itemListDetail = Grails.get(ComplaintDetailService).getList()
 		 tableDetailContainer.addNestedContainerProperty("complaint.id")
 		 tableDetailContainer.addNestedContainerProperty("createdBy.id")
 		 tableDetailContainer.addNestedContainerProperty("createdBy.username")

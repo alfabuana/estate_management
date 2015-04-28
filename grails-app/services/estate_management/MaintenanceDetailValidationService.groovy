@@ -24,16 +24,14 @@ class MaintenanceDetailValidationService {
 	}
 	def createObjectValidation(def object)
 	{
-		object = maintenanceNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = usernameNotNull(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def updateObjectValidation(def object)
 	{
-		object = maintenanceNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = usernameNotNull(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def softdeleteObjectValidation(object)

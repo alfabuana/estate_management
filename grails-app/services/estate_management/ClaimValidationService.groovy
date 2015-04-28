@@ -44,7 +44,7 @@ class ClaimValidationService {
 		return object
 	}
 	def amountNotNull(def object){
-		if (object.amount == null)
+		if (object.amount == null || object.amount == "")
 		{
 			object.errors.rejectValue('amount','null','Amount tidak boleh kosong')
 		}

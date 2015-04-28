@@ -1,107 +1,66 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.test.spock.IntegrationSpec
-
+import spock.lang.Shared
 class ProjectIntegrationSpec extends IntegrationSpec {
 	def projectService
+	def userService
+	
+	@Shared
+	def shiroUser
 
     def setup() {
+		shiroUser = new ShiroUser()
+		shiroUser.username = "admin1234"
+		shiroUser.passwordHash = "sysadmin"
+		shiroUser = userService.createObject(shiroUser)
     }
 
     def cleanup() {
     }
 
     void "Test Create new Project"() {
-		setup:'setting new project'
-		Project project = new Project()
-		project.title = "newTitle"
-		project.description = "newDescription"
-		project.amountAgree = 1000
-		project.amountDisagree = 2000
+		setup: 'setting new Payment Request'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
 
-		when:'createObject is called'
+		when : 'createObject is called'
 		project = projectService.createObject(project)
 
-		then:'check has errors'
+		then: 'check has errors'
 		project.hasErrors() == false
-		project.isDeleted == false
 	}
 	void "Test Create Project Validation title Not Null"() {
 		setup:'setting new project'
-		Project project = new Project()
-		project.title = ""
-		project.description = "newDescription"
-		project.amountAgree = 1000
-		project.amountDisagree = 2000
+		def project = [
+			username:shiroUser.username,
+			title:null
+		]
 
 		when:'createObject is called'
 		project = projectService.createObject(project)
 
 		then:'check has errors'
 		project.hasErrors() == true
-		println project.errors.getFieldError().defaultMessage
-	}
-	void "Test Create Project Validation description Not Null"() {
-		setup:'setting new project'
-		Project project = new Project()
-		project.title = "newTitle"
-		project.description = ""
-		project.amountAgree = 1000
-		project.amountDisagree = 2000
-
-		when:'createObject is called'
-		project = projectService.createObject(project)
-
-		then:'check has errors'
-		project.hasErrors() == true
-		println project.errors.getFieldError().defaultMessage
-	}
-	void "Test Create Project Validation amount Agree Not Null"() {
-		setup:'setting new project'
-		Project project = new Project()
-		project.title = "newTitle"
-		project.description = "newDescription"
-		project.amountAgree = null
-		project.amountDisagree = 2000
-
-		when:'createObject is called'
-		project = projectService.createObject(project)
-
-		then:'check has errors'
-		project.hasErrors() == true
-		println project.errors.getFieldError().defaultMessage
-	}
-	void "Test Create Project Validation amount disagree Not Null"() {
-		setup:'setting new project'
-		Project project = new Project()
-		project.title = "newTitle"
-		project.description = "newDescription"
-		project.amountAgree = 1000
-		project.amountDisagree = null
-
-		when:'createObject is called'
-		project = projectService.createObject(project)
-
-		then:'check has errors'
-		project.hasErrors() == true
-		println project.errors.getFieldError().defaultMessage
+		println "validasi sukses dengan error message : "+ project.errors.getFieldError().defaultMessage
 	}
 	void "Test Update new Project"() {
 		setup:'setting new project'
-		Project project = new Project()
-		project.title = "newTitle"
-		project.description = "newDescription"
-		project.amountAgree = 1000
-		project.amountDisagree = 2000
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
 		project = projectService.createObject(project)
 		
 		and: 'setting data for Update'
-		Project project2 = new Project()
-		project2.id = project.id
-		project2.title = "updateTitle"
-		project2.description = "updateDescription"
-		project2.amountAgree = 3000
-		project2.amountDisagree = 4000
+		def project2 = [
+			id:project.id,
+			username:shiroUser.username,
+			title:"newTitle"
+		]
 		 
 		when:'updateObject is called'
 		project = projectService.updateObject(project2)
@@ -109,26 +68,21 @@ class ProjectIntegrationSpec extends IntegrationSpec {
 		then:'check has errors'
 		project.hasErrors() == false
 		project.title == project2.title
-		project.description == project2.description
-		project.amountAgree == project2.amountAgree
-		project.amountDisagree == project2.amountDisagree
 	}
 	void "Test Update project Project title Not Null"() {
 		setup:'setting new project'
-		Project project = new Project()
-		project.title = "newTitle"
-		project.description = "newDescription"
-		project.amountAgree = 1000
-		project.amountDisagree = 2000
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
 		project = projectService.createObject(project)
 		
 		and: 'setting data for Update'
-		Project project2 = new Project()
-		project2.id= project.id
-		project2.title = ""
-		project2.description = "updateDescription"
-		project2.amountAgree = 3000
-		project2.amountDisagree = 4000
+		def project2 = [
+			id:project.id,
+			username:shiroUser.username,
+			title:""
+		]
 		 
 		when:'updateObject is called'
 		project = projectService.updateObject(project2)
@@ -137,85 +91,41 @@ class ProjectIntegrationSpec extends IntegrationSpec {
 		project.hasErrors() == true
 		println "Validasi sukses dengan error message : " + project.errors.getFieldError().defaultMessage
 	}
-	void "Test Update project Project description Not Null"() {
+	
+	void "Test Update project Validation Is Confirmed"() {
 		setup:'setting new project'
-		Project project = new Project()
-		project.title = "newTitle"
-		project.description = "newDescription"
-		project.amountAgree = 1000
-		project.amountDisagree = 2000
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
 		project = projectService.createObject(project)
+		def confirm = 
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		project = projectService.confirmObject(confirm)
 		
 		and: 'setting data for Update'
-		Project project2 = new Project()
-		project2.id = project.id
-		project2.title = "newTitle"
-		project2.description = ""
-		project2.amountAgree = 3000
-		project2.amountDisagree = 4000
+		def project2 = [
+			id:project.id,
+			username:shiroUser.username,
+			title:""
+		]
 		 
 		when:'updateObject is called'
 		project = projectService.updateObject(project2)
 		
 		then:'check has errors'
 		project.hasErrors() == true
-		println "Validasi sukses dengan error message : " + project.errors.getFieldError().defaultMessage
-	}
-	void "Test Update project Project amount agree Not Null"() {
-		setup:'setting new project'
-		Project project = new Project()
-		project.title = "newTitle"
-		project.description = "newDescription"
-		project.amountAgree = 1000
-		project.amountDisagree = 2000
-		project = projectService.createObject(project)
-		
-		and: 'setting data for Update'
-		Project project2 = new Project()
-		project2.id = project.id
-		project2.title = "newTitle"
-		project2.description = "updateDescription"
-		project2.amountAgree = null
-		project2.amountDisagree = 4000
-		 
-		when:'updateObject is called'
-		project = projectService.updateObject(project2)
-		
-		then:'check has errors'
-		project.hasErrors() == true
-		println "Validasi sukses dengan error message : " + project.errors.getFieldError().defaultMessage
-	}
-	void "Test Update project Project amount disagree Not Null"() {
-		setup:'setting new project'
-		Project project = new Project()
-		project.title = "newTitle"
-		project.description = "newDescription"
-		project.amountAgree = 1000
-		project.amountDisagree = 2000
-		project = projectService.createObject(project)
-		
-		and: 'setting data for Update'
-		Project project2 = new Project()
-		project2.id = project.id
-		project2.title = "newTitle"
-		project2.description = "updateDescription"
-		project2.amountAgree = 3000
-		project2.amountDisagree = null
-		 
-		when:'updateObject is called'
-		project = projectService.updateObject(project2)
-		
-		then:'check has errors'
-		project.hasErrors() == true
-		println "Validasi sukses dengan error message : " + project.errors.getFieldError().defaultMessage
+		println "Validasi sukses dengan error message : " + project.errors.getAllErrors().defaultMessage
 	}
 	void "Test SoftDelete Project"() {
 		setup:'setting new project'
-		Project project = new Project()
-		project.title = "newTitle"
-		project.description = "newDescription"
-		project.amountAgree = 1000
-		project.amountDisagree = 2000
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
 		project = projectService.createObject(project)
 		
 		when:'sofDeleted is called'
@@ -224,5 +134,254 @@ class ProjectIntegrationSpec extends IntegrationSpec {
 		then:'check has errors'
 		project.hasErrors() == false
 		project.isDeleted == true
+	}
+	void "Test SoftDelete Project Validation Is Deleted"() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		project = projectService.softDeletedObject(project)
+		
+		when:'sofDeleted is called'
+		project = projectService.softDeletedObject(project)
+		
+		then:'check has errors'
+		project.hasErrors() == true
+		println "Validasi sukses dengan error message : " + project.errors.getAllErrors().defaultMessage
+	}
+	void "Test SoftDelete Project Validation Is Confirmed"() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		def confirm =
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		project = projectService.confirmObject(confirm)
+
+		
+		when:'sofDeleted is called'
+		project = projectService.softDeletedObject(project)
+		
+		then:'check has errors'
+		project.hasErrors() == true
+		println "Validasi sukses dengan error message : " + project.errors.getAllErrors().defaultMessage
+	}
+	void "Test Confirm Project"() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		def confirm =
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		
+		
+		when:'sofDeleted is called'
+		project = projectService.confirmObject(confirm)
+		
+		then:'check has errors'
+		project.hasErrors() == false
+		project.isConfirmed == true
+	}
+	void "Test Confirm Project Validation Is Confirmed"() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		def confirm =
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		project = projectService.confirmObject(confirm)
+		
+		when:'sofDeleted is called'
+		project = projectService.confirmObject(confirm)
+		
+		then:'check has errors'
+		project.hasErrors() == true
+		println "Validasi sukses dengan error message : " + project.errors.getAllErrors().defaultMessage
+	}
+	void "Test unConfirm Project"() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		def confirm =
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		
+		project = projectService.confirmObject(confirm)
+		when:'sofDeleted is called'
+		project = projectService.unConfirmObject(project)
+		
+		then:'check has errors'
+		project.hasErrors() == false
+		project.isConfirmed == false
+	}
+	void "Test unConfirm Project Validation Is Not Confirmed"() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		def confirm =
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		
+		when:'sofDeleted is called'
+		project = projectService.unConfirmObject(project)
+		
+		then:'check has errors'
+		project.hasErrors() == true
+		println "Validasi sukses dengan error message : " + project.errors.getAllErrors().defaultMessage
+	}
+	void "Test unConfirm Project Validation Is Finished"() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		def confirm =
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		project = projectService.confirmObject(confirm)
+		project = projectService.finishObject(project)
+		when:'sofDeleted is called'
+		project = projectService.unConfirmObject(project)
+		
+		then:'check has errors'
+		project.hasErrors() == true
+		println "Validasi sukses dengan error message : " + project.errors.getAllErrors().defaultMessage
+	}
+	
+	void "Test Finish Project "() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		def confirm =
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		project = projectService.confirmObject(confirm)
+		
+		when:'sofDeleted is called'
+		project = projectService.finishObject(project)
+		
+		then:'check has errors'
+		project.hasErrors() == false
+		project.isFinished == true
+	}
+	void "Test Finish Project Validation IsFinished"() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		def confirm =
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		project = projectService.confirmObject(confirm)
+		project = projectService.finishObject(project)
+		
+		when:'sofDeleted is called'
+		project = projectService.finishObject(project)
+		
+		then:'check has errors'
+		project.hasErrors() == true
+		println "Validasi sukses dengan error message : " + project.errors.getAllErrors().defaultMessage
+	}
+	void "Test Finish Project Validation Is Not Confirmed"() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		def confirm =
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		
+		when:'sofDeleted is called'
+		project = projectService.finishObject(project)
+		
+		then:'check has errors'
+		project.hasErrors() == true
+		println "Validasi sukses dengan error message : " + project.errors.getAllErrors().defaultMessage
+	}
+	void "Test unFinish Project "() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		def confirm =
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		project = projectService.confirmObject(confirm)
+		project = projectService.finishObject(project)
+		
+		when:'sofDeleted is called'
+		project = projectService.unFinishObject(project)
+		
+		then:'check has errors'
+		project.hasErrors() == false
+		project.isFinished == false
+	}
+	void "Test unFinish Project Validation Is Not Finished"() {
+		setup:'setting new project'
+		def project = [
+			username:shiroUser.username,
+			title:"newTitle"
+		]
+		project = projectService.createObject(project)
+		def confirm =
+		[
+			id:project.id,
+			username:shiroUser.username
+			]
+		project = projectService.confirmObject(confirm)
+		
+		when:'sofDeleted is called'
+		project = projectService.unFinishObject(project)
+		
+		then:'check has errors'
+		project.hasErrors() == true
+		println "Validasi sukses dengan error message : " + project.errors.getAllErrors().defaultMessage
 	}
 }

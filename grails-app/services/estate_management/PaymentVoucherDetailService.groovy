@@ -1,5 +1,6 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.transaction.Transactional
 import java.text.SimpleDateFormat
 
@@ -31,15 +32,23 @@ class PaymentVoucherDetailService {
 			return code
 		}
 	def createObject(object){
-		object.paymentVoucher = PaymentVoucher.get(object.paymentVoucherId)
+		PaymentVoucher paymentVoucher = PaymentVoucher.get(object.paymentVoucherId)
+		object.paymentVoucher = paymentVoucher
 		object.isDeleted = false
 		object.isConfirmed = false
-		object.amount = object.payable.amount
+		if (object.payable == null){
+			object.amount = 0
+		}
+		else
+		{
+			object.amount = object.payable.amount
+		}
 		object.createdBy = userService.getObjectByUserName(object.username)
 		object = paymentVoucherDetailValidationService.createObjectValidation(object as PaymentVoucherDetail)
 		if (object.errors.getErrorCount() == 0)
 		{
 			object = object.save()
+			paymentVoucher.addToPaymentVoucherDetails(object)
 			paymentVoucherService.calculateTotal(object.paymentVoucher.id)
 			object.code = createCode(object)
 			object = object.save()
@@ -51,7 +60,13 @@ class PaymentVoucherDetailService {
 //		valObject.paymentVoucher = object.paymentVoucher
 		valObject.payable = object.payable
 		valObject.code = object.code
-		valObject.amount = object.payable.amount
+		if (object.payable == null){
+			object.amount = 0
+		}
+		else
+		{
+			valObject.amount = object.payable.amount
+		}
 		valObject.description = object.description
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = paymentVoucherDetailValidationService.updateObjectValidation(valObject)

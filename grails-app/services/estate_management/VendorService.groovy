@@ -60,6 +60,7 @@ class VendorService {
 			newObject.isDeleted = true
 			newObject.save()
 		}
+		return newObject
 	}
 
 

@@ -28,5 +28,6 @@ class PaymentRequest {
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
 		code(nullable:true)
+		description(nullable:true)
     }
 }

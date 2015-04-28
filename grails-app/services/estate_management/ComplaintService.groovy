@@ -38,7 +38,7 @@ class ComplaintService {
 		object = complaintValidationService.createObjectValidation(object as Complaint)
 		if (object.errors.getErrorCount() == 0)
 		{
-			object =object.save()
+			object = object.save()
 			object.code = createCode(object)
 			object = object.save()
 		}
@@ -51,10 +51,8 @@ class ComplaintService {
 //			username == object.username
 //		}
 //		valObject.username = object.username
-		valObject.description = object.description
 		valObject.title = object.title
 		valObject.home = object.home
-		valObject.code = object.code
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = complaintValidationService.updateObjectValidation(valObject)
 		if (valObject.errors.getErrorCount() == 0)

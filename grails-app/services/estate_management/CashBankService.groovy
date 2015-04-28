@@ -1,6 +1,7 @@
 package estate_management
 
 import grails.converters.JSON
+import org.apache.commons.lang3.math.NumberUtils
 import grails.transaction.Transactional
 @Transactional
 class CashBankService {
@@ -35,7 +36,14 @@ class CashBankService {
 		def valObject = CashBank.read(object.id)
 		valObject.name = object.name
 		valObject.description = object.description
-		valObject.amount = Double.parseDouble(object.amount)
+		if (NumberUtils.isNumber(object.amount) ==  true)
+		{
+			valObject.amount = Double.parseDouble(object.amount)
+		}
+		else
+		{ 
+			valObject.amount = null
+		}
 		valObject.isBank = object.isBank
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = cashBankValidationService.updateObjectValidation(valObject)

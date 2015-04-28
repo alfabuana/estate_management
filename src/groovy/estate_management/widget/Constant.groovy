@@ -82,6 +82,7 @@ public final class Constant {
 	}
 	
 	public enum AccessType {
+		View("View"),
 		Add("Add"),
 		Edit("Edit"),
 		Delete("Delete"),

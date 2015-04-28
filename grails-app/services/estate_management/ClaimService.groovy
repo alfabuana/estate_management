@@ -1,6 +1,7 @@
 package estate_management
 
 import grails.transaction.Transactional
+import org.apache.commons.lang3.math.NumberUtils
 import java.text.SimpleDateFormat
 
 @Transactional
@@ -43,7 +44,14 @@ class ClaimService {
 		def valObject = Claim.read(object.id)
 		valObject.permit = object.permit
 		valObject.description = object.description
-		valObject.amount = Double.parseDouble(object.amount)
+		if (NumberUtils.isNumber(object.amount) ==  true)
+		{
+			valObject.amount = Double.parseDouble(object.amount)
+		}
+		else
+		{ 
+			valObject.amount = null
+		}
 		valObject.claimDate = object.claimDate
 		valObject.updatedBy = userService.getObjectByUserName(object.username)
 		valObject = claimValidationService.updateObjectValidation(valObject)

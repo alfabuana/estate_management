@@ -40,6 +40,7 @@ import com.vaadin.ui.MenuBar.MenuItem
 import estate_management.RoleService
 import com.vaadin.grails.Grails
 import estate_management.widget.Constant
+import grails.converters.JSON
 import org.apache.shiro.subject.Subject
 import org.apache.shiro.SecurityUtils
 class MasterRole extends VerticalLayout{
@@ -65,7 +66,7 @@ class MasterRole extends VerticalLayout{
 	private Action actionDelete = new Action("Delete");
 	private int code = 1;
 	private static final int MAX_PAGE_LENGTH = 15;
-	String Title = "User Role"
+	String Title = "Master:UserRole:"
 	//						Constant.MenuName.Item + ":";
 	private Subject currentUser
 	public MasterRole() {
@@ -308,7 +309,7 @@ class MasterRole extends VerticalLayout{
 		//		tableContainer.addNestedContainerProperty("customer1.nama")
 		table.setContainerDataSource(tableContainer);
 		table.setColumnHeader("name","Name")
-		table.visibleColumns = ["id","name","dateCreated","lastUpdated","isDeleted"]
+		table.visibleColumns = ["id", "name", "dateCreated", "lastUpdated", "isDeleted"]
 		table.setSelectable(true)
 		table.setImmediate(false)
 		//		table.setPageLength(table.size())
@@ -339,8 +340,9 @@ class MasterRole extends VerticalLayout{
 	}
 	void initTableDetail() {
 		// Table with a component column in non-editable mode
-		//		final TableDetail tableDetail = new TableDetail("My Table");
-//		tableDetail.addContainerProperty("id", String.class, null);
+		def ind = tableContainer.getItem(table.getValue()).getItemProperty("id").toString()
+
+		//		tableDetail.addContainerProperty("id", String.class, null);
 		tableDetail.addContainerProperty("menu", String.class, null);
 		tableDetail.addContainerProperty("item", String.class, null);
 		tableDetail.addContainerProperty("view", CheckBox.class, null);
@@ -356,7 +358,8 @@ class MasterRole extends VerticalLayout{
 		tableDetail.addContainerProperty("unfinish", CheckBox.class, null);
 
 		//		// Insert this data
-		def people = [["menu":Constant.MenuGroup.ProjectManagement.toString(),"item":Constant.MenuName.ProjectVoting.toString()],
+		def people = [
+			["menu":Constant.MenuGroup.ProjectManagement.toString(),"item":Constant.MenuName.ProjectVoting.toString()],
 			["menu":Constant.MenuGroup.ProjectManagement.toString(),"item":Constant.MenuName.PostProject.toString()],
 			["menu":Constant.MenuGroup.Master.toString(),"item":Constant.MenuName.Home.toString()],
 			["menu":Constant.MenuGroup.Master.toString(),"item":Constant.MenuName.User.toString()],
@@ -377,15 +380,15 @@ class MasterRole extends VerticalLayout{
 			["menu":Constant.MenuGroup.Tenant.toString(),"item":Constant.MenuName.HomeAssignment.toString()],
 			["menu":Constant.MenuGroup.Tenant.toString(),"item":Constant.MenuName.InvoicePayment.toString()],
 			["menu":Constant.MenuGroup.Tenant.toString(),"item":Constant.MenuName.OutstandingInvoice.toString()],
-			["menu":Constant.MenuGroup.Tenant.toString(),"item":Constant.MenuName.ParkingRegistration.toString()]]
+			["menu":Constant.MenuGroup.Tenant.toString(),"item":Constant.MenuName.ParkingRegistration.toString()]
+		]
 
 		Integer x = 0
 		// Insert the data and the additional component column
-		
-		def roleList = ShiroRole.find{
-			id == 1
-		}
-		
+
+		def roleList = ShiroRole.find{ id == ind }
+
+		tableDetail.removeAllItems();
 		for (def a in people) {
 			x++
 
@@ -406,32 +409,218 @@ class MasterRole extends VerticalLayout{
 			final CheckBox checkboxFinish = new CheckBox();
 			final CheckBox checkboxUnfinish = new CheckBox();
 
-
+			checkboxView.setEnabled(currentUser.isPermitted(Title + Constant.AccessType.Edit))
 			checkboxView.setData(a.menu+ ":"+a.item+":View")
 			checkboxView.setValue(checkRoleValue(roleList.permissions,checkboxView.getData()))
+			checkboxView.addValueChangeListener(new ValueChangeListener() {
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							boolean value = ((Boolean) checkboxView.getValue()).booleanValue();
+							def object = [id : ind,
+								permission : checkboxView.getData()]
+							if(value == true)
+							{
+								Grails.get(RoleService).addPermissions(object)
+							}
+							else
+							{
+								Grails.get(RoleService).removePermissions(object)
+							}
+						}
+					});
+			checkboxAdd.setEnabled(currentUser.isPermitted(Title + Constant.AccessType.Edit))
 			checkboxAdd.setData(a.menu+ ":"+a.item+":Add")
 			checkboxAdd.setValue(checkRoleValue(roleList.permissions,checkboxAdd.getData()))
+			checkboxAdd.addValueChangeListener(new ValueChangeListener() {
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							boolean value = ((Boolean) checkboxAdd.getValue()).booleanValue();
+							def object = [id : ind,
+								permission : checkboxAdd.getData()]
+							if(value == true)
+							{
+								Grails.get(RoleService).addPermissions(object)
+							}
+							else
+							{
+								Grails.get(RoleService).removePermissions(object)
+							}
+						}
+					});
+			checkboxEdit.setEnabled(currentUser.isPermitted(Title + Constant.AccessType.Edit))
 			checkboxEdit.setData(a.menu+ ":"+a.item+":Edit")
 			checkboxEdit.setValue(checkRoleValue(roleList.permissions,checkboxEdit.getData()))
+			checkboxEdit.addValueChangeListener(new ValueChangeListener() {
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							boolean value = ((Boolean) checkboxEdit.getValue()).booleanValue();
+							def object = [id : ind,
+								permission : checkboxEdit.getData()]
+							if(value == true)
+							{
+								Grails.get(RoleService).addPermissions(object)
+							}
+							else
+							{
+								Grails.get(RoleService).removePermissions(object)
+							}
+						}
+					});
+			checkboxDelete.setEnabled(currentUser.isPermitted(Title + Constant.AccessType.Edit))
 			checkboxDelete.setData(a.menu+ ":"+a.item+":Delete")
 			checkboxDelete.setValue(checkRoleValue(roleList.permissions,checkboxDelete.getData()))
+			checkboxDelete.addValueChangeListener(new ValueChangeListener() {
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							boolean value = ((Boolean) checkboxDelete.getValue()).booleanValue();
+							def object = [id : ind,
+								permission : checkboxDelete.getData()]
+							if(value == true)
+							{
+								Grails.get(RoleService).addPermissions(object)
+							}
+							else
+							{
+								Grails.get(RoleService).removePermissions(object)
+							}
+						}
+					});
+			checkboxConfirm.setEnabled(currentUser.isPermitted(Title + Constant.AccessType.Edit))
 			checkboxConfirm.setData(a.menu+ ":"+a.item+":Confirm")
 			checkboxConfirm.setValue(checkRoleValue(roleList.permissions,checkboxConfirm.getData()))
+			checkboxConfirm.addValueChangeListener(new ValueChangeListener() {
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							boolean value = ((Boolean) checkboxConfirm.getValue()).booleanValue();
+							def object = [id : ind,
+								permission : checkboxConfirm.getData()]
+							if(value == true)
+							{
+								Grails.get(RoleService).addPermissions(object)
+							}
+							else
+							{
+								Grails.get(RoleService).removePermissions(object)
+							}
+						}
+					});
+			checkboxUnconfirm.setEnabled(currentUser.isPermitted(Title + Constant.AccessType.Edit))
 			checkboxUnconfirm.setData(a.menu+ ":"+a.item+":Unconfirm")
 			checkboxUnconfirm.setValue(checkRoleValue(roleList.permissions,checkboxUnconfirm.getData()))
+			checkboxUnconfirm.addValueChangeListener(new ValueChangeListener() {
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							boolean value = ((Boolean) checkboxUnconfirm.getValue()).booleanValue();
+							def object = [id : ind,
+								permission : checkboxUnconfirm.getData()]
+							if(value == true)
+							{
+								Grails.get(RoleService).addPermissions(object)
+							}
+							else
+							{
+								Grails.get(RoleService).removePermissions(object)
+							}
+						}
+					});
+			checkboxPrint.setEnabled(currentUser.isPermitted(Title + Constant.AccessType.Edit))
 			checkboxPrint.setData(a.menu+ ":"+a.item+":Print")
 			checkboxPrint.setValue(checkRoleValue(roleList.permissions,checkboxPrint.getData()))
-			checkboxClear.setData(a.menu+ ":"+a.item+":Print")
+			checkboxPrint.addValueChangeListener(new ValueChangeListener() {
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							boolean value = ((Boolean) checkboxPrint.getValue()).booleanValue();
+							def object = [id : ind,
+								permission : checkboxPrint.getData()]
+							if(value == true)
+							{
+								Grails.get(RoleService).addPermissions(object)
+							}
+							else
+							{
+								Grails.get(RoleService).removePermissions(object)
+							}
+						}
+					});
+			checkboxClear.setEnabled(currentUser.isPermitted(Title + Constant.AccessType.Edit))
+			checkboxClear.setData(a.menu+ ":"+a.item+":Clear")
 			checkboxClear.setValue(checkRoleValue(roleList.permissions,checkboxClear.getData()))
+			checkboxClear.addValueChangeListener(new ValueChangeListener() {
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							boolean value = ((Boolean) checkboxClear.getValue()).booleanValue();
+							def object = [id : ind,
+								permission : checkboxClear.getData()]
+							if(value == true)
+							{
+								Grails.get(RoleService).addPermissions(object)
+							}
+							else
+							{
+								Grails.get(RoleService).removePermissions(object)
+							}
+						}
+					});
+			checkboxUnclear.setEnabled(currentUser.isPermitted(Title + Constant.AccessType.Edit))
 			checkboxUnclear.setData(a.menu+ ":"+a.item+":Unclear")
 			checkboxUnclear.setValue(checkRoleValue(roleList.permissions,checkboxUnclear.getData()))
+			checkboxUnclear.addValueChangeListener(new ValueChangeListener() {
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							boolean value = ((Boolean) checkboxUnclear.getValue()).booleanValue();
+							def object = [id : ind,
+								permission : checkboxUnclear.getData()]
+							if(value == true)
+							{
+								Grails.get(RoleService).addPermissions(object)
+							}
+							else
+							{
+								Grails.get(RoleService).removePermissions(object)
+							}
+						}
+					});
+			checkboxFinish.setEnabled(currentUser.isPermitted(Title + Constant.AccessType.Edit))
 			checkboxFinish.setData(a.menu+ ":"+a.item+":Finish")
 			checkboxFinish.setValue(checkRoleValue(roleList.permissions,checkboxFinish.getData()))
+			checkboxFinish.addValueChangeListener(new ValueChangeListener() {
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							boolean value = ((Boolean) checkboxFinish.getValue()).booleanValue();
+							def object = [id : ind,
+								permission : checkboxFinish.getData()]
+							if(value == true)
+							{
+								Grails.get(RoleService).addPermissions(object)
+							}
+							else
+							{
+								Grails.get(RoleService).removePermissions(object)
+							}
+						}
+					});
+			checkboxUnfinish.setEnabled(currentUser.isPermitted(Title + Constant.AccessType.Edit))
 			checkboxUnfinish.setData(a.menu+ ":"+a.item+":Unfinish"); // Store item ID
 			checkboxUnfinish.setValue(checkRoleValue(roleList.permissions,checkboxUnfinish.getData()))
+			checkboxUnfinish.addValueChangeListener(new ValueChangeListener() {
+						@Override
+						public void valueChange(ValueChangeEvent event) {
+							boolean value = ((Boolean) checkboxUnfinish.getValue()).booleanValue();
+							def object = [id : ind,
+								permission : checkboxUnfinish.getData()]
+							if(value == true)
+							{
+								Grails.get(RoleService).addPermissions(object)
+							}
+							else
+							{
+								Grails.get(RoleService).removePermissions(object)
+							}
+						}
+					});
 
 			Object [] values = new Object[13]
-			
+
 			values[0] = a.menu
 			values[1] = a.item
 			values[2] = checkboxView
@@ -453,7 +642,8 @@ class MasterRole extends VerticalLayout{
 
 
 		tableDetail.setSelectable(true)
-		tableDetail.setImmediate(false)
+		tableDetail.setImmediate(true)
+
 		tableDetail.setVisible(true)
 		tableDetail.setSizeFull()
 	}
@@ -492,4 +682,3 @@ class MasterRole extends VerticalLayout{
 
 }
 
-	

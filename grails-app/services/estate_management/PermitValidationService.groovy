@@ -71,6 +71,23 @@ class PermitValidationService {
 		}
 		return object
 	}
+	
+	def amountDepositNotNull(def object){
+		if (object.amountDeposit == null || object.amountDeposit == "")
+		{
+			object.errors.rejectValue('amountDeposit','null','Amount Deposit tidak boleh kosong')
+		}
+		return object
+	}
+	
+	def startDateNotNull(def object){
+		if (object.startDate == null || object.startDate == "")
+		{
+			object.errors.rejectValue('startDate','null','Start Date tidak boleh kosong')
+		}
+		return object
+	}
+	
 	def createObjectValidation(def object)
 	{
 		object = constructionTypeNotNull(object)
@@ -80,6 +97,10 @@ class PermitValidationService {
 		object = homeNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = estimateWorkDaysNotNull(object)
+		if (object.errors.hasErrors()) return object
+		object = amountDepositNotNull(object)
+		if (object.errors.hasErrors()) return object
+		object = startDateNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -93,6 +114,10 @@ class PermitValidationService {
 		object = homeNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = estimateWorkDaysNotNull(object)
+		if (object.errors.hasErrors()) return object
+		object = amountDepositNotNull(object)
+		if (object.errors.hasErrors()) return object
+		object = startDateNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)
@@ -128,7 +153,6 @@ class PermitValidationService {
 	{
 		object = isNotCleared(object)
 		if (object.errors.hasErrors()) return object
-//		object = isNotConfimed(object)
 		return object
 	}
 	def printObjectValidation(object)

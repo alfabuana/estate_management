@@ -13,6 +13,13 @@ class PayableService {
 	def getObjectById(def object){
 		return Payable.get(object)
 	}
+	def getObjectBySource(def source,def sourceId,def sourceDetailId){
+		return Payable.find{
+			payableSource == source &&
+			payableSourceId == sourceId &&
+			payableSourceDetailId == sourceDetailId
+		}
+	}
 	
 	def getList(){
 		return Payable.findAll{isDeleted==false}

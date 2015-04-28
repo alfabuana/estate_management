@@ -33,7 +33,7 @@ class CashBankValidationService {
 		return object
 	}
 	def amountNotNull(def object){
-		if (object.amount == null)
+		if (object.amount == null || object.amount == "")
 		{
 			object.errors.rejectValue('amount','null','Amount tidak boleh kosong')
 		}
@@ -50,8 +50,8 @@ class CashBankValidationService {
 	{
 		object = nameNotNull(object)
 		if (object.errors.hasErrors()) return object
-		object = amountNotNull(object)
-		if (object.errors.hasErrors()) return object
+//		object = amountNotNull(object)
+//		if (object.errors.hasErrors()) return object
 		object  = isBankNotNull(object)
 		return object
 	}
@@ -68,8 +68,8 @@ class CashBankValidationService {
 	{
 		object = cashBankIsUsed(object)
 		if (object.errors.hasErrors()) return object
-//		object = isDeleted(object)
-//		if (object.errors.hasErrors()) return object
+		object = isDeleted(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	

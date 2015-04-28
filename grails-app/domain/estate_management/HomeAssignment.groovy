@@ -17,5 +17,6 @@ class HomeAssignment {
 		confirmationDate (nullable : true)
 		updatedBy(nullable : true)
 		confirmedBy(nullable : true)
+		createdBy(nullable:true)
     }
 }

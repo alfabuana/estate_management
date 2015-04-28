@@ -1,64 +1,56 @@
 package estate_management
 
+import grails.converters.JSON
 import grails.test.spock.IntegrationSpec
-
+import spock.lang.Shared
 class ComplaintIntegrationSpec extends IntegrationSpec {
 	def userService
 	def homeService
 	def complaintService
 
-    def setup() {
-    }
+	@Shared
+	def shiroUser
+	def home
 
-    def cleanup() {
-    }
-
-    void "Test Create New Complaint"() {
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
+	def setup() {
+		shiroUser = new ShiroUser()
+		shiroUser.username = "admin1234"
+		shiroUser.passwordHash = "sysadmin"
 		shiroUser = userService.createObject(shiroUser)
-		
-		and:'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
 
-		and: 'setting new Complaint'
+		home = [
+			name:"Home1",
+			address:"12345",
+			createdBy:shiroUser
+		]
+		home = homeService.createObject(home)
+	}
+
+	def cleanup() {
+	}
+
+	void "Test Create New Complaint"() {
+		setup:'setting new Complaint'
 		def complaint = [
-			username:shiroUser,
+			username:shiroUser.username,
 			home:home,
-			description:"newDescription",
-			title:"newTitle"
+			title:"newTitle",
 		]
 
-		when : 'createObject is called'
+		when:'createObject is called'
 		complaint = complaintService.createObject(complaint)
 
-		then: 'check has errors'
+		then:'check has errors'
 		complaint.hasErrors() == false
 		complaint.isDeleted == false
+		complaint.id != null
 	}
-	void "Test Create Complaint Validation Username Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-		
-		and:'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
 
-		and: 'setting new Complaint'
+	void "Test Create Complaint Validation Username Not Null"(){
+		setup: 'setting new Complaint'
 		def complaint = [
 			username:null,
 			home:home,
-			description:"newDescription",
 			title:"newTitle"
 		]
 
@@ -70,51 +62,10 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + complaint.errors.getFieldError().defaultMessage
 	}
 	void "Test Create Complaint Validation Home Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-		
-		and:'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-
-		and: 'setting new Complaint'
+		setup: 'setting new Complaint'
 		def complaint = [
-			username:home,
+			username:shiroUser.username,
 			home:null,
-			description:"newDescription",
-			title:"newTitle"
-		]
-
-		when:'createObject is called'
-		complaint = complaintService.createObject(complaint)
-
-		then:'check has errors'
-		complaint.hasErrors() == true
-		println "Validasi sukses dengan error message : " + complaint.errors.getFieldError().defaultMessage
-	}
-	void "Test Create Complaint Validation description Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-		
-		and:'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-
-		and: 'setting new Complaint'
-		def complaint = [
-			username:shiroUser,
-			home:home,
-			description:"",
 			title:"newTitle"
 		]
 
@@ -126,52 +77,25 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 		println "Validasi sukses dengan error message : " + complaint.errors.getFieldError().defaultMessage
 	}
 	void "Test Create Complaint Validation title Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-		
-		and:'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-
-		and: 'setting new Complaint'
+		setup: 'setting new Complaint'
 		def complaint = [
-			username:shiroUser,
+			username:shiroUser.username,
 			home:home,
-			description:"newDescription",
 			title:""
 		]
 
 		when:'createObject is called'
 		complaint = complaintService.createObject(complaint)
-
 		then:'check has errors'
 		complaint.hasErrors() == true
 		println "Validasi sukses dengan error message : " + complaint.errors.getFieldError().defaultMessage
 	}
 	void "Test Update New Complaint"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-		
-		and:'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-
-		and: 'setting new Complaint'
+		setup: 'setting new Complaint'
 		def complaint = [
-			username:shiroUser,
+			username:shiroUser.username,
 			home:home,
-			description:"newDescription",
-			title:"newTitle"
+			title:"newTitle",
 		]
 		complaint= complaintService.createObject(complaint)
 
@@ -180,8 +104,8 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 			id: complaint.id,
 			username:shiroUser,
 			home:home,
-			description:"newDescription",
-			title:"newTitle"
+			title:"updateTitle",
+			updatedBy:shiroUser.username
 		]
 
 		when:'updateObject is called'
@@ -189,41 +113,34 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 
 		then:'check has errors'
 		complaint.hasErrors() == false
-		complaint.username == complaint.username
+		complaint.user == complaint.user
 		complaint.home == complaint.home
-		complaint.description == complaint.description
 		complaint.title == complaint.title
 	}
-	void "Test Update Complaint Validation username Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-		
-		and:'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-
-		and: 'setting new Complaint'
+	
+	void "Test Update New Complaint Validation Is Confirmed"(){
+		setup: 'setting new Complaint'
 		def complaint = [
-			username:shiroUser,
+			username:shiroUser.username,
 			home:home,
-			description:"newDescription",
-			title:"newTitle"
+			title:"newTitle",
 		]
-
 		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
 
+		complaint = complaintService.confirmObject(confirm)
+		
 		and:'setting data for Update'
 		def complaint2 = [
 			id: complaint.id,
-			username:null,
+			username:shiroUser,
 			home:home,
-			description:"newDescription",
-			title:"newTitle"
+			title:"updateTitle",
+			updatedBy:shiroUser.username
 		]
 
 		when:'updateObject is called'
@@ -231,28 +148,14 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 
 		then:'check has errors'
 		complaint.hasErrors() == true
-		println "Validasi sukses dengan error message : " + complaint.errors.getFieldError().defaultMessage
-
+		println "Validasi sukses dengan error message : " + complaint.errors.getAllErrors().defaultMessage
 	}
 	void "Test Update Complaint Validation home Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-		
-		and:'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-
-		and: 'setting new Complaint'
+		setup: 'setting new Complaint'
 		def complaint = [
-			username:shiroUser,
+			username:shiroUser.username,
 			home:home,
-			description:"newDescription",
-			title:"newTitle"
+			title:"newTitle",
 		]
 
 		complaint= complaintService.createObject(complaint)
@@ -262,48 +165,7 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 			id: complaint.id,
 			username:shiroUser,
 			home:null,
-			description:"newDescription",
-			title:"newTitle"
-		]
-
-		when:'updateObject is called'
-		complaint = complaintService.updateObject(complaint2)
-
-		then:'check has errors'
-		complaint.hasErrors() == true
-		println "Validasi sukses dengan error message : " + complaint.errors.getFieldError().defaultMessage
-
-	}
-	void "Test Update Complaint Validation description Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-		
-		and:'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-
-		and: 'setting new Complaint'
-		def complaint = [
-			username:shiroUser,
-			home:home,
-			description:"newDescription",
-			title:"newTitle"
-		]
-
-		complaint= complaintService.createObject(complaint)
-
-		and:'setting data for Update'
-		def complaint2 = [
-			id: complaint.id,
-			username:shiroUser,
-			home:home,
-			description:"",
-			title:"newTitle"
+			title:"updateTitle"
 		]
 
 		when:'updateObject is called'
@@ -315,24 +177,11 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test Update Complaint Validation title Not Null"(){
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-		
-		and:'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-
-		and: 'setting new Complaint'
+		setup: 'setting new Complaint'
 		def complaint = [
-			username:shiroUser,
+			username:shiroUser.username,
 			home:home,
-			description:"newDescription",
-			title:"newTitle"
+			title:"newTitle",
 		]
 
 		complaint= complaintService.createObject(complaint)
@@ -342,7 +191,6 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 			id: complaint.id,
 			username:shiroUser,
 			home:home,
-			description:"newDescription",
 			title:""
 		]
 
@@ -355,34 +203,273 @@ class ComplaintIntegrationSpec extends IntegrationSpec {
 
 	}
 	void "Test SoftDelete Complaint"() {
-		setup:'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-		
-		and:'setting new Home'
-		Home home = new Home()
-		home.name = "newName"
-		home.address = "newAddress"
-		home = homeService.createObject(home)
-
-		and: 'setting new Complaint'
+		setup: 'setting new Complaint'
 		def complaint = [
-			username:shiroUser,
+			username:shiroUser.username,
 			home:home,
-			description:"newDescription",
-			title:"newTitle"
+			title:"newTitle",
 		]
 
 		complaint= complaintService.createObject(complaint)
 
 		when:'softDeleted is called'
 		complaint = complaintService.softDeletedObject(complaint)
-		
+
 		then:'check has errors'
 		complaint.hasErrors() == false
 		complaint.isDeleted == true
+	}
+	void "Test SoftDelete Complaint Validation Is Confirmed"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+
+		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
+		complaint = complaintService.confirmObject(confirm)
+
+		when:'softDeleted is called'
+		complaint = complaintService.softDeletedObject(complaint)
+
+		then:'check has errors'
+		complaint.hasErrors() == true
+		println "Validasi sukses dengan error message : " + complaint.errors.getAllErrors().defaultMessage
+	}
+	void "Test SoftDelete Complaint Validation Is Deleted"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+
+		complaint= complaintService.createObject(complaint)
+		
+		complaint = complaintService.softDeletedObject(complaint)
+
+		when:'softDeleted is called'
+		complaint = complaintService.softDeletedObject(complaint)
+
+		then:'check has errors'
+		complaint.hasErrors() == true
+		println "Validasi sukses dengan error message : " + complaint.errors.getAllErrors().defaultMessage
+	}
+	void "Test Confirm Complaint"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
+
+		when:'confirm is called'
+		complaint = complaintService.confirmObject(confirm)
+
+		then:'check has errors'
+		complaint.hasErrors() == false
+		complaint.isConfirmed == true
+	}
+	
+	void "Test Confirm Complaint Validation Is Confirmed"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
+		complaint = complaintService.confirmObject(confirm)
+		when:'confirm is called'
+		complaint = complaintService.confirmObject(confirm)
+
+		then:'check has errors'
+		complaint.hasErrors() == true
+		println "Validasi sukses dengan error message : " + complaint.errors.getAllErrors().defaultMessage
+	}
+	void "Test UnConfirm Complaint"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
+		complaint = complaintService.confirmObject(confirm)
+		when:'confirm is called'
+		complaint = complaintService.unConfirmObject(confirm)
+
+		then:'check has errors'
+		complaint.hasErrors() == false
+		complaint.isConfirmed == false
+	}
+	void "Test UnConfirm Complaint Validation Is Cleared"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
+		complaint = complaintService.confirmObject(confirm)
+		complaint = complaintService.clearObject(complaint)
+		when:'confirm is called'
+		complaint = complaintService.unConfirmObject(confirm)
+
+		then:'check has errors'
+		complaint.hasErrors() == true
+		println "Validasi sukses dengan error message : " + complaint.errors.getAllErrors().defaultMessage
+	}
+	void "Test UnConfirm Complaint Validation Is Confirmed"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
+		when:'confirm is called'
+		complaint = complaintService.unConfirmObject(confirm)
+
+		then:'check has errors'
+		complaint.hasErrors() == true
+		println "Validasi sukses dengan error message : " + complaint.errors.getAllErrors().defaultMessage
+	}
+	void "Test Clear Complaint"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
+		complaint = complaintService.confirmObject(confirm)
+		when:'confirm is called'
+		complaint = complaintService.clearObject(confirm)
+
+		then:'check has errors'
+		complaint.hasErrors() == false
+		complaint.isCleared == true
+	}
+	void "Test Clear Complaint Validation Is Not Confirmed"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
+		when:'confirm is called'
+		complaint = complaintService.clearObject(confirm)
+
+		then:'check has errors'
+		complaint.hasErrors() == true
+		println "Validasi sukses dengan error message : " + complaint.errors.getAllErrors().defaultMessage
+	}
+	void "Test UnClear Complaint"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
+		complaint = complaintService.confirmObject(confirm)
+		complaint = complaintService.clearObject(confirm)
+		when:'confirm is called'
+		complaint = complaintService.unClearObject(confirm)
+
+		then:'check has errors'
+		complaint.hasErrors() == false
+		complaint.isCleared == false
+	}
+	void "Test UnClear Complaint Validation Is Confirmed"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
+		when:'confirm is called'
+		complaint = complaintService.unClearObject(confirm)
+
+		then:'check has errors'
+		complaint.hasErrors() == true
+		println "Validasi sukses dengan error message : " + complaint.errors.getAllErrors().defaultMessage
+	}
+	void "Test UnClear Complaint Validation Is Cleared"() {
+		setup: 'setting new Complaint'
+		def complaint = [
+			username:shiroUser.username,
+			home:home,
+			title:"newTitle",
+		]
+		complaint= complaintService.createObject(complaint)
+		
+		def confirm = [
+			id:complaint.id,
+			username:shiroUser
+			]
+		complaint = complaintService.confirmObject(confirm)
+		when:'confirm is called'
+		complaint = complaintService.unClearObject(confirm)
+
+		then:'check has errors'
+		complaint.hasErrors() == true
+		println "Validasi sukses dengan error message : " + complaint.errors.getAllErrors().defaultMessage
 	}
 }
 

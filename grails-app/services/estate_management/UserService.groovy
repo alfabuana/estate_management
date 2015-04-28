@@ -47,12 +47,22 @@ class UserService {
 		return newObject
 	}
 	
-	def updateObject(def object){
+	def updatePassword(def object){
 		def newObject = ShiroUser.read(object.id)
-		newObject.username = String.valueOf(object.username).toUpperCase()
 		newObject.passwordHash = new Sha256Hash(object.passwordHash).toHex()
+		object = userValidatorService.updateObjectValidation(newObject)
+		if (object.errors.getErrorCount() == 0)
+		{
+			newObject.save()
+			object = newObject
+		}
+		else newObject.discard()
+		return object
+	}
+	
+	def updateRoles(def object){
+		def newObject = ShiroUser.read(object.id)
 		newObject.roles = object.roles
-//		newObject.email = object.email
 		object = userValidatorService.updateObjectValidation(newObject)
 		if (object.errors.getErrorCount() == 0)
 		{

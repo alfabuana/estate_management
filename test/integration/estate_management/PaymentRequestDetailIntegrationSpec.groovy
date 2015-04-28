@@ -1,437 +1,239 @@
 package estate_management
 
 import grails.test.spock.IntegrationSpec
+import spock.lang.Shared
 
 class PaymentRequestDetailIntegrationSpec extends IntegrationSpec {
 	def userService
 	def paymentRequestService
 	def paymentRequestDetailService
+	def vendorService
+	def projectService
+	
+	@Shared
+	def shiroUser
+	def vendor
+	def project
+	def paymentRequest
 
 	def setup() {
+		shiroUser = new ShiroUser()
+		shiroUser.username = "admin1234"
+		shiroUser.passwordHash = "sysadmin"
+		shiroUser = userService.createObject(shiroUser)
+		
+		vendor = [
+			name:"vendor1"]
+		vendor = vendorService.createObject(vendor)
+		
+		project = [
+			title:"project1"]
+		project = projectService.createObject(project)
+		
+		paymentRequest = [
+			username:shiroUser.username,
+			vendor:vendor.id,
+			project:project.id,
+			dueDate:new Date (2015,3,26),
+			requestDate: new Date (2015,3,28)
+		]
+		paymentRequest = paymentRequestService.createObject(paymentRequest)
 	}
 
 	def cleanup() {
 	}
 
 	void "Test Create new payment Request Detail"() {
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-		println shiroUser.id
-
-		and: 'setting new payment Request'
-		def paymentRequest = [
-			username:shiroUser,
-			description:"newDescription",
-			code:"newCode",
-			amount:1000,
-			dueDate:new Date (2015,3,26),
-			confirmationDate:new Date (2015,3,27),
-			requestDate: new Date (2015,3,28)
-		]
-		paymentRequest = paymentRequestService.createObject(paymentRequest)
-
-		and: 'setting new Payment Request Detail'
-		def paymentRequestDetail = [
-			paymentRequest:paymentRequest,
-			code:"newCode",
-			amount:1000,
-			confirmationDate:new Date (2015,3,27)
-		]
-
-		when : 'createObject is called'
-		paymentRequestDetail = paymentRequestDetailService.createObject(paymentRequestDetail)
+		setup: 'setting new Payment Request Detail'
+		def paymentRequestDetails = [
+			paymentRequestId:paymentRequest.id,
+			amount:50000]
+		
+		when:'create is called'
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails)
 
 		then: 'check has errors'
-		paymentRequestDetail.hasErrors() == false
-		paymentRequestDetail.isDeleted == false
+		paymentRequestDetails.hasErrors() == false
+		paymentRequestDetails.isDeleted == false
 	}
-	void "Test Create PaymentRequest Detail Validation payment Request Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Payment Request'
-		def paymentRequest = [
-			username:null,
-			description:"newDescription",
-			code:"newCode",
-			amount:1000,
-			dueDate:new Date (2015,3,26),
-			confirmationDate:new Date (2015,3,27),
-			requestDate: new Date (2015,3,28)
-		]
-		paymentRequest = paymentRequestService.createObject(paymentRequest)
+	
+	void "Test Create new payment Request Detail Validation Is Confirmed"() {
+		setup: 'setting new Payment Request Detail'
+		def paymentRequestDetails = [
+			paymentRequestId:paymentRequest.id,
+			amount:50000]
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails)
 		
-		and: 'setting new Payment Request Detail'
-		def paymentRequestDetail = [
-			paymentRequest:null,
-			code:"newCode",
-			amount:1000,
-			confirmationDate:new Date (2015,3,27)
-		]
-
-		when:'createObject is called'
-		paymentRequestDetail = paymentRequestDetailService.createObject(paymentRequestDetail)
-
-		then:'check has errors'
-		paymentRequestDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentRequestDetail.errors.getFieldError().defaultMessage
-	}
-	void "Test Create PaymentRequest Detail Validation code Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Payment Request'
-		def paymentRequest = [
-			username:null,
-			description:"newDescription",
-			code:"newCode",
-			amount:1000,
-			dueDate:new Date (2015,3,26),
-			confirmationDate:new Date (2015,3,27),
-			requestDate: new Date (2015,3,28)
-		]
-		paymentRequest = paymentRequestService.createObject(paymentRequest)
+		def confirm = [
+			id:paymentRequest.id,
+			username:shiroUser.username
+			]
+		paymentRequest = paymentRequestService.confirmObject(confirm)
 		
-		and: 'setting new Payment Request Detail'
-		def paymentRequestDetail = [
-			paymentRequest:paymentRequest,
-			code:"",
-			amount:1000,
-			confirmationDate:new Date (2015,3,27)
-		]
+		def paymentRequestDetails2 = [
+			paymentRequestId:paymentRequest.id,
+			amount:50000]
+		
+		when:'create is called'
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails2)
 
-		when:'createObject is called'
-		paymentRequestDetail = paymentRequestDetailService.createObject(paymentRequestDetail)
-
-		then:'check has errors'
-		paymentRequestDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentRequestDetail.errors.getFieldError().defaultMessage
-	}
+		then: 'check has errors'
+		paymentRequestDetails.hasErrors() == true
+		println "Validasi sukses dengan error message : " + paymentRequestDetails.errors.getAllErrors().defaultMessage
+	} 
 	void "Test Create PaymentRequest Detail Validation amount Not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Payment Request'
-		def paymentRequest = [
-			username:null,
-			description:"newDescription",
-			code:"newCode",
-			amount:1000,
-			dueDate:new Date (2015,3,26),
-			confirmationDate:new Date (2015,3,27),
-			requestDate: new Date (2015,3,28)
-		]
-		paymentRequest = paymentRequestService.createObject(paymentRequest)
+		setup: 'setting new Payment Request Detail'
+		def paymentRequestDetails = [
+			paymentRequestId:paymentRequest.id,
+			amount:null]
 		
-		and: 'setting new Payment Request Detail'
-		def paymentRequestDetail = [
-			paymentRequest:paymentRequest,
-			code:"newCode",
-			amount:null,
-			confirmationDate:new Date (2015,3,27)
-		]
-
-		when:'createObject is called'
-		paymentRequestDetail = paymentRequestDetailService.createObject(paymentRequestDetail)
+		when:'create is called'
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails)
 
 		then:'check has errors'
-		paymentRequestDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentRequestDetail.errors.getFieldError().defaultMessage
+		paymentRequestDetails.hasErrors() == true
+		println "Validasi sukses dengan error message : " + paymentRequestDetails.errors.getFieldError().defaultMessage
 	}
 	void "Test Update New Home Detail Request"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Payment Request'
-		def paymentRequest = [
-			username:shiroUser,
-			description:"newDescription",
-			code:"newCode",
-			amount:1000,
-			dueDate:new Date (2015,3,26),
-			confirmationDate:new Date (2015,3,27),
-			requestDate: new Date (2015,3,28)
-		]
-		paymentRequest = paymentRequestService.createObject(paymentRequest)
-		
-		and: 'setting new Payment Request Detail'
-		def paymentRequestDetail = [
-			paymentRequest:paymentRequest,
-			code:"newCode",
-			amount:1000,
-			confirmationDate:new Date (2015,3,27)
-		]
-		paymentRequestDetail = paymentRequestDetailService.createObject(paymentRequestDetail)
+		setup: 'setting new Payment Request Detail'
+		def paymentRequestDetails = [
+			paymentRequestId:paymentRequest.id,
+			amount:50000]
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails)
 		
 		and:'setting data for Update'
 		def paymentRequestDetail2 = [
-			id: paymentRequestDetail.id,
-			paymentRequest:paymentRequest,
-			code:"updateCode",
-			amount:2000,
-			confirmationDate:new Date (2015,3,28)
+			id: paymentRequestDetails.id,
+			paymentRequestId:paymentRequest.id,
+			amount:"60000"
 		]
 
 		when:'updateObject is called'
-		paymentRequestDetail = paymentRequestDetailService.updateObject(paymentRequestDetail2)
+		paymentRequestDetails = paymentRequestDetailService.updateObject(paymentRequestDetail2)
 
 		then:'check has errors'
-		paymentRequestDetail.hasErrors() == false
-		paymentRequestDetail.paymentRequest == paymentRequestDetail.paymentRequest
-		paymentRequestDetail.code == paymentRequestDetail.code
-		paymentRequestDetail.amount == paymentRequestDetail.amount
-		paymentRequestDetail.confirmationDate == paymentRequestDetail.confirmationDate
+		paymentRequestDetails.hasErrors() == false
+		paymentRequestDetails.paymentRequest == paymentRequestDetails.paymentRequest
+		paymentRequestDetails.amount == paymentRequestDetails.amount
 	}
-	void "Test Update Home Detail Request Validation payment Request not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Payment Request'
-		def paymentRequest = [
-			username:shiroUser,
-			description:"newDescription",
-			code:"newCode",
-			amount:1000,
-			dueDate:new Date (2015,3,26),
-			confirmationDate:new Date (2015,3,27),
-			requestDate: new Date (2015,3,28)
-		]
-		paymentRequest = paymentRequestService.createObject(paymentRequest)
+	void "Test Update Home Detail Request Validation is confirmed"(){
+		setup: 'setting new Payment Request Detail'
+		def paymentRequestDetails = [
+			paymentRequestId:paymentRequest.id,
+			amount:50000]
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails)
 		
-		and: 'setting new Payment Request Detail'
-		def paymentRequestDetail = [
-			paymentRequest:paymentRequest,
-			code:"newCode",
-			amount:1000,
-			confirmationDate:new Date (2015,3,27)
-		]
-		paymentRequestDetail = paymentRequestDetailService.createObject(paymentRequestDetail)
+		def confirm = [
+			id:paymentRequest.id,
+			username:shiroUser.username
+			]
+		paymentRequest = paymentRequestService.confirmObject(confirm)
 		
-		and:'setting data for Update'
-		def paymentRequestDetail2 = [
-			id: paymentRequestDetail.id,
-			paymentRequest:null,
-			code:"updateCode",
-			amount:2000,
-			confirmationDate:new Date (2015,3,28)
-		]
-
-		when:'updateObject is called'
-		paymentRequestDetail = paymentRequestDetailService.updateObject(paymentRequestDetail2)
-
-		then:'check has errors'
-		paymentRequestDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentRequestDetail.errors.getFieldError().defaultMessage
-	}
-	void "Test Update Home Detail Request Validation code not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Payment Request'
-		def paymentRequest = [
-			username:shiroUser,
-			description:"newDescription",
-			code:"newCode",
-			amount:1000,
-			dueDate:new Date (2015,3,26),
-			confirmationDate:new Date (2015,3,27),
-			requestDate: new Date (2015,3,28)
-		]
-		paymentRequest = paymentRequestService.createObject(paymentRequest)
+		def paymentRequestDetails2 = [
+			id:paymentRequestDetails.id,
+			paymentRequestId:paymentRequest.id,
+			amount:"50000"]
 		
-		and: 'setting new Payment Request Detail'
-		def paymentRequestDetail = [
-			paymentRequest:paymentRequest,
-			code:"newCode",
-			amount:1000,
-			confirmationDate:new Date (2015,3,27)
-		]
-		paymentRequestDetail = paymentRequestDetailService.createObject(paymentRequestDetail)
-		
-		and:'setting data for Update'
-		def paymentRequestDetail2 = [
-			id: paymentRequestDetail.id,
-			paymentRequest:paymentRequest,
-			code:"",
-			amount:2000,
-			confirmationDate:new Date (2015,3,28)
-		]
+		when:'create is called'
+		paymentRequestDetails = paymentRequestDetailService.updateObject(paymentRequestDetails2)
 
-		when:'updateObject is called'
-		paymentRequestDetail = paymentRequestDetailService.updateObject(paymentRequestDetail2)
-
-		then:'check has errors'
-		paymentRequestDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentRequestDetail.errors.getFieldError().defaultMessage
+		then: 'check has errors'
+		paymentRequestDetails.hasErrors() == true
+		println "Validasi sukses dengan error message : " + paymentRequestDetails.errors.getAllErrors().defaultMessage
 	}
 	void "Test Update Home Detail Request Validation amount not Null"(){
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Payment Request'
-		def paymentRequest = [
-			username:shiroUser,
-			description:"newDescription",
-			code:"newCode",
-			amount:1000,
-			dueDate:new Date (2015,3,26),
-			confirmationDate:new Date (2015,3,27),
-			requestDate: new Date (2015,3,28)
-		]
-		paymentRequest = paymentRequestService.createObject(paymentRequest)
-		
-		and: 'setting new Payment Request Detail'
-		def paymentRequestDetail = [
-			paymentRequest:paymentRequest,
-			code:"newCode",
-			amount:1000,
-			confirmationDate:new Date (2015,3,27)
-		]
-		paymentRequestDetail = paymentRequestDetailService.createObject(paymentRequestDetail)
+		setup: 'setting new Payment Request Detail'
+		def paymentRequestDetails = [
+			paymentRequestId:paymentRequest.id,
+			amount:50000]
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails)
 		
 		and:'setting data for Update'
 		def paymentRequestDetail2 = [
-			id: paymentRequestDetail.id,
-			paymentRequest:paymentRequest,
-			code:"updateCode",
-			amount:null,
-			confirmationDate:new Date (2015,3,28)
+			id: paymentRequestDetails.id,
+			paymentRequestId:paymentRequest.id,
+			amount:null
 		]
 
 		when:'updateObject is called'
-		paymentRequestDetail = paymentRequestDetailService.updateObject(paymentRequestDetail2)
+		paymentRequestDetails = paymentRequestDetailService.updateObject(paymentRequestDetail2)
 
 		then:'check has errors'
-		paymentRequestDetail.hasErrors() == true
-		println "Validasi sukses dengan error message : " + paymentRequestDetail.errors.getFieldError().defaultMessage
+		paymentRequestDetails.hasErrors() == true
+		println "Validasi sukses dengan error message : " + paymentRequestDetails.errors.getFieldError().defaultMessage
 	}
 	void "Test SoftDelete Payment Request Detail"() {
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Payment Request'
-		def paymentRequest = [
-			username:shiroUser,
-			description:"newDescription",
-			code:"newCode",
-			amount:1000,
-			dueDate:new Date (2015,3,26),
-			confirmationDate:new Date (2015,3,27),
-			requestDate: new Date (2015,3,28)
-		]
-		paymentRequest = paymentRequestService.createObject(paymentRequest)
-		
-		and: 'setting new Payment Request Detail'
-		def paymentRequestDetail = [
-			paymentRequest:paymentRequest,
-			code:"newCode",
-			amount:1000,
-			confirmationDate:new Date (2015,3,27)
-		]
-		paymentRequestDetail = paymentRequestDetailService.createObject(paymentRequestDetail)
+		setup: 'setting new Payment Request Detail'
+		def paymentRequestDetails = [
+			paymentRequestId:paymentRequest.id,
+			amount:50000]
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails)
 
 		when:'createObject is called'
-		paymentRequestDetail = paymentRequestDetailService.softDeletedObject(paymentRequestDetail)
+		paymentRequestDetails = paymentRequestDetailService.softDeletedObject(paymentRequestDetails)
 		
 		then:'check has errors'
-		paymentRequestDetail.hasErrors() == false
-		paymentRequestDetail.isDeleted == true
+		paymentRequestDetails.hasErrors() == false
+		paymentRequestDetails.isDeleted == true
 	}
+	
+	void "Test softdelete Home Detail Request Validation is confirmed"(){
+		setup: 'setting new Payment Request Detail'
+		def paymentRequestDetails = [
+			paymentRequestId:paymentRequest.id,
+			amount:50000]
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails)
+		
+		def confirm = [
+			id:paymentRequest.id,
+			username:shiroUser.username
+			]
+		paymentRequest = paymentRequestService.confirmObject(confirm)
+		
+		
+		when:'create is called'
+		paymentRequestDetails = paymentRequestDetailService.softDeletedObject(paymentRequestDetails)
+
+		then: 'check has errors'
+		paymentRequestDetails.hasErrors() == true
+		println "Validasi sukses dengan error message : " + paymentRequestDetails.errors.getAllErrors().defaultMessage
+	}
+
 	void "Test Confirm Payment Request Detail"() {
 		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Payment Request'
-		def paymentRequest = [
-			username:shiroUser,
-			description:"newDescription",
-			code:"newCode",
-			amount:1000,
-			dueDate:new Date (2015,3,26),
-			confirmationDate:new Date (2015,3,27),
-			requestDate: new Date (2015,3,28)
-		]
-		paymentRequest = paymentRequestService.createObject(paymentRequest)
+		def paymentRequestDetails = [
+			paymentRequestId:paymentRequest.id,
+			amount:50000]
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails)
 		
-		and: 'setting new Payment Request Detail'
-		def paymentRequestDetail = [
-			paymentRequest:paymentRequest,
-			code:"newCode",
-			amount:1000,
-			confirmationDate:new Date (2015,3,27)
-		]
-		paymentRequestDetail = paymentRequestDetailService.createObject(paymentRequestDetail)
-
+		def confirm = [
+			id:paymentRequestDetails.id,
+			username:shiroUser.username
+			]
 		when:'createObject is called'
-		paymentRequestDetail = paymentRequestDetailService.confirmObject(paymentRequestDetail)
+		paymentRequestDetails = paymentRequestDetailService.confirmObject(confirm)
 		
 		then:'check has errors'
-		paymentRequestDetail.hasErrors() == false
-		paymentRequestDetail.isConfirmed == true
+		paymentRequestDetails.hasErrors() == false
+		paymentRequestDetails.isConfirmed == true
 	}
 	void "Test unConfirm Payment Request Detail"() {
-		setup: 'setting new User'
-		ShiroUser shiroUser = new ShiroUser()
-		shiroUser.username = "username"
-		shiroUser.passwordHash = "password"
-		shiroUser = userService.createObject(shiroUser)
-
-		and: 'setting new Payment Request'
-		def paymentRequest = [
-			username:shiroUser,
-			description:"newDescription",
-			code:"newCode",
-			amount:1000,
-			dueDate:new Date (2015,3,26),
-			confirmationDate:new Date (2015,3,27),
-			requestDate: new Date (2015,3,28)
-		]
-		paymentRequest = paymentRequestService.createObject(paymentRequest)
+		def paymentRequestDetails = [
+			paymentRequestId:paymentRequest.id,
+			amount:50000]
+		paymentRequestDetails = paymentRequestDetailService.createObject(paymentRequestDetails)
 		
-		and: 'setting new Payment Request Detail'
-		def paymentRequestDetail = [
-			paymentRequest:paymentRequest,
-			code:"newCode",
-			amount:1000,
-			confirmationDate:new Date (2015,3,27)
-		]
-		paymentRequestDetail = paymentRequestDetailService.createObject(paymentRequestDetail)
+		def confirm = [
+			id:paymentRequestDetails.id,
+			username:shiroUser.username
+			]
+		paymentRequestDetails = paymentRequestDetailService.confirmObject(confirm)
 
 		when:'createObject is called'
-		paymentRequestDetail = paymentRequestDetailService.unConfirmObject(paymentRequestDetail)
+		paymentRequestDetails = paymentRequestDetailService.unConfirmObject(paymentRequestDetails)
 		
 		then:'check has errors'
-		paymentRequestDetail.hasErrors() == false
-		paymentRequestDetail.isConfirmed == false
+		paymentRequestDetails.hasErrors() == false
+		paymentRequestDetails.isConfirmed == false
 	}
 }

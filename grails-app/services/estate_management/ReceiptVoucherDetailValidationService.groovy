@@ -65,12 +65,6 @@ class ReceiptVoucherDetailValidationService {
 		object = receiptVoucherNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = receivableNotNull(object)
-		if (object.errors.hasErrors()) return object
-//		object = codeNotNull(object)
-//		if (object.errors.hasErrors()) return object
-		object = amountNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
 		return object
 	}
 	def updateObjectValidation(def object)
@@ -80,12 +74,6 @@ class ReceiptVoucherDetailValidationService {
 		object = receiptVoucherNotNull(object)
 		if (object.errors.hasErrors()) return object
 		object = receivableNotNull(object)
-		if (object.errors.hasErrors()) return object
-//		object = codeNotNull(object)
-//		if (object.errors.hasErrors()) return object
-		object = amountNotNull(object)
-		if (object.errors.hasErrors()) return object
-		object = descriptionNotNull(object)
 		return object
 	}
 	def softdeleteObjectValidation(object)

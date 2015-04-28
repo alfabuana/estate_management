@@ -38,9 +38,8 @@ class ProjectDetailValidationService {
 	}
 	def updateObjectValidation(def object)
 	{
-		object = projectNotNull(object)
-		if (object.errors.hasErrors()) return object
 		object = attachmentUrlNotNull(object)
+		if (object.errors.hasErrors()) return object
 		return object
 	}
 	def softdeleteObjectValidation(object)
