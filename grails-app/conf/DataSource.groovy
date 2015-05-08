@@ -1,13 +1,4 @@
 dataSource {
-<<<<<<< HEAD
-    pooled = true
-    jmxExport = true
-    driverClassName = "org.postgresql.Driver"
-    username = "webadmin"
-    password = "HXCqsn83750"
-=======
-    
->>>>>>> 4d5cb98b4e0ac6cf0151cc85df5c6fc97fd6bc21
 }
 hibernate {
     cache.use_second_level_cache = true
@@ -35,30 +26,20 @@ environments {
     test {
         dataSource {
             dbCreate = "update"
-<<<<<<< HEAD
-            url = "jdbc:postgresql://localhost:5432/estatemanagement"
-        }
-=======
             url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
 			pooled = true
 			jmxExport = true
 			}
->>>>>>> 4d5cb98b4e0ac6cf0151cc85df5c6fc97fd6bc21
     }
     production {
         dataSource {
             dbCreate = "update"
-<<<<<<< HEAD
-			
-            url = "jdbc:postgresql://postgres20973-estate.jelastic.skali.net/estatemanagement"
-=======
-            url = "jdbc:postgresql://localhost:5432/estatemanagement"
+            url = "jdbc:postgresql://postgres23596-playssd.jelastic.skali.net/estatemanagement"
 			pooled = true
 			jmxExport = true
 			driverClassName = "org.postgresql.Driver"
-			username = "postgres"
-			password = "123"
->>>>>>> 4d5cb98b4e0ac6cf0151cc85df5c6fc97fd6bc21
+			username = "webadmin"
+			password = "ZQHpaa11044"
             properties {
                // See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation
                jmxEnabled = true
